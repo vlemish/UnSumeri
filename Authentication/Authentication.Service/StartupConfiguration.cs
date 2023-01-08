@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using Core.Log.Extensions;
 
 namespace Authentication.Service
 {
@@ -6,14 +6,7 @@ namespace Authentication.Service
     {
         public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
         {
-            Log.Logger = new LoggerConfiguration().WriteTo.Console().WriteTo.File("log")
-                .CreateBootstrapLogger();
-
-            builder.Host.UseSerilog((hostContext, services, configuration) =>
-            {
-                configuration.WriteTo.Console();
-                configuration.WriteTo.File("log");
-            });
+            builder.Services.ConfigureSerilog(builder.Configuration);
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

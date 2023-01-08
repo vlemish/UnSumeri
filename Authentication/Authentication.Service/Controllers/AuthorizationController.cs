@@ -6,14 +6,17 @@ namespace Authentication.Service.Controllers
     [Route("api/authorization")]
     public class AuthorizationController : ControllerBase
     {
-        public AuthorizationController()
-        {
+        private readonly ILogger<AuthorizationController> _logger;
 
+        public AuthorizationController(ILogger<AuthorizationController> logger)
+        {
+            _logger = logger;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(string username, string password)
         {
+            _logger.LogInformation("Hello!");
             await Task.Delay(200);
             return Ok();
         }

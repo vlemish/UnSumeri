@@ -1,5 +1,7 @@
 using Authentication.Service;
 
+using Serilog;
+
 try
 {
     var builder = WebApplication.CreateBuilder(args);
@@ -14,11 +16,11 @@ try
 }
 catch(Exception ex)
 {
-    // log exception
+    Log.Error($"There was a problem setting up the application: {ex.Message}", ex);
 
     throw;
 }
 finally
 {
-    // log that application has shut down
+    Log.Information("The application was shut down!");
 }

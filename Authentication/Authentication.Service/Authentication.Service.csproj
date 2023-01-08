@@ -17,4 +17,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Core.Log">
+      <HintPath>..\..\Log\Core.Log\bin\Debug\net6.0\Core.Log.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
