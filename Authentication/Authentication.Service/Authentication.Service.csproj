@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Logging\Core.Log\Core.Log.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Core.Log">
       <HintPath>..\..\Log\Core.Log\bin\Debug\net6.0\Core.Log.dll</HintPath>
     </Reference>
