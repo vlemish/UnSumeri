@@ -1,4 +1,4 @@
-namespace UntitledArticles.API
+namespace UntitledArticles.API.Service
 {
     public class WeatherForecast
     {
