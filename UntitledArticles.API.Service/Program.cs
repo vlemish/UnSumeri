@@ -1,25 +1,28 @@
-var builder = WebApplication.CreateBuilder(args);
+using Serilog;
 
-// Add services to the container.
+using UntitledArticles.API.Service;
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+    // entry point for configs
+    builder.ConfigureServices();
+
+    WebApplication? app = builder.Build();
+
+    // entry point for app config
+    app.ConfigureApplication();
+
+    app.Run();
 }
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Unhandled exception");
+}
+finally
+{
+    Log.Information("Application was shut down");
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+    Log.CloseAndFlush();
+}
