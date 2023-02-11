@@ -23,4 +23,10 @@
     <Folder Include="Logs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\UntitiledArticles.API.Application\UntitiledArticles.API.Application.csproj" />
+    <ProjectReference Include="..\UntitledArticles.API.Domain\UntitledArticles.API.Domain.csproj" />
+    <ProjectReference Include="..\UntitledArticles.API.Infrastructure\UntitledArticles.API.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

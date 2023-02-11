@@ -1,5 +1,7 @@
 ﻿using Serilog;
 
+using UntitiledArticles.API.Application;
+
 namespace UntitledArticles.API.Service
 {
     public static class StartupConfiguration
@@ -13,6 +15,9 @@ namespace UntitledArticles.API.Service
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.ConfigureApplication(builder.Configuration);
+
             return builder;
         }
 
