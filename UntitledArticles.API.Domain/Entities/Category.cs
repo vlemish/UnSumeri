@@ -1,4 +1,6 @@
-﻿namespace UntitledArticles.API.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace UntitledArticles.API.Domain.Entities
 {
     public class Category : IEntity
     {
@@ -11,5 +13,8 @@
         public int ParentCategoryId { get; set; }
 
         public virtual ICollection<Article> Articles { get; set; }
+
+        [NotMapped]
+        public CategoryMapping CategoryMapping { get; set; }
     }
 }
