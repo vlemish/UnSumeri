@@ -7,5 +7,7 @@
         public string Content { get; }
 
         public DateTime CreatedAtTime { get; set; }
+
+        public Category Category { get; set; }
     }
 }

@@ -8,6 +8,8 @@
 
         public DateTime CreatedAtTime { get; set; }
 
-        public ICollection<Category> Categories { get; set; }
+        public ICollection<CategoryMapping> CategoryMappings { get; set; }
+
+        public ICollection<Article> Articles { get; set; }
     }
 }

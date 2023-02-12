@@ -10,8 +10,8 @@ namespace UntitledArticles.API.Domain.Entities
     {
         public int Id { get; set; }
 
-        public Category Category { get; set; }
-
         public Category AncestorCategory { get; set; }
+
+        public Category SubCategory { get; set; }
     }
 }
