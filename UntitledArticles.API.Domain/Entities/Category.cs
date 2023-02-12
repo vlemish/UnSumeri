@@ -8,8 +8,8 @@
 
         public DateTime CreatedAtTime { get; set; }
 
-        public ICollection<CategoryMapping> CategoryMappings { get; set; }
+        public int ParentCategoryId { get; set; }
 
-        public ICollection<Article> Articles { get; set; }
+        public virtual ICollection<Article> Articles { get; set; }
     }
 }
