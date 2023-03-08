@@ -8,13 +8,14 @@ namespace UntitledArticles.API.Domain.Entities
 
         public string Name { get; set; }
 
-        public DateTime CreatedAtTime { get; set; }
+        public DateTime CreatedAtTime { get; } = DateTime.UtcNow;
 
-        public int ParentCategoryId { get; set; }
+        public Category Parent { get; set; }
+
+        public int? ParentId { get; set; }
+
+        public virtual ICollection<Category> SubCategories { get; set; }
 
         public virtual ICollection<Article> Articles { get; set; }
-
-        [NotMapped]
-        public CategoryMapping CategoryMapping { get; set; }
     }
 }

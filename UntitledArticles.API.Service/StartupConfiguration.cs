@@ -2,6 +2,8 @@
 
 using UntitiledArticles.API.Application;
 
+using UntitledArticles.API.Infrastructure;
+
 namespace UntitledArticles.API.Service
 {
     public static class StartupConfiguration
@@ -16,6 +18,7 @@ namespace UntitledArticles.API.Service
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.ConfigureInfrastructure(builder.Configuration);
             builder.Services.ConfigureApplication(builder.Configuration);
 
             return builder;
