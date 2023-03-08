@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UntitledArticles.API.Infrastructure;
 
@@ -11,9 +12,11 @@ using UntitledArticles.API.Infrastructure;
 namespace UntitledArticles.API.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230212124010_MakeParentCategoryIdOptional")]
+    partial class MakeParentCategoryIdOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,12 +67,10 @@ namespace UntitledArticles.API.Infrastructure.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar");
 
-                    b.Property<int?>("ParentId")
+                    b.Property<int?>("ParentCategoryId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
 
                     b.ToTable("Categories", (string)null);
                 });
@@ -87,19 +88,7 @@ namespace UntitledArticles.API.Infrastructure.Migrations
 
             modelBuilder.Entity("UntitledArticles.API.Domain.Entities.Category", b =>
                 {
-                    b.HasOne("UntitledArticles.API.Domain.Entities.Category", "Parent")
-                        .WithMany("SubCategories")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("UntitledArticles.API.Domain.Entities.Category", b =>
-                {
                     b.Navigation("Articles");
-
-                    b.Navigation("SubCategories");
                 });
 #pragma warning restore 612, 618
         }

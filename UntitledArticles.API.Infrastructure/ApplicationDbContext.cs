@@ -26,11 +26,17 @@ namespace UntitledArticles.API.Infrastructure
         {
         }
 
-        /// <inheritdoc />
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public ApplicationDbContext(DbContextOptions options)
+            : base(options)
         {
-            optionsBuilder.UseSqlServer("Data Source=localhost\\SQLEXPRESS;Initial Catalog=UntitledArticlesDB;Integrated Security=True;TrustServerCertificate=True");
+
         }
+
+        ///// <inheritdoc />
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer("Server=untitled_articles_mssql;Database=UnitledArticlesDB;User=sa;Password=Str0ngPa$$w0rd;Trust Server Certificate=true");
+        //}
 
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,7 +49,11 @@ namespace UntitledArticles.API.Infrastructure
                 e.Property(p => p.CreatedAtTime).HasColumnType("datetime");
                 e.Property(p => p.Name).HasColumnType("nvarchar").HasMaxLength(150);
                 e.HasMany(c => c.Articles).WithOne(a => a.Category);
-                e.HasIndex(p => new { p.Id, p.ParentCategoryId }).IsClustered(false);
+                e.HasOne(c => c.Parent)
+                .WithMany(c => c.SubCategories)
+                .HasForeignKey(c => c.ParentId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Article>(e =>
