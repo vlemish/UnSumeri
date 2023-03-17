@@ -78,6 +78,7 @@ namespace UntitiledArticles.API.Application.Categories.Queries
                     ParentId = category.ParentId,
                     SubCategories = CreateCategoryReadDtos(category.SubCategories),
                 };
+                categoryReadDtos.Add(subCategory);
             }
 
             return categoryReadDtos.AsReadOnly();
