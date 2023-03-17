@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using UntitiledArticles.API.Application.Categories.Commands.Add;
+using UntitiledArticles.API.Application.Categories.Queries;
 
 using UntitledArticles.API.Service.Contracts.Requests;
 
@@ -29,6 +30,36 @@ namespace UntitledArticles.API.Service.Controllers
             {
                 var command = new AddCategory(request.Name);
                 AddCategoryResponse response = await _mediator.Send(command);
+                if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
+                {
+                    return new ObjectResult(response.Result.Id)
+                    {
+                        StatusCode = StatusCodes.Status201Created,
+                    };
+                }
+
+                _logger.LogError($"An error occured during processing {AddCategory} request: {response.Status.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            catch (FluentValidation.ValidationException ex)
+            {
+                _logger.LogError($"An error occured during validation: {ex.Message}", ex);
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occured during processing {AddCategory} request: {ex.Message}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetCategoryById([FromRoute] int id)
+        {
+            try
+            {
+                var query = new GetCategory(id);
+                GetCategoryResponse response = await _mediator.Send(query);
                 if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
                 {
                     return new ObjectResult(response.Result.Id)

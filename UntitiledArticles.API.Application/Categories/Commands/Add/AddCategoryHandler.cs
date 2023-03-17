@@ -31,7 +31,7 @@ namespace UntitiledArticles.API.Application.Categories.Commands.Add
         private AddCategoryResponse ReportSuccess(Category category)
         {
             _logger.LogDebug($"Add Category was successfully handled! Category Id = {category.Id}");
-            return new(new AddCategorySuccess(category), new AddCategoryResult(category.Id));
+            return new(new Statuses.AddCategorySuccess(category), new AddCategoryResult(category.Id));
         }
 
         private Category CreateCategory(string name) =>

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using UntitiledArticles.API.Application.OperationStatuses;
+﻿using UntitiledArticles.API.Application.OperationStatuses;
 
 using UntitledArticles.API.Domain.Entities;
 
