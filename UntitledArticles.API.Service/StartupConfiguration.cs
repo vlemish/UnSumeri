@@ -1,8 +1,13 @@
-﻿using Serilog;
+﻿using AutoMapper;
+
+using Serilog;
+
+using System.Reflection;
 
 using UntitiledArticles.API.Application;
 
 using UntitledArticles.API.Infrastructure;
+using UntitledArticles.API.Service.Mappings;
 
 namespace UntitledArticles.API.Service
 {
@@ -20,6 +25,11 @@ namespace UntitledArticles.API.Service
 
             builder.Services.ConfigureInfrastructure(builder.Configuration);
             builder.Services.ConfigureApplication(builder.Configuration);
+
+            builder.Services.AddAutoMapper(configAction => configAction.AddProfiles(new List<Profile>()
+            {
+                new CategoryMappings(),
+            }));
 
             return builder;
         }

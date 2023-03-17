@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using System.Data.Entity;
-
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
 
@@ -83,7 +81,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         {
             try
             {
-                return _categories.Where(predicate).FirstOrDefault();
+                return _categories.Include(s => s.SubCategories).Where(predicate).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -103,7 +101,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             {
                 return;
             }
-            
+
             _context.Entry(entity).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }
