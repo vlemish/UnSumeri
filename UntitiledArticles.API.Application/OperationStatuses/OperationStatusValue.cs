@@ -4,5 +4,6 @@
     {
         OK,
         NotFound,
+        ParentNotExists,
     }
 }

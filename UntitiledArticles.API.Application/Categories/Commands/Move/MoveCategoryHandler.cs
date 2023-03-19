@@ -26,14 +26,36 @@ namespace UntitiledArticles.API.Application.Categories.Commands.Move
 
         public async Task<MoveCategoryResponse> Handle(MoveCategory request, CancellationToken cancellationToken)
         {
-            GetCategoryResponse response = await _mediator.Send(new GetCategory(request.Id));
-            if (response.Status.Status != OperationStatuses.OperationStatusValue.OK)
+            GetCategoryResponse categoryResponse = await _mediator.Send(new GetCategory(request.Id));
+            if (categoryResponse.Status.Status != OperationStatuses.OperationStatusValue.OK)
             {
-                ReportNotFound(response.Status);
+                ReportNotFound(categoryResponse.Status);
+            }
+            bool isParentCategoryValid = await ValidateParentCategoryAsync(request);
+            if (!isParentCategoryValid)
+            {
+                return ReportParentCategoryNotExist(request);
             }
 
-            await _categoryRepository.UpdateAsync(CreateCategoryForUpdate(request, response.Result));
+            await _categoryRepository.UpdateAsync(CreateCategoryForUpdate(request, categoryResponse.Result));
             return ReportSuccess(request);
+        }
+
+        private async Task<bool> ValidateParentCategoryAsync(MoveCategory request)
+        {
+            if (!request.ParentId.HasValue)
+            {
+                return true;
+            }
+
+            var parentCategoryResponse = await _mediator.Send(new GetCategory(request.ParentId.Value));
+            return parentCategoryResponse.Status.Status == OperationStatusValue.OK;
+        }
+
+        private MoveCategoryResponse ReportParentCategoryNotExist(MoveCategory request)
+        {
+            _logger.LogDebug($"Failed to move category where Id = {request.Id} and Parent Id = {request.ParentId}: Parent Category doesn't exist!");
+            return new(new MoveCategoryParentCategoryNotExist(request.Id, request.ParentId));
         }
 
         private MoveCategoryResponse ReportNotFound(IOperationStatus status)
