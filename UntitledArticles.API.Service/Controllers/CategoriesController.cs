@@ -151,6 +151,11 @@ namespace UntitledArticles.API.Service.Controllers
                             _logger.LogError(response.Status.Message);
                             return NotFound();
                         }
+                    case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.ParentNotExists:
+                        {
+                            _logger.LogError(response.Status.Message);
+                            return NotFound();
+                        }
                     default:
                         {
                             _logger.LogError($"An error occured during processing {MoveCategory} request: {response.Status.Message}");

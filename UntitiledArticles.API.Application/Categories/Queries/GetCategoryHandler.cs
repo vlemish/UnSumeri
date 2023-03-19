@@ -28,7 +28,7 @@ namespace UntitiledArticles.API.Application.Categories.Queries
             var category = await _categoryRepository.GetOneByFilter(p => p.Id == request.Id);
             if (category is null)
             {
-                ReportNotFound(request);
+               return ReportNotFound(request);
             }
 
             var result = CreateGetCategoryResult(category);
