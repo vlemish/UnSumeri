@@ -81,7 +81,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         {
             try
             {
-                return _categories.Include(s => s.SubCategories).Where(predicate).FirstOrDefault();
+                return _categories.Include(s => s.SubCategories).ThenInclude(x => x.SubCategories).Where(predicate).FirstOrDefault();
             }
             catch (Exception ex)
             {

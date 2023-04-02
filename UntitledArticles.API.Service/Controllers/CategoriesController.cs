@@ -41,7 +41,7 @@ namespace UntitledArticles.API.Service.Controllers
                     };
                 }
 
-                _logger.LogError($"An error occured during processing {AddCategory} request: {response.Status.Message}");
+                _logger.LogError($"An error occured during processing {nameof(AddCategory)} request: {response.Status.Message}");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
             catch (FluentValidation.ValidationException ex)
@@ -51,7 +51,7 @@ namespace UntitledArticles.API.Service.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occured during processing {AddCategory} request: {ex.Message}", ex);
+                _logger.LogError($"An error occured during processing {nameof(AddCategory)} request: {ex.Message}", ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -73,7 +73,7 @@ namespace UntitledArticles.API.Service.Controllers
                     };
                 }
 
-                _logger.LogError($"An error occured during processing {AddCategory} request: {response.Status.Message}");
+                _logger.LogError($"An error occured during processing {nameof(AddSubcategory)} request: {response.Status.Message}");
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
             catch (FluentValidation.ValidationException ex)
@@ -83,7 +83,7 @@ namespace UntitledArticles.API.Service.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occured during processing {AddCategory} request: {ex.Message}", ex);
+                _logger.LogError($"An error occured during processing {nameof(AddSubcategory)} request: {ex.Message}", ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -112,7 +112,7 @@ namespace UntitledArticles.API.Service.Controllers
                         }
                     default:
                         {
-                            _logger.LogError($"An error occured during processing {GetCategoryById} request: {response.Status.Message}");
+                            _logger.LogError($"An error occured during processing {nameof(GetCategoryById)} request: {response.Status.Message}");
                             return StatusCode(StatusCodes.Status500InternalServerError);
                         }
                 }
@@ -124,24 +124,24 @@ namespace UntitledArticles.API.Service.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occured during processing {GetCategoryById} request: {ex.Message}", ex);
+                _logger.LogError($"An error occured during processing {nameof(GetCategoryById)} request: {ex.Message}", ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
-        [HttpPut("{id:int}/move/{parentId:int?}")]
+        [HttpPut("{id:int}/move/{moveToId:int?}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> MoveCategory([FromRoute] int id, [FromRoute] int? parentId)
+        public async Task<IActionResult> MoveCategory([FromRoute] int id, [FromRoute] int? moveToId)
         {
             try
             {
-                var command = new MoveCategory(id, parentId);
+                var command = new MoveCategory(id, moveToId);
                 MoveCategoryResponse response = await _mediator.Send(command);
                 if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
                 {
-                    return StatusCode(StatusCodes.Status204NoContent);
+                    return Ok();
                 }
 
                 switch (response.Status.Status)
@@ -158,7 +158,7 @@ namespace UntitledArticles.API.Service.Controllers
                         }
                     default:
                         {
-                            _logger.LogError($"An error occured during processing {MoveCategory} request: {response.Status.Message}");
+                            _logger.LogError($"An error occured during processing {nameof(MoveCategory)} request: {response.Status.Message}");
                             return StatusCode(StatusCodes.Status500InternalServerError);
                         }
                 }
@@ -170,7 +170,7 @@ namespace UntitledArticles.API.Service.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occured during processing {MoveCategory} request: {ex.Message}", ex);
+                _logger.LogError($"An error occured during processing {nameof(MoveCategory)} request: {ex.Message}", ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
