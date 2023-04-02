@@ -81,7 +81,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         {
             try
             {
-                return _categories.Include(s => s.SubCategories).Where(predicate).FirstOrDefault();
+                return _categories.Include(s => s.SubCategories).ThenInclude(x => x.SubCategories).Where(predicate).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -102,7 +102,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
                 return;
             }
 
-            _context.Entry(entity).CurrentValues.SetValues(entity);
+            _context.Entry(entityToUpdate).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }
     }
