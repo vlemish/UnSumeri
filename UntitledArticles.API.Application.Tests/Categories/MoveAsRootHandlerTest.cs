@@ -21,6 +21,7 @@ public class MoveAsRootHandlerTest
     [Fact]
     public async Task TestMoveAsRootHandler_WhenParticipantNotFound_ThenNotFoundStatus()
     {
+        // trigger workflow to run
         int id = 2;
         MoveAsRoot request = new(id);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NotFound;
