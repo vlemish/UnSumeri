@@ -1,14 +1,12 @@
-﻿using MediatR;
+﻿using AutoMapper;
+
+using MediatR;
 
 using Microsoft.Extensions.Logging;
 
-using System.Collections.ObjectModel;
-
 using UntitiledArticles.API.Application.Categories.Queries.Statuses;
-using UntitiledArticles.API.Application.Models.Categories;
 
 using UntitledArticles.API.Domain.Contracts;
-using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Queries
 {
@@ -16,11 +14,13 @@ namespace UntitiledArticles.API.Application.Categories.Queries
     {
         private readonly ILogger<GetCategoryHandler> _logger;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IMapper _mapper;
 
-        public GetCategoryHandler(ILogger<GetCategoryHandler> logger, ICategoryRepository categoryRepository)
+        public GetCategoryHandler(ILogger<GetCategoryHandler> logger, ICategoryRepository categoryRepository, IMapper mapper)
         {
             _logger = logger;
             _categoryRepository = categoryRepository;
+            _mapper = mapper;
         }
 
         public async Task<GetCategoryResponse> Handle(GetCategory request, CancellationToken cancellationToken)
@@ -31,7 +31,7 @@ namespace UntitiledArticles.API.Application.Categories.Queries
                return ReportNotFound(request);
             }
 
-            var result = CreateGetCategoryResult(category);
+            var result = _mapper.Map<GetCategoryResult>(category);
 
             return ReportSuccess(request, result);
         }
@@ -48,41 +48,5 @@ namespace UntitiledArticles.API.Application.Categories.Queries
             _logger.LogDebug($"Get Category where Id = {request.Id} was successfully handled");
             return new GetCategoryResponse(new GetCategorySuccess(request.Id), result);
         }
-
-        private GetCategoryResult CreateGetCategoryResult(Category category)
-        {
-            var result = new GetCategoryResult()
-            {
-                Id = category.Id,
-                Name = category.Name,
-                ParentId = category.ParentId,
-                SubCategories = CreateCategoryReadDtos(category.SubCategories),
-            };
-
-            return result;
-        }
-
-        private ReadOnlyCollection<CategoryReadDto> CreateCategoryReadDtos(ICollection<Category> categories)
-        {
-            if (categories is null)
-            {
-                return null;
-            }
-            List<CategoryReadDto> categoryReadDtos = new();
-            foreach (var category in categories)
-            {
-                var subCategory = new CategoryReadDto()
-                {
-                    Id = category.Id,
-                    Name = category.Name,
-                    ParentId = category.ParentId,
-                    SubCategories = CreateCategoryReadDtos(category.SubCategories),
-                };
-                categoryReadDtos.Add(subCategory);
-            }
-
-            return categoryReadDtos.AsReadOnly();
-        }
-
     }
 }

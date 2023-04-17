@@ -1,15 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+
+using MediatR;
+
+using Microsoft.Extensions.Logging;
 using Moq;
 using UntitiledArticles.API.Application.Categories.Queries;
 using UntitiledArticles.API.Application.OperationStatuses;
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
+using UntitledArticles.API.Service.Mappings;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
 public class GetCategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepositoryMock;
+    private IMapper _mapper;
 
     [Fact]
     public async Task TestGetCategoryHandler_WhenCategoryExist_ThenSuccess()
@@ -28,7 +34,7 @@ public class GetCategoryHandlerTest
         SetupMocks(category);
 
         GetCategoryHandler handler = new(new Mock<ILogger<GetCategoryHandler>>().Object,
-            _categoryRepositoryMock.Object);
+            _categoryRepositoryMock.Object, _mapper);
 
         GetCategoryResponse result = await handler.Handle(request, default);
 
@@ -47,7 +53,7 @@ public class GetCategoryHandlerTest
         SetupMocks(category);
 
         GetCategoryHandler handler = new(new Mock<ILogger<GetCategoryHandler>>().Object,
-            _categoryRepositoryMock.Object);
+            _categoryRepositoryMock.Object, _mapper);
 
         GetCategoryResponse result = await handler.Handle(request, default);
 
@@ -60,6 +66,7 @@ public class GetCategoryHandlerTest
         _categoryRepositoryMock
             .Setup(m => m.GetOneByFilter(It.IsAny<Func<Category, bool>>()))
             .ReturnsAsync(category);
+        _mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new CategoryMappings())));
     }
     
     private bool IsCategoryResultEqualToCategory(Category category, GetCategoryResult result)

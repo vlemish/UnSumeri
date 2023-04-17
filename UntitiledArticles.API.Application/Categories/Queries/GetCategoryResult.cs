@@ -1,6 +1,4 @@
-﻿using UntitiledArticles.API.Application.Models.Categories;
-
-namespace UntitiledArticles.API.Application.Categories.Queries
+﻿namespace UntitiledArticles.API.Application.Categories.Queries
 {
     public record GetCategoryResult
     {
@@ -10,6 +8,6 @@ namespace UntitiledArticles.API.Application.Categories.Queries
 
         public int? ParentId { get; init; }
 
-        public IReadOnlyCollection<CategoryReadDto> SubCategories { get; init; }
+        public IReadOnlyCollection<GetCategoryResult> SubCategories { get; init; }
     }
 }

@@ -2,15 +2,15 @@
 
 namespace UntitiledArticles.API.Application.Categories.Commands.Delete.Statuses;
 
-public class DeleteCategoryNotFoundStatus : IOperationStatus
+public class DeleteCategoryNotFound : IOperationStatus
 {
     private readonly int _id;
 
-    public DeleteCategoryNotFoundStatus(int id)
+    public DeleteCategoryNotFound(int id)
     {
         _id = id;
     }
 
     public OperationStatusValue Status { get; } = OperationStatusValue.NotFound;
-    public string Message { get; } = $"Category when Category Id = {_id} doesn't exist!";
+    public string Message => $"Category when Category Id = {_id} doesn't exist!";
 }

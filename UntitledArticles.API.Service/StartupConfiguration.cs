@@ -8,6 +8,7 @@ using UntitiledArticles.API.Application;
 
 using UntitledArticles.API.Infrastructure;
 using UntitledArticles.API.Service.Mappings;
+using UntitledArticles.API.Service.Middlewares;
 
 namespace UntitledArticles.API.Service
 {
@@ -48,6 +49,8 @@ namespace UntitledArticles.API.Service
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             return app;
         }
