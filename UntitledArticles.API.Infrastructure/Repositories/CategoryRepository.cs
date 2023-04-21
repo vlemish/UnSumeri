@@ -16,6 +16,8 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             _categories = _context.Categories;
         }
 
+        #region Implementation of ICategoryRepository
+
         public async Task<Category> AddAsync(Category entity)
         {
             if (entity is null)
@@ -39,6 +41,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         {
             try
             {
+                Category parent = entity;
                 _categories.Remove(entity);
                 await _context.SaveChangesAsync();
                 return entity.Id;
@@ -64,7 +67,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
 
         public async Task<IList<Category>> GetAll()
         {
-            return await _categories.ToListAsync();
+            return await _categories.Include(c => c.SubCategories).ToListAsync();
         }
 
         public Task<int> GetCount(Func<Category, bool> predicate)
@@ -74,14 +77,14 @@ namespace UntitledArticles.API.Infrastructure.Repositories
 
         public async Task<IList<Category>> GetManyByFilter(Func<Category, bool> predicate)
         {
-            return await _categories.Where(c => predicate(c)).ToListAsync();
+            return await _categories.AsNoTracking().Where(c => predicate(c)).ToListAsync();
         }
 
         public async Task<Category> GetOneByFilter(Func<Category, bool> predicate)
         {
             try
             {
-                return _categories.Include(s => s.SubCategories).ThenInclude(x => x.SubCategories).Where(predicate).FirstOrDefault();
+                return _categories.AsNoTracking().Include(c => c.SubCategories).ThenInclude(s=> s.SubCategories).Where(predicate).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -105,5 +108,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             _context.Entry(entityToUpdate).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }
+
+        #endregion
     }
 }

@@ -1,12 +1,12 @@
 ﻿using UntitiledArticles.API.Application.OperationStatuses;
 
-namespace UntitiledArticles.API.Application.Categories.Queries.Statuses
+namespace UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses
 {
-    public class GetCategoryNotFound : IOperationStatus
+    public class GetCategoryByIdNotFound : IOperationStatus
     {
         private readonly int _id;
 
-        public GetCategoryNotFound(int id)
+        public GetCategoryByIdNotFound(int id)
         {
             _id = id;
         }

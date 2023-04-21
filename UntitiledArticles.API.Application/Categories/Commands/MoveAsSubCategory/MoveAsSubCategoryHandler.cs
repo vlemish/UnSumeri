@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using UntitiledArticles.API.Application.Categories.Commands.Move.Statuses;
 using UntitiledArticles.API.Application.Categories.Commands.MoveAsRoot;
 using UntitiledArticles.API.Application.Categories.Queries;
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
 using UntitiledArticles.API.Application.Models.Factories;
 using UntitiledArticles.API.Application.Models.Strategies;
 using UntitiledArticles.API.Application.OperationStatuses;
@@ -28,14 +29,14 @@ public class MoveAsSubCategoryHandler : IRequestHandler<MoveAsSubCategory, MoveA
 
     public async Task<MoveAsSubCategoryResponse> Handle(MoveAsSubCategory request, CancellationToken cancellationToken)
     {
-        GetCategoryResponse categoryResponse = await _mediator.Send(new GetCategory(request.Id), cancellationToken);
+        GetCategoryByIdResponse categoryResponse = await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
         if (categoryResponse.Status.Status != OperationStatusValue.OK)
         {
             return ReportNotFound(categoryResponse.Status);
         }
 
-        GetCategoryResponse categoryToMoveResponse =
-            await _mediator.Send(new GetCategory(request.MoveToId), cancellationToken);
+        GetCategoryByIdResponse categoryToMoveResponse =
+            await _mediator.Send(new GetCategoryById(request.MoveToId), cancellationToken);
         if (categoryToMoveResponse.Status.Status != OperationStatusValue.OK)
         {
             return ReportParentCategoryNotExist(request);

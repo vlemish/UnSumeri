@@ -10,7 +10,7 @@ namespace UntitledArticles.API.Domain.Entities
 
         public DateTime CreatedAtTime { get; } = DateTime.UtcNow;
 
-        public Category Parent { get; set; }
+        public virtual Category Parent { get; set; }
 
         public int? ParentId { get; set; }
 

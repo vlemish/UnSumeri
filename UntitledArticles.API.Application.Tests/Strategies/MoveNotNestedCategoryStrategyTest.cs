@@ -1,8 +1,11 @@
 ﻿using MediatR;
+
 using Moq;
-using UntitiledArticles.API.Application.Categories.Queries;
-using UntitiledArticles.API.Application.Categories.Queries.Statuses;
+
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
+using UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses;
 using UntitiledArticles.API.Application.Models.Strategies;
+
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
 
@@ -17,8 +20,8 @@ public class MoveNotNestedCategoryStrategyTest
     public async Task TestMoveNotNestedCategoryStrategy_WhenCategoryExist_ThenMoved()
     {
         int id = 2;
-        GetCategoryResponse categoryToMoveResponse =
-            new GetCategoryResponse(new GetCategorySuccess(id), CreateTestCategoryResult(id, null));
+        GetCategoryByIdResponse categoryToMoveResponse =
+            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, null));
         
         SetupMocks(id, categoryToMoveResponse);
         
@@ -32,8 +35,8 @@ public class MoveNotNestedCategoryStrategyTest
     public async Task TestMoveNotNestedCategoryStrategy_WhenCategoryNotExist_ThenArgumentOutOfRangeException()
     {
         int id = 2;
-        GetCategoryResponse categoryToMoveResponse =
-            new GetCategoryResponse(new GetCategoryNotFound(id), null);
+        GetCategoryByIdResponse categoryToMoveResponse =
+            new GetCategoryByIdResponse(new GetCategoryByIdNotFound(id), null);
         
         SetupMocks(id, categoryToMoveResponse);
         
@@ -46,7 +49,7 @@ public class MoveNotNestedCategoryStrategyTest
     private void VerifyMoveCategoryNotFoundMocks(int id)
     {
         _mediatorMock
-            .Verify(m => m.Send(It.Is<GetCategory>(x => x.Id == id), It.IsAny<CancellationToken>()),
+            .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == id), It.IsAny<CancellationToken>()),
                 Times.Once);
         _categoryRepositoryMock
             .Verify(m => m.UpdateAsync(It.Is<Category>(x => x.Id == id)),
@@ -56,20 +59,20 @@ public class MoveNotNestedCategoryStrategyTest
      private void VerifyMoveSuccessMocks(int id)
     {
         _mediatorMock
-            .Verify(m => m.Send(It.Is<GetCategory>(x => x.Id == id), It.IsAny<CancellationToken>()),
+            .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == id), It.IsAny<CancellationToken>()),
                 Times.Once);
         _categoryRepositoryMock
             .Verify(m => m.UpdateAsync(It.Is<Category>(x => x.Id == id)),
                 Times.Once);
     }
 
-     private void SetupMocks(int id, GetCategoryResponse categoryToMoveResponse)
+     private void SetupMocks(int id, GetCategoryByIdResponse categoryToMoveResponse)
     {
         _categoryRepositoryMock = new();
         _mediatorMock = new();
 
         _mediatorMock
-            .Setup(m => m.Send(It.Is<GetCategory>(x => x.Id == id), It.IsAny<CancellationToken>()))
+            .Setup(m => m.Send(It.Is<GetCategoryById>(x => x.Id == id), It.IsAny<CancellationToken>()))
             .ReturnsAsync(categoryToMoveResponse);
 
         _categoryRepositoryMock
@@ -77,7 +80,7 @@ public class MoveNotNestedCategoryStrategyTest
             .Returns(Task.CompletedTask);
     }
 
-    private GetCategoryResult CreateTestCategoryResult(int id, int? parentId) =>
+    private GetCategoryByIdResult CreateTestCategoryResult(int id, int? parentId) =>
         new()
         {
             Id = id,

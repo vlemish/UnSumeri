@@ -7,10 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 using System.Reflection;
 
-using UntitiledArticles.API.Application.Categories.Commands.Add;
-using UntitiledArticles.API.Application.Categories.Commands.AddSubcategory;
-using UntitiledArticles.API.Application.Categories.Commands.Move;
 using UntitiledArticles.API.Application.Models.Factories;
+using UntitiledArticles.API.Application.PipelineBehaviours;
 
 namespace UntitiledArticles.API.Application
 {
@@ -21,9 +19,9 @@ namespace UntitiledArticles.API.Application
             services.AddTransient<ICategoryMoveStrategyFactory, CategoryMoveStrategyFactory>();
             services.AddMediatR(Assembly.GetExecutingAssembly());
             //services.AddDbContextFactory()
-            services.AddScoped<IValidator<AddCategory>, AddCategoryValidator>();
-            services.AddScoped<IValidator<AddSubcategory>, AddSubcategoryValidator>();
-            services.AddScoped<IValidator<MoveCategory>, MoveCategoryValidator>();
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             return services;
         }
     }

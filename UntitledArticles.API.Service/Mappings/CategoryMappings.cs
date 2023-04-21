@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 
-using UntitiledArticles.API.Application.Categories.Commands.Add;
-using UntitiledArticles.API.Application.Models.Categories;
+using UntitiledArticles.API.Application.Categories.Queries;
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
 
 using UntitledArticles.API.Domain.Entities;
 
@@ -11,8 +11,9 @@ namespace UntitledArticles.API.Service.Mappings
     {
         public CategoryMappings()
         {
-            CreateMap<Category, CategoryReadDto>();
-            CreateMap<Category, AddCategoryResult>();
+            //CreateMap<Category, CategoryReadDto>();
+            CreateMap<Category, GetCategoryByIdResult>();
+            CreateMap<Category, GetCategoryByIdResult>().ReverseMap();
         }
     }
 }

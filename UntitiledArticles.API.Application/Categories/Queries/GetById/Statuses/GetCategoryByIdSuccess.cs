@@ -1,12 +1,12 @@
 ﻿using UntitiledArticles.API.Application.OperationStatuses;
 
-namespace UntitiledArticles.API.Application.Categories.Queries.Statuses
+namespace UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses
 {
-    public class GetCategorySuccess : IOperationStatus
+    public class GetCategoryByIdSuccess : IOperationStatus
     {
         private readonly int _id;
 
-        public GetCategorySuccess(int id)
+        public GetCategoryByIdSuccess(int id)
         {
             _id = id;
         }

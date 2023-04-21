@@ -1,12 +1,16 @@
 ﻿using MediatR;
+
 using Microsoft.Extensions.Logging;
+
 using Moq;
+
 using UntitiledArticles.API.Application.Categories.Commands.MoveAsSubCategory;
-using UntitiledArticles.API.Application.Categories.Queries;
-using UntitiledArticles.API.Application.Categories.Queries.Statuses;
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
+using UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses;
 using UntitiledArticles.API.Application.Models.Factories;
 using UntitiledArticles.API.Application.Models.Strategies;
 using UntitiledArticles.API.Application.OperationStatuses;
+
 using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
@@ -24,9 +28,9 @@ public class MoveAsSubCategoryHandlerTest
         int parentId = 3;
         MoveAsSubCategory request = new(id, parentId);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OK;
-        GetCategoryResponse expectedCategoryResponse =
-            new GetCategoryResponse(new GetCategorySuccess(id), GetTestCategoryResult(id));
-        GetCategoryResponse expectedParentCategoryResponse = new(new GetCategorySuccess(parentId), GetTestCategoryResult(parentId));
+        GetCategoryByIdResponse expectedCategoryResponse =
+            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(id), GetTestCategoryResult(id));
+        GetCategoryByIdResponse expectedParentCategoryResponse = new(new GetCategoryByIdSuccess(parentId), GetTestCategoryResult(parentId));
 
         SetupMocks(id, parentId, expectedCategoryResponse, expectedParentCategoryResponse);
 
@@ -46,8 +50,8 @@ public class MoveAsSubCategoryHandlerTest
         int parentId = 3;
         MoveAsSubCategory request = new(id, parentId);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NotFound;
-        GetCategoryResponse expectedCategoryResponse = new GetCategoryResponse(new GetCategoryNotFound(id), null);
-        GetCategoryResponse expectedParentCategoryResponse = null;
+        GetCategoryByIdResponse expectedCategoryResponse = new GetCategoryByIdResponse(new GetCategoryByIdNotFound(id), null);
+        GetCategoryByIdResponse expectedParentCategoryResponse = null;
 
         SetupMocks(id, parentId, expectedCategoryResponse, expectedParentCategoryResponse);
 
@@ -67,10 +71,10 @@ public class MoveAsSubCategoryHandlerTest
         int parentId = 3;
         MoveAsSubCategory request = new(id, parentId);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.ParentNotExists;
-        GetCategoryResponse expectedCategoryResponse =
-            new GetCategoryResponse(new GetCategorySuccess(id), GetTestCategoryResult(id));
-        GetCategoryResponse expectedParentCategoryResponse =
-            new GetCategoryResponse(new GetCategoryNotFound(parentId), null);
+        GetCategoryByIdResponse expectedCategoryResponse =
+            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(id), GetTestCategoryResult(id));
+        GetCategoryByIdResponse expectedParentCategoryResponse =
+            new GetCategoryByIdResponse(new GetCategoryByIdNotFound(parentId), null);
 
         SetupMocks(id, parentId, expectedCategoryResponse, expectedParentCategoryResponse);
 
@@ -83,7 +87,7 @@ public class MoveAsSubCategoryHandlerTest
         VerifyParentCategoryNotFoundMocks(id, parentId);
     }
 
-    private GetCategoryResult GetTestCategoryResult(int id) =>
+    private GetCategoryByIdResult GetTestCategoryResult(int id) =>
         new()
         {
             Name = "testname",
@@ -93,10 +97,10 @@ public class MoveAsSubCategoryHandlerTest
     private void VerifyCategoryNotFoundMocks(int id, int parentId)
     {
         _mediatorMock
-            .Verify(m => m.Send(It.Is<GetCategory>(x => x.Id == id), It.IsAny<CancellationToken>()),
+            .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == id), It.IsAny<CancellationToken>()),
                 Times.Once());
         _mediatorMock
-            .Verify(m => m.Send(It.Is<GetCategory>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
+            .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
                 Times.Never());
         _categoryMoveStrategyFactoryMock
             .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()),
@@ -109,10 +113,10 @@ public class MoveAsSubCategoryHandlerTest
     private void VerifyParentCategoryNotFoundMocks(int id, int parentId)
     {
         _mediatorMock
-            .Verify(m => m.Send(It.Is<GetCategory>(x => x.Id == id), It.IsAny<CancellationToken>()),
+            .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == id), It.IsAny<CancellationToken>()),
                 Times.Once());
         _mediatorMock
-            .Verify(m => m.Send(It.Is<GetCategory>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
+            .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
                 Times.Once());
         _categoryMoveStrategyFactoryMock
             .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()),
@@ -125,10 +129,10 @@ public class MoveAsSubCategoryHandlerTest
     private void VerifyMoveSuccessMocks(int id, int parentId)
     {
         _mediatorMock
-            .Verify(m => m.Send(It.Is<GetCategory>(x => x.Id == id), It.IsAny<CancellationToken>()),
+            .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == id), It.IsAny<CancellationToken>()),
                 Times.Once());
         _mediatorMock
-            .Verify(m => m.Send(It.Is<GetCategory>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
+            .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
                 Times.Once());
         _categoryMoveStrategyFactoryMock
             .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()),
@@ -138,18 +142,18 @@ public class MoveAsSubCategoryHandlerTest
                 Times.Once());
     }
 
-    private void SetupMocks(int id, int parentId, GetCategoryResponse expectedCategoryResponse,
-        GetCategoryResponse expectedParentCategoryResponse)
+    private void SetupMocks(int id, int parentId, GetCategoryByIdResponse expectedCategoryResponse,
+        GetCategoryByIdResponse expectedParentCategoryResponse)
     {
         _mediatorMock = new();
         _categoryMoveStrategyFactoryMock = new();
         _categoryMoveStrategyMock = new();
 
         _mediatorMock
-            .Setup(m => m.Send(It.Is<GetCategory>(x => x.Id == id), It.IsAny<CancellationToken>()))
+            .Setup(m => m.Send(It.Is<GetCategoryById>(x => x.Id == id), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedCategoryResponse);
         _mediatorMock
-            .Setup(m => m.Send(It.Is<GetCategory>(x => x.Id == parentId), It.IsAny<CancellationToken>()))
+            .Setup(m => m.Send(It.Is<GetCategoryById>(x => x.Id == parentId), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedParentCategoryResponse);
         _categoryMoveStrategyFactoryMock
             .Setup(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()))
