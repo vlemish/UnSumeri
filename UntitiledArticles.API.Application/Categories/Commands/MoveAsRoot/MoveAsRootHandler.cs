@@ -1,11 +1,13 @@
 ﻿using MediatR;
+
 using Microsoft.Extensions.Logging;
+
 using UntitiledArticles.API.Application.Categories.Commands.Move.Statuses;
-using UntitiledArticles.API.Application.Categories.Queries;
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
 using UntitiledArticles.API.Application.Models.Factories;
 using UntitiledArticles.API.Application.Models.Strategies;
 using UntitiledArticles.API.Application.OperationStatuses;
-using UntitledArticles.API.Domain.Contracts;
+
 using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Commands.MoveAsRoot;
@@ -27,7 +29,7 @@ public class MoveAsRootHandler : IRequestHandler<MoveAsRoot, MoveAsRootResponse>
 
     public async Task<MoveAsRootResponse> Handle(MoveAsRoot request, CancellationToken cancellationToken)
     {
-        GetCategoryResponse categoryResponse = await _mediator.Send(new GetCategory(request.Id), cancellationToken);
+        GetCategoryByIdResponse categoryResponse = await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
         if (categoryResponse.Status.Status != OperationStatuses.OperationStatusValue.OK)
         {
             return ReportNotFound(request, categoryResponse.Status);

@@ -1,6 +1,8 @@
 ﻿using MediatR;
-using UntitiledArticles.API.Application.Categories.Queries;
+
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
 using UntitiledArticles.API.Application.OperationStatuses;
+
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
 
@@ -24,8 +26,8 @@ public class MoveNestedCategoryStrategy : ICategoryMoveStrategy
             throw new ArgumentNullException($"{nameof(moveToCategoryId)} was null!");
         }
 
-        GetCategoryResponse parentCategoryResponse = await _mediator.Send(new GetCategory(moveToCategoryId.Value));
-        GetCategoryResponse categoryToMoveResponse = await _mediator.Send(new GetCategory(id));
+        GetCategoryByIdResponse parentCategoryResponse = await _mediator.Send(new GetCategoryById(moveToCategoryId.Value));
+        GetCategoryByIdResponse categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id));
 
         ValidateGetCategoryResponses(parentCategoryResponse, categoryToMoveResponse);
         
@@ -44,13 +46,13 @@ public class MoveNestedCategoryStrategy : ICategoryMoveStrategy
         });
     }
 
-    private void ValidateGetCategoryResponses(params GetCategoryResponse[] responses) =>
+    private void ValidateGetCategoryResponses(params GetCategoryByIdResponse[] responses) =>
         responses
             .Where(response => !IsGetCategoryResponseValid(response))
             .ToList()
             .ForEach(r => throw new ArgumentOutOfRangeException(r.Status.Message));
 
-    private bool IsGetCategoryResponseValid(GetCategoryResponse response) =>
+    private bool IsGetCategoryResponseValid(GetCategoryByIdResponse response) =>
         response?.Status?.Status == OperationStatusValue.OK
         && response.Result is not null;
 }

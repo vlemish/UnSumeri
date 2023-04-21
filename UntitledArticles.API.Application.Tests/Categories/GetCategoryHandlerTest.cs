@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
 using UntitiledArticles.API.Application.Categories.Queries;
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
 using UntitiledArticles.API.Application.OperationStatuses;
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
@@ -29,14 +30,14 @@ public class GetCategoryHandlerTest
             Name = "test_category",
             SubCategories = subCategories,
         };
-        GetCategory request = new(id);
+        GetCategoryById request = new(id);
 
         SetupMocks(category);
 
-        GetCategoryHandler handler = new(new Mock<ILogger<GetCategoryHandler>>().Object,
+        GetCategoryByIdHandler handler = new(new Mock<ILogger<GetCategoryByIdHandler>>().Object,
             _categoryRepositoryMock.Object, _mapper);
 
-        GetCategoryResponse result = await handler.Handle(request, default);
+        GetCategoryByIdResponse result = await handler.Handle(request, default);
 
         Assert.Equal(expectedOperationValue, result.Status.Status);
         Assert.True(IsCategoryResultEqualToCategory(category, result.Result));
@@ -48,14 +49,14 @@ public class GetCategoryHandlerTest
         int id = 2;
         Category category = null;
         OperationStatusValue expectedOperationValue = OperationStatusValue.NotFound;
-        GetCategory request = new(id);
+        GetCategoryById request = new(id);
 
         SetupMocks(category);
 
-        GetCategoryHandler handler = new(new Mock<ILogger<GetCategoryHandler>>().Object,
+        GetCategoryByIdHandler handler = new(new Mock<ILogger<GetCategoryByIdHandler>>().Object,
             _categoryRepositoryMock.Object, _mapper);
 
-        GetCategoryResponse result = await handler.Handle(request, default);
+        GetCategoryByIdResponse result = await handler.Handle(request, default);
 
         Assert.Equal(expectedOperationValue, result.Status.Status);
     }
@@ -69,7 +70,7 @@ public class GetCategoryHandlerTest
         _mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new CategoryMappings())));
     }
     
-    private bool IsCategoryResultEqualToCategory(Category category, GetCategoryResult result)
+    private bool IsCategoryResultEqualToCategory(Category category, GetCategoryByIdResult result)
     {
         if (category.Id == result.Id || category.Name == result.Name || category.ParentId == result.ParentId ||
             category.SubCategories.Count == category.SubCategories.Count)

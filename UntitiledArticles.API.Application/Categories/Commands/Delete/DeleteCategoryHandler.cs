@@ -5,8 +5,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 
 using UntitiledArticles.API.Application.Categories.Commands.Delete.Statuses;
-using UntitiledArticles.API.Application.Categories.Queries;
-using UntitiledArticles.API.Application.OperationStatuses;
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
 
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
@@ -30,7 +29,7 @@ public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, DeleteCateg
 
     public async Task<DeleteCategoryResponse> Handle(DeleteCategory request, CancellationToken cancellationToken)
     {
-        GetCategoryResponse response = await _mediator.Send(new GetCategory(request.Id), cancellationToken);
+        GetCategoryByIdResponse response = await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
         Category category = _mapper.Map<Category>(response.Result);
         if (category is null)
         {
@@ -60,7 +59,7 @@ public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, DeleteCateg
         return new(operationStatus);
     }
 
-    private Category CreateCategory(GetCategoryResult categoryResult) =>
+    private Category CreateCategory(GetCategoryByIdResult categoryResult) =>
         new()
         {
             Id = categoryResult.Id,

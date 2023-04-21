@@ -1,13 +1,16 @@
 ﻿using MediatR;
+
 using Microsoft.Extensions.Logging;
+
 using Moq;
+
 using UntitiledArticles.API.Application.Categories.Commands.MoveAsRoot;
-using UntitiledArticles.API.Application.Categories.Queries;
-using UntitiledArticles.API.Application.Categories.Queries.Statuses;
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
+using UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses;
 using UntitiledArticles.API.Application.Models.Factories;
 using UntitiledArticles.API.Application.Models.Strategies;
 using UntitiledArticles.API.Application.OperationStatuses;
-using UntitledArticles.API.Domain.Contracts;
+
 using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
@@ -25,7 +28,7 @@ public class MoveAsRootHandlerTest
         int id = 2;
         MoveAsRoot request = new(id);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NotFound;
-        GetCategoryResponse expectedGetCategoryResponse = new(new GetCategoryNotFound(id), null);
+        GetCategoryByIdResponse expectedGetCategoryResponse = new(new GetCategoryByIdNotFound(id), null);
 
         SetupMocks(id, expectedGetCategoryResponse);
 
@@ -46,8 +49,8 @@ public class MoveAsRootHandlerTest
         int id = 2;
         MoveAsRoot request = new(id);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OK;
-        GetCategoryResponse expectedGetCategoryResponse = new(new GetCategorySuccess(id),
-            new GetCategoryResult() { Name = "name", Id = id, ParentId = 3 });
+        GetCategoryByIdResponse expectedGetCategoryResponse = new(new GetCategoryByIdSuccess(id),
+            new GetCategoryByIdResult() { Name = "name", Id = id, ParentId = 3 });
 
         SetupMocks(id, expectedGetCategoryResponse);
 
@@ -66,7 +69,7 @@ public class MoveAsRootHandlerTest
         Times categoryMoveStrategyTimesCalled)
     {
         _mediatorMock
-            .Verify(m => m.Send(It.IsAny<GetCategory>(),
+            .Verify(m => m.Send(It.IsAny<GetCategoryById>(),
                 It.IsAny<CancellationToken>()), mediatorTimesCalled);
         _categoryMoveStrategyFactoryMock
             .Verify(m =>
@@ -76,14 +79,14 @@ public class MoveAsRootHandlerTest
             .Verify(m => m.Move(It.IsAny<int>(), It.IsAny<int?>()), categoryMoveStrategyTimesCalled);
     }
 
-    private void SetupMocks(int id, GetCategoryResponse expectedGetCategoryResponse)
+    private void SetupMocks(int id, GetCategoryByIdResponse expectedGetCategoryResponse)
     {
         _mediatorMock = new();
         _categoryMoveStrategyFactoryMock = new();
         _categoryMoveStrategyMock = new();
 
         _mediatorMock
-            .Setup(m => m.Send(It.IsAny<GetCategory>(),
+            .Setup(m => m.Send(It.IsAny<GetCategoryById>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedGetCategoryResponse);
         _categoryMoveStrategyFactoryMock

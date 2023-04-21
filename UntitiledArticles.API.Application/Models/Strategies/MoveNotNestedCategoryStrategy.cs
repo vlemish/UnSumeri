@@ -1,6 +1,8 @@
 ﻿using MediatR;
-using UntitiledArticles.API.Application.Categories.Queries;
+
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
 using UntitiledArticles.API.Application.OperationStatuses;
+
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
 
@@ -19,7 +21,7 @@ public class MoveNotNestedCategoryStrategy : ICategoryMoveStrategy
     
     public async Task Move(int id, int? moveToCategoryId)
     {
-        GetCategoryResponse categoryToMoveResponse = await _mediator.Send(new GetCategory(id));
+        GetCategoryByIdResponse categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id));
         ValidateGetCategoryResponses(categoryToMoveResponse);
         
         await _categoryRepository.UpdateAsync(new Category()
@@ -30,13 +32,13 @@ public class MoveNotNestedCategoryStrategy : ICategoryMoveStrategy
         });
     }
     
-    private void ValidateGetCategoryResponses(params GetCategoryResponse[] responses) =>
+    private void ValidateGetCategoryResponses(params GetCategoryByIdResponse[] responses) =>
         responses
             .Where(response => !IsGetCategoryResponseValid(response))
             .ToList()
             .ForEach(r => throw new ArgumentOutOfRangeException(r.Status.Message));
 
-    private bool IsGetCategoryResponseValid(GetCategoryResponse response) =>
+    private bool IsGetCategoryResponseValid(GetCategoryByIdResponse response) =>
         response?.Status?.Status == OperationStatusValue.OK
         && response.Result is not null;
 }

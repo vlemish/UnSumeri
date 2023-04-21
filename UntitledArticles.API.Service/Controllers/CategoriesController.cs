@@ -6,7 +6,7 @@ using UntitiledArticles.API.Application.Categories.Commands.Add;
 using UntitiledArticles.API.Application.Categories.Commands.AddSubcategory;
 using UntitiledArticles.API.Application.Categories.Commands.Delete;
 using UntitiledArticles.API.Application.Categories.Commands.Move;
-using UntitiledArticles.API.Application.Categories.Queries;
+using UntitiledArticles.API.Application.Categories.Queries.GetById;
 
 using UntitledArticles.API.Service.Contracts.Requests;
 
@@ -69,8 +69,8 @@ namespace UntitledArticles.API.Service.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var query = new GetCategory(id);
-            GetCategoryResponse response = await _mediator.Send(query);
+            var query = new GetCategoryById(id);
+            GetCategoryByIdResponse response = await _mediator.Send(query);
             if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
             {
                 return Ok(response.Result);
