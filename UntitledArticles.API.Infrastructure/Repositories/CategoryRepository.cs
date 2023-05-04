@@ -2,6 +2,9 @@
 
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
+using UntitledArticles.API.Domain.Enums;
+using UntitledArticles.API.Domain.Pagination;
+using UntitledArticles.API.Infrastructure.Extensions;
 
 namespace UntitledArticles.API.Infrastructure.Repositories
 {
@@ -65,31 +68,52 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             }
         }
 
-        public async Task<IList<Category>> GetAll()
+        public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption) =>
+            await GetAll(loadOptions, orderByOption, depth: 8);
+
+        public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, int depth) =>
+            await _categories
+                .Sort(p => p.Id, orderByOption)
+                .Where(c => !c.ParentId.HasValue)
+                .Skip(loadOptions.Skip)
+                .Take(loadOptions.Offset)
+                .Include(c => c.SubCategories)
+                .ThenInclude(c => c.SubCategories)
+                .AsNoTracking()
+                .ToListAsync();
+
+        public async Task<int> GetCount(Func<Category, bool> predicate)
         {
-            return await _categories.Include(c => c.SubCategories).ToListAsync();
+            return _categories.Count();
         }
 
-        public Task<int> GetCount(Func<Category, bool> predicate)
-        {
-            return _categories.Where(c => predicate(c)).CountAsync();
-        }
+        public async Task<IList<Category>> GetManyByFilter(Func<Category, bool> predicate) =>
+            await GetManyByFilter(predicate, depth: 2);
 
-        public async Task<IList<Category>> GetManyByFilter(Func<Category, bool> predicate)
-        {
-            return await _categories.AsNoTracking().Where(c => predicate(c)).ToListAsync();
-        }
+        public async Task<IList<Category>> GetManyByFilter(Func<Category, bool> predicate, int depth) =>
+            await _categories.IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+                .AsNoTracking()
+                .Where(c => predicate(c))
+                .ToListAsync();
 
         public async Task<Category> GetOneByFilter(Func<Category, bool> predicate)
         {
             try
             {
-                return _categories.AsNoTracking().Include(c => c.SubCategories).ThenInclude(s=> s.SubCategories).Where(predicate).FirstOrDefault();
+                return await GetOneByFilter(predicate, depth: 2);
             }
             catch (Exception ex)
             {
                 throw;
             }
+        }
+
+        public async Task<Category> GetOneByFilter(Func<Category, bool> predicate, int depth)
+        {
+            return _categories.IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+                .AsNoTracking()
+                .Where(predicate)
+                .FirstOrDefault();
         }
 
         public async Task<Category> GetOneById(int id)

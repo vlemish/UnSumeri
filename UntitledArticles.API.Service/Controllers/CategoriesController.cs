@@ -6,8 +6,11 @@ using UntitiledArticles.API.Application.Categories.Commands.Add;
 using UntitiledArticles.API.Application.Categories.Commands.AddSubcategory;
 using UntitiledArticles.API.Application.Categories.Commands.Delete;
 using UntitiledArticles.API.Application.Categories.Commands.Move;
+using UntitiledArticles.API.Application.Categories.Queries.GetAll;
 using UntitiledArticles.API.Application.Categories.Queries.GetById;
+using UntitiledArticles.API.Application.OperationStatuses;
 
+using UntitledArticles.API.Domain.Pagination;
 using UntitledArticles.API.Service.Contracts.Requests;
 
 namespace UntitledArticles.API.Service.Controllers
@@ -89,6 +92,23 @@ namespace UntitledArticles.API.Service.Controllers
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     }
             }
+        }
+
+        [HttpGet("")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAll([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
+        {
+            GetAllCategories query = new GetAllCategories(new LoadOptions(request.Offset, request.Skip), request.OrderByOption);
+            GetAllCategoriesResponse response = await _mediator.Send(query, cancellationToken);
+            if (response.Status.Status == OperationStatusValue.OK)
+            {
+                _logger.LogInformation(response.Status.Message);
+                return Ok(response.Result);
+            }
+            
+            _logger.LogError(response.Status.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPut("{id:int}/move/{moveToId:int?}")]
