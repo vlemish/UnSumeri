@@ -40,7 +40,7 @@ public class GetAllCategoriesHandler : IRequestHandler<GetAllCategories, GetAllC
         CancellationToken cancellationToken)
     {
         int totalRecordsCountTask = await _repository.GetCount(c => c.Id > 0);
-        IList<Category> categoriesTask = await _repository.GetAll(request.LoadOptions, request.OrderByOption);
+        IList<Category> categoriesTask = await _repository.GetAll(request.LoadOptions, request.OrderByOption, request.Depth);
 
         //await Task.WhenAll(totalRecordsCountTask, categoriesTask);
 

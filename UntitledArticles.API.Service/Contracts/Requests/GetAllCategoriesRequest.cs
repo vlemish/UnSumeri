@@ -8,5 +8,7 @@ public class GetAllCategoriesRequest
 
     public int? Skip { get; set; }
 
+    public int? Depth {get;set;} = 2;
+
     public OrderByOption? OrderByOption { get; set; }
 }

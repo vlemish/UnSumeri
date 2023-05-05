@@ -77,10 +77,12 @@ namespace UntitledArticles.API.Infrastructure.Repositories
                 .Where(c => !c.ParentId.HasValue)
                 .Skip(loadOptions.Skip)
                 .Take(loadOptions.Offset)
+                .IncludeSelfReferencingCollectionWithDepth(c=> c.SubCategories, depth)
                 .Include(c => c.SubCategories)
                 .ThenInclude(c => c.SubCategories)
                 .AsNoTracking()
                 .ToListAsync();
+        
 
         public async Task<int> GetCount(Func<Category, bool> predicate)
         {
