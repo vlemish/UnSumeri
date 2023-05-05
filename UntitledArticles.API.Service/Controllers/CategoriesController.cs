@@ -6,8 +6,11 @@ using UntitiledArticles.API.Application.Categories.Commands.Add;
 using UntitiledArticles.API.Application.Categories.Commands.AddSubcategory;
 using UntitiledArticles.API.Application.Categories.Commands.Delete;
 using UntitiledArticles.API.Application.Categories.Commands.Move;
+using UntitiledArticles.API.Application.Categories.Queries.GetAll;
 using UntitiledArticles.API.Application.Categories.Queries.GetById;
+using UntitiledArticles.API.Application.OperationStatuses;
 
+using UntitledArticles.API.Domain.Pagination;
 using UntitledArticles.API.Service.Contracts.Requests;
 
 namespace UntitledArticles.API.Service.Controllers
@@ -67,7 +70,7 @@ namespace UntitledArticles.API.Service.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetById([FromRoute] int id)
+        public async Task<IActionResult> GetById([FromRoute] int id, int? depth)
         {
             var query = new GetCategoryById(id);
             GetCategoryByIdResponse response = await _mediator.Send(query);
@@ -79,16 +82,33 @@ namespace UntitledArticles.API.Service.Controllers
             switch (response.Status.Status)
             {
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
-                    {
-                        _logger.LogError(response.Status.Message);
-                        return NotFound();
-                    }
+                {
+                    _logger.LogError(response.Status.Message);
+                    return NotFound();
+                }
                 default:
-                    {
-                        _logger.LogError($"An error occured during processing {nameof(GetById)} request: {response.Status.Message}");
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
+                {
+                    _logger.LogError($"An error occured during processing {nameof(GetById)} request: {response.Status.Message}");
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
             }
+        }
+
+        [HttpGet("")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAll([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
+        {
+            GetAllCategories query = new GetAllCategories(new LoadOptions(request.Offset, request.Skip), request.OrderByOption, request.Depth);
+            GetAllCategoriesResponse response = await _mediator.Send(query, cancellationToken);
+            if (response.Status.Status == OperationStatusValue.OK)
+            {
+                _logger.LogInformation(response.Status.Message);
+                return Ok(response.Result);
+            }
+
+            _logger.LogError(response.Status.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPut("{id:int}/move/{moveToId:int?}")]
@@ -107,20 +127,20 @@ namespace UntitledArticles.API.Service.Controllers
             switch (response.Status.Status)
             {
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
-                    {
-                        _logger.LogError(response.Status.Message);
-                        return NotFound();
-                    }
+                {
+                    _logger.LogError(response.Status.Message);
+                    return NotFound();
+                }
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.ParentNotExists:
-                    {
-                        _logger.LogError(response.Status.Message);
-                        return NotFound();
-                    }
+                {
+                    _logger.LogError(response.Status.Message);
+                    return NotFound();
+                }
                 default:
-                    {
-                        _logger.LogError($"An error occured during processing {nameof(Move)} request: {response.Status.Message}");
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
+                {
+                    _logger.LogError($"An error occured during processing {nameof(Move)} request: {response.Status.Message}");
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
             }
         }
 
@@ -140,15 +160,15 @@ namespace UntitledArticles.API.Service.Controllers
             switch (response.Status.Status)
             {
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
-                    {
-                        _logger.LogError(response.Status.Message);
-                        return NotFound();
-                    }
+                {
+                    _logger.LogError(response.Status.Message);
+                    return NotFound();
+                }
                 default:
-                    {
-                        _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.Status.Message}");
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
+                {
+                    _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.Status.Message}");
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
             }
         }
     }

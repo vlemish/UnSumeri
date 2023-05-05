@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-
-using UntitledArticles.API.Domain.Entities;
+﻿using UntitledArticles.API.Domain.Entities;
+using UntitledArticles.API.Domain.Enums;
+using UntitledArticles.API.Domain.Pagination;
 
 namespace UntitledArticles.API.Domain.Contracts
 {
@@ -22,6 +22,6 @@ namespace UntitledArticles.API.Domain.Contracts
 
         Task<IList<T>> GetManyByFilter(Func<T, bool> predicate);
 
-        Task<IList<T>> GetAll();
+        Task<IList<T>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption);
     }
 }

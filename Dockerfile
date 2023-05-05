@@ -2,14 +2,13 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
-
-ENV ASPNETCORE_URLS=http://+:5000
-ENV ASPNETCORE_ENVIRONMENT=development
-ENV ASPNETCORE_HTTP_PORT=https://+:5001
+EXPOSE 80
+EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["UntitledArticles.API.Service/UntitledArticles.API.Service.csproj", "UntitledArticles.API.Service/"]
+COPY . .
+# COPY ["/UntitledArticles.API.Service/UntitledArticles.API.Service.csproj", "/UntitledArticles.API.Service/"]
 RUN dotnet restore "UntitledArticles.API.Service/UntitledArticles.API.Service.csproj"
 COPY . .
 WORKDIR "/src/UntitledArticles.API.Service"
@@ -21,7 +20,4 @@ RUN dotnet publish "UntitledArticles.API.Service.csproj" -c Release -o /app/publ
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-EXPOSE 5000
-
 ENTRYPOINT ["dotnet", "UntitledArticles.API.Service.dll"]

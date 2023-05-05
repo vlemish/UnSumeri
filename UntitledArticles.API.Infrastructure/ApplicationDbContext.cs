@@ -32,11 +32,11 @@ namespace UntitledArticles.API.Infrastructure
 
         }
 
-        ///// <inheritdoc />
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer("Server=untitled_articles_mssql;Database=UnitledArticlesDB;User=sa;Password=Str0ngPa$$w0rd;Trust Server Certificate=true");
-        //}
+        // /// <inheritdoc />
+        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // {
+        //    optionsBuilder.UseSqlServer("Server=172.17.0.1,1433;Database=UnitledArticlesDB;User=sa;Password=Str0ngPa$$w0rd;Trust Server Certificate=true");
+        // }
 
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
