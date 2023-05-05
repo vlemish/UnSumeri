@@ -65,7 +65,7 @@ public class GetCategoryHandlerTest
     {
         _categoryRepositoryMock = new();
         _categoryRepositoryMock
-            .Setup(m => m.GetOneByFilter(It.IsAny<Func<Category, bool>>()))
+            .Setup(m => m.GetOneByFilter(It.IsAny<Func<Category, bool>>(), It.IsAny<int>()))
             .ReturnsAsync(category);
         _mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new CategoryMappings())));
     }
