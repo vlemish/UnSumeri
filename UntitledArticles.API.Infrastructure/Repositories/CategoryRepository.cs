@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
@@ -78,27 +79,26 @@ namespace UntitledArticles.API.Infrastructure.Repositories
                 .Skip(loadOptions.Skip)
                 .Take(loadOptions.Offset)
                 .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
-                .Include(c => c.SubCategories)
-                .ThenInclude(c => c.SubCategories)
                 .AsNoTracking()
                 .ToListAsync();
 
 
-        public async Task<int> GetCount(Func<Category, bool> predicate)
+        public async Task<int> GetCount(Expression<Func<Category, bool>> predicate)
         {
             return _categories.Count();
         }
 
-        public async Task<IList<Category>> GetManyByFilter(Func<Category, bool> predicate) =>
+        public async Task<IList<Category>> GetManyByFilter(Expression<Func<Category, bool>> predicate) =>
             await GetManyByFilter(predicate, depth: 2);
 
-        public async Task<IList<Category>> GetManyByFilter(Func<Category, bool> predicate, int depth) =>
-            await _categories.IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+        public async Task<IList<Category>> GetManyByFilter(Expression<Func<Category, bool>> predicate, int depth) =>
+            await _categories
                 .AsNoTracking()
-                .Where(c => predicate(c))
+                .Where(predicate)
+                .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
                 .ToListAsync();
 
-        public async Task<Category> GetOneByFilter(Func<Category, bool> predicate)
+        public async Task<Category> GetOneByFilter(Expression<Func<Category, bool>> predicate)
         {
             try
             {
@@ -110,13 +110,12 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             }
         }
 
-        public async Task<Category> GetOneByFilter(Func<Category, bool> predicate, int depth)
-        {
-            return _categories.IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+        public async Task<Category> GetOneByFilter(Expression<Func<Category, bool>> predicate, int depth) =>
+            await _categories
                 .AsNoTracking()
                 .Where(predicate)
-                .FirstOrDefault();
-        }
+                .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+                .FirstOrDefaultAsync();
 
         public async Task<Category> GetOneById(int id)
         {
