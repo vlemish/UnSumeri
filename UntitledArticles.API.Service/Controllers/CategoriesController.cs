@@ -6,6 +6,7 @@ using UntitiledArticles.API.Application.Categories.Commands.Add;
 using UntitiledArticles.API.Application.Categories.Commands.AddSubcategory;
 using UntitiledArticles.API.Application.Categories.Commands.Delete;
 using UntitiledArticles.API.Application.Categories.Commands.Move;
+using UntitiledArticles.API.Application.Categories.Commands.Update;
 using UntitiledArticles.API.Application.Categories.Queries.GetAll;
 using UntitiledArticles.API.Application.Categories.Queries.GetById;
 using UntitiledArticles.API.Application.OperationStatuses;
@@ -30,6 +31,7 @@ namespace UntitledArticles.API.Service.Controllers
 
         [HttpPost("", Name = nameof(AddCategory))]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Add([FromBody] AddCategoryRequest request)
         {
@@ -49,6 +51,7 @@ namespace UntitledArticles.API.Service.Controllers
 
         [HttpPost("{id:int}")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddSubcategory([FromRoute] int id, [FromBody] AddSubcategoryRequest request)
         {
@@ -68,6 +71,7 @@ namespace UntitledArticles.API.Service.Controllers
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById([FromRoute] int id, int? depth)
@@ -96,6 +100,7 @@ namespace UntitledArticles.API.Service.Controllers
 
         [HttpGet("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
         {
@@ -113,6 +118,7 @@ namespace UntitledArticles.API.Service.Controllers
 
         [HttpPut("{id:int}/move/{moveToId:int?}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Move([FromRoute] int id, [FromRoute] int? moveToId)
@@ -146,19 +152,21 @@ namespace UntitledArticles.API.Service.Controllers
 
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             DeleteCategory command = new(id);
             DeleteCategoryResponse response = await _mediator.Send(command);
-            if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
-            {
-                return Ok(id);
-            }
 
             switch (response.Status.Status)
             {
+                case OperationStatusValue.OK:
+                {
+                    _logger.LogInformation(response.Status.Message);
+                    return Ok(id);
+                }
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
                 {
                     _logger.LogError(response.Status.Message);
@@ -170,6 +178,36 @@ namespace UntitledArticles.API.Service.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError);
                 }
             }
+        }
+
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] string name, CancellationToken cancellationToken)
+        {
+            UpdateCategory command = new(id, name);
+            UpdateCategoryResponse response = await _mediator.Send(command, cancellationToken);
+
+            switch (response.Status.Status)
+            {
+                case OperationStatusValue.OK:
+                {
+                    _logger.LogInformation(response.Status.Message);
+                    return NoContent();
+                }
+                case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
+                {
+                    _logger.LogError(response.Status.Message);
+                    return NotFound();
+                }
+                default:
+                {
+                    _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.Status.Message}");
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+            }
+
         }
     }
 }

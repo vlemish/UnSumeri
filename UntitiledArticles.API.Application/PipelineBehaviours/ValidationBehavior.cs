@@ -1,12 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace UntitiledArticles.API.Application.PipelineBehaviours
 {
     public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
@@ -40,6 +34,7 @@ namespace UntitiledArticles.API.Application.PipelineBehaviours
             {
                 throw new ValidationException(errorsDictionary.FirstOrDefault().Value.FirstOrDefault());
             }
+            
             return await next();
         }
     }
