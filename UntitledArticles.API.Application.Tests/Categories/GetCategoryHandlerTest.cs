@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 
 using MediatR;
 
@@ -65,7 +66,7 @@ public class GetCategoryHandlerTest
     {
         _categoryRepositoryMock = new();
         _categoryRepositoryMock
-            .Setup(m => m.GetOneByFilter(It.IsAny<Func<Category, bool>>(), It.IsAny<int>()))
+            .Setup(m => m.GetOneByFilter(It.IsAny<Expression<Func<Category, bool>>>(), It.IsAny<int>()))
             .ReturnsAsync(category);
         _mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new CategoryMappings())));
     }

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 
 using MediatR;
 
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses;
 
 using UntitledArticles.API.Domain.Contracts;
+using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Queries.GetById
 {
@@ -25,7 +27,7 @@ namespace UntitiledArticles.API.Application.Categories.Queries.GetById
 
         public async Task<GetCategoryByIdResponse> Handle(GetCategoryById request, CancellationToken cancellationToken)
         {
-            var category = await _categoryRepository.GetOneByFilter(p => p.Id == request.Id, request.Depth);
+            var category = await _categoryRepository.GetOneByFilter(c=> c.Id == request.Id, request.Depth);
             if (category is null)
             {
                 return ReportNotFound(request);
@@ -34,6 +36,26 @@ namespace UntitiledArticles.API.Application.Categories.Queries.GetById
             var result = _mapper.Map<GetCategoryByIdResult>(category);
 
             return ReportSuccess(request, result);
+        }
+
+       private Expression<Func<T, bool>> GetConstComparison<T, P>(string propertyNameOrPath, P value)
+        {
+            ParameterExpression paramT = Expression.Parameter(typeof(T), "x");
+            Expression expr = getPropertyPathExpression(paramT, propertyNameOrPath.Split('.'));
+            return Expression.Lambda<Func<T, bool>>(Expression.Equal(expr, Expression.Constant(value)), paramT);
+        }
+
+        private Expression getPropertyPathExpression(Expression expr, IEnumerable<string> propertyNameOrPath)
+        {
+            var mExpr = Expression.PropertyOrField(expr, propertyNameOrPath.First());
+            if (propertyNameOrPath.Count() > 1)
+            {
+                return getPropertyPathExpression(mExpr, propertyNameOrPath.Skip(1));
+            }
+            else
+            {
+                return mExpr;
+            }
         }
 
         private GetCategoryByIdResponse ReportNotFound(GetCategoryById request)
