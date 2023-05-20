@@ -17,6 +17,8 @@ using UntitledArticles.API.Service.Contracts.Requests;
 namespace UntitledArticles.API.Service.Controllers
 {
     using Domain.Contracts;
+    using UntitiledArticles.API.Application.Articles.Commands;
+    using UntitiledArticles.API.Application.Articles.Commands.Add;
     using UntitiledArticles.API.Application.Models.Mediatr;
 
     [ApiController]
@@ -30,46 +32,6 @@ namespace UntitledArticles.API.Service.Controllers
         {
             _logger = logger;
             _mediator = mediator;
-        }
-
-        [HttpPost("", Name = nameof(AddCategory))]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Add([FromBody] AddCategoryRequest request)
-        {
-            var command = new AddCategory(request.Name);
-            ResultDto<AddCategoryResult> response = await _mediator.Send(command);
-            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
-            {
-                return new ObjectResult(response.Payload.Id)
-                {
-                    StatusCode = StatusCodes.Status201Created,
-                };
-            }
-
-            _logger.LogError($"An error occured during processing {nameof(AddCategory)} request: {response.OperationStatus.Message}");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
-
-        [HttpPost("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddSubcategory([FromRoute] int id, [FromBody] AddSubcategoryRequest request)
-        {
-            var command = new AddSubcategory(request.Name, id);
-            ResultDto<AddSubcategoryResult> response = await _mediator.Send(command);
-            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
-            {
-                return new ObjectResult(response.Payload.Id)
-                {
-                    StatusCode = StatusCodes.Status201Created,
-                };
-            }
-
-            _logger.LogError($"An error occured during processing {nameof(AddSubcategory)} request: {response.OperationStatus.Message}");
-            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpGet("{id:int}")]
@@ -116,6 +78,81 @@ namespace UntitledArticles.API.Service.Controllers
             }
 
             _logger.LogError(response.OperationStatus.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+
+        [HttpPost("", Name = nameof(AddCategory))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Add([FromBody] AddCategoryRequest request)
+        {
+            var command = new AddCategory(request.Name);
+            ResultDto<AddCategoryResult> response = await _mediator.Send(command);
+            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
+            {
+                return new ObjectResult(response.Payload.Id)
+                {
+                    StatusCode = StatusCodes.Status201Created,
+                };
+            }
+
+            _logger.LogError($"An error occured during processing {nameof(AddCategory)} request: {response.OperationStatus.Message}");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        [HttpPost("{categoryId:int}")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddArticle([FromRoute] int categoryId, [FromBody] AddArticleRequest request, CancellationToken cancellationToken)
+        {
+            AddArticle addArticle = new(categoryId, request.Title, request.Content);
+            ResultDto<AddArticleResult> response = await _mediator.Send(addArticle, cancellationToken);
+            switch (response.OperationStatus.Status)
+            {
+                case OperationStatusValue.OK:
+                {
+                    return new ObjectResult(response.Payload.Id)
+                    {
+                        StatusCode = StatusCodes.Status201Created,
+                    };
+                }
+                case OperationStatusValue.NotFound:
+                {
+                    return NotFound();
+                }
+                case OperationStatusValue.Duplicate:
+                {
+                    return Conflict();
+                }
+                default:
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+            }
+        }
+
+        [HttpPost("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddSubcategory([FromRoute] int id, [FromBody] AddSubcategoryRequest request)
+        {
+            var command = new AddSubcategory(request.Name, id);
+            ResultDto<AddSubcategoryResult> response = await _mediator.Send(command);
+            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
+            {
+                return new ObjectResult(response.Payload.Id)
+                {
+                    StatusCode = StatusCodes.Status201Created,
+                };
+            }
+
+            _logger.LogError($"An error occured during processing {nameof(AddSubcategory)} request: {response.OperationStatus.Message}");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 

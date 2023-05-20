@@ -7,9 +7,12 @@ using UntitledArticles.API.Service.Contracts.Requests;
 namespace UntitledArticles.API.Service.Controllers
 {
     using UntitiledArticles.API.Application.Articles.Commands;
+    using UntitiledArticles.API.Application.Articles.Queries.GetOneById;
+    using UntitiledArticles.API.Application.Models;
     using UntitiledArticles.API.Application.Models.Mediatr;
 
     [ApiController]
+    [Route("api/articles")]
     public class ArticlesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -19,32 +22,24 @@ namespace UntitledArticles.API.Service.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("{categoryId:int}")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Add([FromRoute] int categoryId, [FromBody] AddArticleRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetArticleById(int id, CancellationToken cancellationToken)
         {
-            AddArticle addArticle = new(categoryId, request.Title, request.Content);
-            ResultDto<AddArticleResult> response = await _mediator.Send(addArticle, cancellationToken);
-            switch (response.OperationStatus.Status)
+            GetOneArticleById query = new(id);
+            ResultDto<ArticleDto> queryResult = await this._mediator.Send(query, cancellationToken);
+            switch (queryResult.OperationStatus.Status)
             {
                 case OperationStatusValue.OK:
                 {
-                    return new ObjectResult(response.Payload.Id)
-                    {
-                        StatusCode = StatusCodes.Status201Created,
-                    };
+                    return this.Ok(queryResult.Payload);
                 }
                 case OperationStatusValue.NotFound:
                 {
-                    return NotFound();
-                }
-                case OperationStatusValue.Duplicate:
-                {
-                    return Conflict();
+                    return this.NotFound();
                 }
                 default:
                 {
