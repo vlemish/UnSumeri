@@ -12,7 +12,7 @@ namespace UntitiledArticles.API.Application.Articles.Commands.Add;
 
 using Models.Mediatr;
 
-public class AddArticleHandler : IRequestHandler<AddArticle, AddArticleResponse>
+public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticleResult>>
 {
     private readonly IArticleRepository _articleRepository;
     private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, AddArticleResponse>
         _mediator = mediator;
     }
 
-    public async Task<AddArticleResponse> Handle(AddArticle request, CancellationToken cancellationToken)
+    public async Task<ResultDto<AddArticleResult>> Handle(AddArticle request, CancellationToken cancellationToken)
     {
         ResultDto<GetCategoryByIdResult> getCategoryByIdResponse =
             await _mediator.Send(CreateGetCategoryById(request), cancellationToken);
@@ -33,7 +33,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, AddArticleResponse>
         var validationResult = ValidateCategory(request, getCategoryByIdResponse);
         if (!validationResult.Success)
         {
-            return new AddArticleResponse(GetFailureOperationStatus(request, validationResult.Status), null);
+            return new (GetFailureOperationStatus(request, validationResult.Status), null);
         }
 
         int addedArticleId = await AddCategoryAsync(request);
@@ -74,7 +74,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, AddArticleResponse>
         : new(true, OperationStatusValue.OK);
     }
 
-    private AddArticleResponse ReportSuccess(int addedArticleId) =>
+    private ResultDto<AddArticleResult> ReportSuccess(int addedArticleId) =>
         new(new AddArticleSuccessStatus(addedArticleId), new AddArticleResult(addedArticleId));
 
     private GetCategoryById CreateGetCategoryById(AddArticle request) =>

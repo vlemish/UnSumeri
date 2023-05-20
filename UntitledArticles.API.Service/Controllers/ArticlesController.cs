@@ -6,6 +6,9 @@ using UntitledArticles.API.Service.Contracts.Requests;
 
 namespace UntitledArticles.API.Service.Controllers
 {
+    using UntitiledArticles.API.Application.Articles.Commands;
+    using UntitiledArticles.API.Application.Models.Mediatr;
+
     [ApiController]
     public class ArticlesController : ControllerBase
     {
@@ -25,12 +28,12 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> Add([FromRoute] int categoryId, [FromBody] AddArticleRequest request, CancellationToken cancellationToken)
         {
             AddArticle addArticle = new(categoryId, request.Title, request.Content);
-            AddArticleResponse response = await _mediator.Send(addArticle, cancellationToken);
+            ResultDto<AddArticleResult> response = await _mediator.Send(addArticle, cancellationToken);
             switch (response.OperationStatus.Status)
             {
                 case OperationStatusValue.OK:
                 {
-                    return new ObjectResult(response.Result.Id)
+                    return new ObjectResult(response.Payload.Id)
                     {
                         StatusCode = StatusCodes.Status201Created,
                     };

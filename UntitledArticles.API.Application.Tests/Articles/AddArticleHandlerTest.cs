@@ -13,6 +13,7 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Articles;
 
+using UntitiledArticles.API.Application.Articles.Commands;
 using UntitiledArticles.API.Application.Models.Mediatr;
 
 public class AddArticleHandlerTest
@@ -39,7 +40,7 @@ public class AddArticleHandlerTest
 
         _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object);
 
-        AddArticleResponse actualResponse = await _handler.Handle(request, default);
+        ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.NotFound, actualResponse.OperationStatus.Status);
     }
@@ -60,7 +61,7 @@ public class AddArticleHandlerTest
 
         _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object);
 
-        AddArticleResponse actualResponse = await _handler.Handle(request, default);
+        ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.Duplicate, actualResponse.OperationStatus.Status);
     }
@@ -81,7 +82,7 @@ public class AddArticleHandlerTest
 
         _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object);
 
-        AddArticleResponse actualResponse = await _handler.Handle(request, default);
+        ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.OK, actualResponse.OperationStatus.Status);
     }
