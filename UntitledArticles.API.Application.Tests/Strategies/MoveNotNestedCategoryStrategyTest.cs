@@ -11,6 +11,8 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Strategies;
 
+using UntitiledArticles.API.Application.Models.Mediatr;
+
 public class MoveNotNestedCategoryStrategyTest
 {
     private Mock<ICategoryRepository> _categoryRepositoryMock;
@@ -20,29 +22,29 @@ public class MoveNotNestedCategoryStrategyTest
     public async Task TestMoveNotNestedCategoryStrategy_WhenCategoryExist_ThenMoved()
     {
         int id = 2;
-        GetCategoryByIdResponse categoryToMoveResponse =
-            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, null));
-        
+        ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
+            new(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, null));
+
         SetupMocks(id, categoryToMoveResponse);
-        
+
         MoveNotNestedCategoryStrategy strategy = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
         await strategy.Move(id, null);
-        
+
         VerifyMoveSuccessMocks(id);
     }
-    
+
     [Fact]
     public async Task TestMoveNotNestedCategoryStrategy_WhenCategoryNotExist_ThenArgumentOutOfRangeException()
     {
         int id = 2;
-        GetCategoryByIdResponse categoryToMoveResponse =
-            new GetCategoryByIdResponse(new GetCategoryByIdNotFound(id), null);
-        
+        ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
+            new(new GetCategoryByIdNotFound(id), null);
+
         SetupMocks(id, categoryToMoveResponse);
-        
+
         MoveNotNestedCategoryStrategy strategy = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => strategy.Move(id, null));
-        
+
         VerifyMoveCategoryNotFoundMocks(id);
     }
 
@@ -55,7 +57,7 @@ public class MoveNotNestedCategoryStrategyTest
             .Verify(m => m.UpdateAsync(It.Is<Category>(x => x.Id == id)),
                 Times.Never);
     }
-    
+
      private void VerifyMoveSuccessMocks(int id)
     {
         _mediatorMock
@@ -66,7 +68,7 @@ public class MoveNotNestedCategoryStrategyTest
                 Times.Once);
     }
 
-     private void SetupMocks(int id, GetCategoryByIdResponse categoryToMoveResponse)
+     private void SetupMocks(int id, ResultDto<GetCategoryByIdResult> categoryToMoveResponse)
     {
         _categoryRepositoryMock = new();
         _mediatorMock = new();

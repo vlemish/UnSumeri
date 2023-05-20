@@ -14,6 +14,8 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
+using UntitiledArticles.API.Application.Models.Mediatr;
+
 public class UpdateCategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepositoryMock;
@@ -27,7 +29,7 @@ public class UpdateCategoryHandlerTest
         int id = 2;
         string name = "testname2";
 
-        GetCategoryByIdResponse expectedGetByIdResponse = new(new GetCategoryByIdSuccess(id), new GetCategoryByIdResult()
+        ResultDto<GetCategoryByIdResult> expectedGetByIdResponse = new(new GetCategoryByIdSuccess(id), new GetCategoryByIdResult()
         {
             Id = 2,
             Name = "testname1",
@@ -37,9 +39,9 @@ public class UpdateCategoryHandlerTest
 
         _handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
 
-        UpdateCategoryResponse actual = await _handler.Handle(new UpdateCategory(id, name), default);
+        ResultDto actual = await _handler.Handle(new UpdateCategory(id, name), default);
 
-        Assert.Equal(UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK, actual.Status.Status);
+        Assert.Equal(UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK, actual.OperationStatus.Status);
     }
 
     [Fact]
@@ -48,18 +50,18 @@ public class UpdateCategoryHandlerTest
         int id = 2;
         string name = "testname2";
 
-        GetCategoryByIdResponse expectedGetByIdResponse = new(new GetCategoryByIdNotFound(id), null);
+        ResultDto<GetCategoryByIdResult> expectedGetByIdResponse = new(new GetCategoryByIdNotFound(id), null);
 
         SetupMocks(expectedGetByIdResponse);
 
         _handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
 
-        UpdateCategoryResponse actual = await _handler.Handle(new UpdateCategory(id, name), default);
+        ResultDto actual = await _handler.Handle(new UpdateCategory(id, name), default);
 
-        Assert.Equal(UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound, actual.Status.Status);
+        Assert.Equal(UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound, actual.OperationStatus.Status);
     }
 
-    private void SetupMocks(GetCategoryByIdResponse expectedGetByIdResponse)
+    private void SetupMocks(ResultDto<GetCategoryByIdResult> expectedGetByIdResponse)
     {
         _categoryRepositoryMock = new();
         _mediatorMock = new();

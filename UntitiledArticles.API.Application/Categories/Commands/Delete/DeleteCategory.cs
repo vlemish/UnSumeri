@@ -2,4 +2,6 @@
 
 namespace UntitiledArticles.API.Application.Categories.Commands.Delete;
 
-public record DeleteCategory(int Id) : IRequest<DeleteCategoryResponse>;
+using Models.Mediatr;
+
+public record DeleteCategory(int Id) : IRequest<ResultDto>;

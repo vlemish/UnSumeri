@@ -12,50 +12,44 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Commands.Delete;
 
-public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, DeleteCategoryResponse>
+using Models.Mediatr;
+
+public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, ResultDto>
 {
-    private readonly ILogger<DeleteCategoryHandler> _logger;
     private readonly ICategoryRepository _repository;
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
 
-    public DeleteCategoryHandler(ILogger<DeleteCategoryHandler> logger, ICategoryRepository repository, IMediator mediator, IMapper mapper)
+    public DeleteCategoryHandler(ICategoryRepository repository, IMediator mediator, IMapper mapper)
     {
-        _logger = logger;
         _repository = repository;
         _mediator = mediator;
         _mapper = mapper;
     }
 
-    public async Task<DeleteCategoryResponse> Handle(DeleteCategory request, CancellationToken cancellationToken)
+    public async Task<ResultDto> Handle(DeleteCategory request, CancellationToken cancellationToken)
     {
-        GetCategoryByIdResponse response = await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
-        Category category = _mapper.Map<Category>(response.Result);
+        ResultDto<GetCategoryByIdResult> response = await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
+        Category category = _mapper.Map<Category>(response.Payload);
         if (category is null)
         {
             return ReportCategoryNotFound(request);
         }
-        //if (getCategoryResponse.Status.Status != OperationStatusValue.OK)
-        //{
-        //    return ReportCategoryNotFound(request);
-        //}
 
         await _repository.DeleteAsync(category);
 
         return ReportSuccess(request);
     }
 
-    private DeleteCategoryResponse ReportCategoryNotFound(DeleteCategory request)
+    private ResultDto ReportCategoryNotFound(DeleteCategory request)
     {
         DeleteCategoryNotFound operationStatus = new(request.Id);
-        _logger.LogError(operationStatus.Message);
         return new(operationStatus);
     }
 
-    private DeleteCategoryResponse ReportSuccess(DeleteCategory request)
+    private ResultDto ReportSuccess(DeleteCategory request)
     {
         DeleteCategorySuccess operationStatus = new(request.Id);
-        _logger.LogInformation(operationStatus.Message);
         return new(operationStatus);
     }
 

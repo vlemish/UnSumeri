@@ -2,5 +2,7 @@
 
 namespace UntitiledArticles.API.Application.Categories.Commands.Move
 {
-    public record MoveCategory(int Id, int? MoveToId) : IRequest<MoveCategoryResponse>;
+    using Models.Mediatr;
+
+    public record MoveCategory(int Id, int? MoveToId) : IRequest<ResultDto>;
 }

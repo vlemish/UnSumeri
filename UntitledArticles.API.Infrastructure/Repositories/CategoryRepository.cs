@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+
 using Microsoft.EntityFrameworkCore;
 
 using UntitledArticles.API.Domain.Contracts;
@@ -72,15 +73,48 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption) =>
             await GetAll(loadOptions, orderByOption, depth: 8);
 
-        public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, int depth) =>
-            await _categories
+        public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, int depth)
+        {
+            var categories = await _categories
                 .Sort(p => p.Id, orderByOption)
                 .Where(c => !c.ParentId.HasValue)
                 .Skip(loadOptions.Skip)
                 .Take(loadOptions.Offset)
                 .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+                .ThenInclude(c => c.Articles)
                 .AsNoTracking()
                 .ToListAsync();
+
+            foreach (var category in categories)
+            {
+                LoadCategories(category);
+            }
+
+            return categories;
+        }
+
+        private async void LoadCategories(Category category)
+        {
+            var res = _categories.Where(c => c.Id == category.Id).Include(c => c.Articles).FirstOrDefault().Articles;
+            category.Articles = res;
+            if (category.SubCategories is null || category.SubCategories.Count == 0)
+            {
+                return;
+            }
+            foreach (var subCategory in category.SubCategories)
+            {
+                LoadCategories(subCategory);
+            }
+        }
+        // await _categories
+        //     .Sort(p => p.Id, orderByOption)
+        //     .Where(c => !c.ParentId.HasValue)
+        //     .Skip(loadOptions.Skip)
+        //     .Take(loadOptions.Offset)
+        //     .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+        //     .ThenInclude(c => c.Articles)
+        //     .AsNoTracking()
+        //     .ToListAsync();
 
 
         public async Task<int> GetCount(Expression<Func<Category, bool>> predicate)

@@ -14,6 +14,8 @@ using UntitledArticles.API.Service.Mappings;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
+using UntitiledArticles.API.Application.Models.Mediatr;
+
 public class GetCategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepositoryMock;
@@ -38,12 +40,12 @@ public class GetCategoryHandlerTest
         GetCategoryByIdHandler handler = new(new Mock<ILogger<GetCategoryByIdHandler>>().Object,
             _categoryRepositoryMock.Object, _mapper);
 
-        GetCategoryByIdResponse result = await handler.Handle(request, default);
+        ResultDto<GetCategoryByIdResult> result = await handler.Handle(request, default);
 
-        Assert.Equal(expectedOperationValue, result.Status.Status);
-        Assert.True(IsCategoryResultEqualToCategory(category, result.Result));
+        Assert.Equal(expectedOperationValue, result.OperationStatus.Status);
+        Assert.True(IsCategoryResultEqualToCategory(category, result.Payload));
     }
-    
+
     [Fact]
     public async Task TestGetCategoryHandler_WhenCategoryNotExist_ThenNotFound()
     {
@@ -57,9 +59,9 @@ public class GetCategoryHandlerTest
         GetCategoryByIdHandler handler = new(new Mock<ILogger<GetCategoryByIdHandler>>().Object,
             _categoryRepositoryMock.Object, _mapper);
 
-        GetCategoryByIdResponse result = await handler.Handle(request, default);
+        ResultDto<GetCategoryByIdResult> result = await handler.Handle(request, default);
 
-        Assert.Equal(expectedOperationValue, result.Status.Status);
+        Assert.Equal(expectedOperationValue, result.OperationStatus.Status);
     }
 
     private void SetupMocks(Category category)
@@ -70,7 +72,7 @@ public class GetCategoryHandlerTest
             .ReturnsAsync(category);
         _mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new CategoryMappings())));
     }
-    
+
     private bool IsCategoryResultEqualToCategory(Category category, GetCategoryByIdResult result)
     {
         if (category.Id == result.Id || category.Name == result.Name || category.ParentId == result.ParentId ||

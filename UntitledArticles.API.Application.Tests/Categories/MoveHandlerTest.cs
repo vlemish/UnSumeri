@@ -9,6 +9,8 @@ using UntitiledArticles.API.Application.OperationStatuses;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
+using UntitiledArticles.API.Application.Models.Mediatr;
+
 public class MoveHandlerTest
 {
     private Mock<IMediator> _mediatorMock;
@@ -24,14 +26,14 @@ public class MoveHandlerTest
         SetupMocks(id, moveToId);
 
         MoveCategoryHandler handler =
-            new MoveCategoryHandler(new Mock<ILogger<MoveCategoryHandler>>().Object, _mediatorMock.Object);
-        MoveCategoryResponse actual = await handler.Handle(moveCategoryRequest, default);
+            new MoveCategoryHandler(_mediatorMock.Object);
+        ResultDto actual = await handler.Handle(moveCategoryRequest, default);
 
         Assert.NotNull(actual);
-        Assert.Equal(expectedOperationStatusValue, actual.Status.Status);
+        Assert.Equal(expectedOperationStatusValue, actual.OperationStatus.Status);
         VerifyMocks(id, moveToId);
     }
-    
+
     [Fact]
     public async Task TestMoveHandler_WhenMoveToIdPresent_ThenCallMoveAsRootCommand()
     {
@@ -43,11 +45,11 @@ public class MoveHandlerTest
         SetupMocks(id, moveToId);
 
         MoveCategoryHandler handler =
-            new MoveCategoryHandler(new Mock<ILogger<MoveCategoryHandler>>().Object, _mediatorMock.Object);
-        MoveCategoryResponse actual = await handler.Handle(moveCategoryRequest, default);
+            new MoveCategoryHandler(_mediatorMock.Object);
+        ResultDto actual = await handler.Handle(moveCategoryRequest, default);
 
         Assert.NotNull(actual);
-        Assert.Equal(expectedOperationStatusValue, actual.Status.Status);
+        Assert.Equal(expectedOperationStatusValue, actual.OperationStatus.Status);
         VerifyMocks(id, moveToId);
     }
 
@@ -74,10 +76,10 @@ public class MoveHandlerTest
 
         _mediatorMock
             .Setup(m => m.Send(It.Is<MoveAsRoot>(x => x.Id == id), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new MoveAsRootResponse(new MoveCategorySuccess(id, null)));
+            .ReturnsAsync(new ResultDto(new MoveCategorySuccess(id, null)));
         _mediatorMock
             .Setup(m => m.Send(It.Is<MoveAsSubCategory>(x => x.Id == id && x.MoveToId == moveToId),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new MoveAsSubCategoryResponse(new MoveCategorySuccess(id, moveToId)));
+            .ReturnsAsync(new ResultDto(new MoveCategorySuccess(id, moveToId)));
     }
 }

@@ -9,44 +9,19 @@ namespace UntitledArticles.API.Infrastructure.Extensions
 {
     internal static class QueryExtensions
     {
-        internal static IIncludableQueryable<TInput, ICollection<TInput>> IncludeSelfReferencingCollectionWithDepth<TInput>(this IQueryable<TInput> dbSet,
+        internal static IIncludableQueryable<TInput, ICollection<TInput>> IncludeSelfReferencingCollectionWithDepth<TInput>(this IQueryable<TInput> source,
             Expression<Func<TInput, ICollection<TInput>>> navigationInclude,
             int depth)
             where TInput : class
         {
-            var includableQueryale = dbSet.Include(navigationInclude);
+            var includableQueryale = source.Include(navigationInclude);
             for (int i = 0; i < depth - 1; i++)
             {
                 includableQueryale = includableQueryale.ThenInclude(navigationInclude);
             }
-
+            
             return includableQueryale;
         }
-
-    //     internal static IQueryable<TEntity> Include<TEntity>(this DbSet<TEntity> source,
-    //     int levelIndex, Expression<Func<TEntity, TEntity>> expression)
-    //     where TEntity : class
-    //   {
-    //     if (levelIndex < 0)
-    //     {
-    //         throw new ArgumentOutOfRangeException(nameof(levelIndex));
-    //     }
-        
-    //     var member = (MemberExpression)expression.Body;
-    //     var property = member.Member.Name;
-    //     var sb = new StringBuilder();
-    //     for (int i = 0; i < levelIndex; i++)
-    //     {
-    //         if (i > 0)
-    //         {
-    //             sb.Append(Type.Delimiter);
-    //         }
-
-    //     sb.Append(property);
-    //   }
-
-    //   return source.Include(sb.ToString());
-    // }
 
         //internal static IIncludableQueryable<TInput, ICollection<TInput>> IncludeSelfReferencingCollectionWithDepth<TInput>(this IQueryable<TInput> input,
         //    Expression<Func<TInput, ICollection<TInput>>> navigationInclude,

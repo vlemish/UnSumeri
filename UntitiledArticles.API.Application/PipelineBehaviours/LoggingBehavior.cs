@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 
 namespace UntitiledArticles.API.Application.PipelineBehaviours
 {
+    using Models.Mediatr;
+
     public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+        where TRequest : IRequest<TResponse>, TResponse
     {
         private ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
 
@@ -19,7 +21,7 @@ namespace UntitiledArticles.API.Application.PipelineBehaviours
             List<string> properties = GetRequestProperties(request);
             _logger.LogInformation($"Handling {typeof(TRequest).Name} where {string.Join(", ", properties)}!");
             TResponse result = await next();
-            _logger.LogInformation($"{typeof(TRequest).Name} where {string.Join(", ", properties)} was handled!");
+            _logger.LogInformation($"{typeof(TRequest).Name} where {string.Join(", ", properties)} was handled with Message = !");
             return result;
         }
 

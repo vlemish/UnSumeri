@@ -4,7 +4,10 @@ using UntitledArticles.API.Domain.Pagination;
 
 namespace UntitiledArticles.API.Application.Categories.Queries.GetAll;
 
-public record GetAllCategories : IRequest<GetAllCategoriesResponse>
+using Models.Mediatr;
+using UntitledArticles.API.Domain.Contracts;
+
+public record GetAllCategories : IRequest<ResultDto<IPaginatedResult<GetAllCategoriesResult>>>
 {
     public GetAllCategories(LoadOptions loadOptions, OrderByOption? orderByOption, int? depth)
     {
@@ -12,7 +15,7 @@ public record GetAllCategories : IRequest<GetAllCategoriesResponse>
         OrderByOption = orderByOption ?? UntitledArticles.API.Domain.Enums.OrderByOption.ASC;
         Depth = depth ?? 2;
     }
-    
+
     public LoadOptions LoadOptions { get; init; } = new();
 
     public OrderByOption OrderByOption { get; init; }

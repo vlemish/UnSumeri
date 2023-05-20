@@ -12,63 +12,49 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Commands.MoveAsSubCategory;
 
-public class MoveAsSubCategoryHandler : IRequestHandler<MoveAsSubCategory, MoveAsSubCategoryResponse>
+using Models.Mediatr;
+
+public class MoveAsSubCategoryHandler : IRequestHandler<MoveAsSubCategory, ResultDto>
 {
-    private readonly ILogger<MoveAsSubCategoryHandler> _logger;
     private readonly ICategoryMoveStrategyFactory _categoryMoveStrategyFactory;
     private readonly IMediator _mediator;
 
-    public MoveAsSubCategoryHandler(ILogger<MoveAsSubCategoryHandler> logger,
-        ICategoryMoveStrategyFactory categoryMoveStrategyFactory,
+    public MoveAsSubCategoryHandler(ICategoryMoveStrategyFactory categoryMoveStrategyFactory,
         IMediator mediator)
     {
-        _logger = logger;
         _categoryMoveStrategyFactory = categoryMoveStrategyFactory;
         _mediator = mediator;
     }
 
-    public async Task<MoveAsSubCategoryResponse> Handle(MoveAsSubCategory request, CancellationToken cancellationToken)
+    public async Task<ResultDto> Handle(MoveAsSubCategory request, CancellationToken cancellationToken)
     {
-        GetCategoryByIdResponse categoryResponse = await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
-        if (categoryResponse.Status.Status != OperationStatusValue.OK)
+        ResultDto<GetCategoryByIdResult> categoryResponse =
+            await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
+        if (categoryResponse.OperationStatus.Status != OperationStatusValue.OK)
         {
-            return ReportNotFound(categoryResponse.Status);
+            return ReportNotFound(categoryResponse.OperationStatus);
         }
 
-        GetCategoryByIdResponse categoryToMoveResponse =
+        ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
             await _mediator.Send(new GetCategoryById(request.MoveToId), cancellationToken);
-        if (categoryToMoveResponse.Status.Status != OperationStatusValue.OK)
+        if (categoryToMoveResponse.OperationStatus.Status != OperationStatusValue.OK)
         {
             return ReportParentCategoryNotExist(request);
         }
-        
-        ICategoryMoveStrategy categoryMoveStrategy = _categoryMoveStrategyFactory.CreateCategoryMoveStrategy(new Category()
-        {
-            Id = request.Id,
-            Name = categoryResponse.Result.Name,
-            ParentId = request.MoveToId
-        }, request.Id);
+
+        ICategoryMoveStrategy categoryMoveStrategy = _categoryMoveStrategyFactory.CreateCategoryMoveStrategy(
+            new Category() { Id = request.Id, Name = categoryResponse.Payload.Name, ParentId = request.MoveToId },
+            request.Id);
         await categoryMoveStrategy.Move(request.Id, request.MoveToId);
         return ReportSuccess(request);
     }
-    
-    private MoveAsSubCategoryResponse ReportParentCategoryNotExist(MoveAsSubCategory request)
-    {
-        _logger.LogDebug(
-            $"Failed to move category where Id = {request.Id} and Parent Id = {request}: Parent Category doesn't exist!");
-        return new(new MoveCategoryParentCategoryNotExist(request.Id, request.MoveToId));
-    }
 
-    private MoveAsSubCategoryResponse ReportNotFound(IOperationStatus status)
-    {
-        _logger.LogDebug($"Failed to move category: {status.Message}");
-        return new(status);
-    }
-    
-    private MoveAsSubCategoryResponse ReportSuccess(MoveAsSubCategory request)
-    {
-        _logger.LogDebug(
-            $"{nameof(MoveAsSubCategory)} where Id = {request.Id} and Parent Id = {request.MoveToId} was successfully handled");
-        return new(new MoveCategorySuccess(request.Id, request.MoveToId));
-    }
+    private ResultDto ReportParentCategoryNotExist(MoveAsSubCategory request) =>
+        new(new MoveCategoryParentCategoryNotExist(request.Id, request.MoveToId));
+
+    private ResultDto ReportNotFound(IOperationStatus status) =>
+        new(status);
+
+    private ResultDto ReportSuccess(MoveAsSubCategory request) =>
+        new(new MoveCategorySuccess(request.Id, request.MoveToId));
 }

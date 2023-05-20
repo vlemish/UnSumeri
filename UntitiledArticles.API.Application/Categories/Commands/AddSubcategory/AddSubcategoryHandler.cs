@@ -1,31 +1,28 @@
 ﻿using MediatR;
-
 using Microsoft.Extensions.Logging;
-
 using UntitiledArticles.API.Application.Categories.Commands.AddSubcategory.Statuses;
-
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Commands.AddSubcategory
 {
-    public class AddSubcategoryHandler : IRequestHandler<AddSubcategory, AddSubcategoryResponse>
+    using Models.Mediatr;
+
+    public class AddSubcategoryHandler : IRequestHandler<AddSubcategory, ResultDto<AddSubcategoryResult>>
     {
-        private readonly ILogger<AddSubcategoryHandler> _logger;
         private readonly ICategoryRepository _categoryRepository;
 
-        public AddSubcategoryHandler(ILogger<AddSubcategoryHandler> logger, ICategoryRepository categoryRepository)
+        public AddSubcategoryHandler(ICategoryRepository categoryRepository)
         {
-            _logger = logger;
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<AddSubcategoryResponse> Handle(AddSubcategory request, CancellationToken cancellationToken)
+        public async Task<ResultDto<AddSubcategoryResult>> Handle(AddSubcategory request,
+            CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Start handling {nameof(AddSubcategory)} request where Name = {request.Name}, Parent Id = {request.ParentId}");
             Category createdCategory = await _categoryRepository.AddAsync(CreateCategory(request));
-            _logger.LogDebug($"{nameof(AddSubcategory)} request where Name = {request.Name}, Parent Id = {request.ParentId} was successfully handled");
-            return new AddSubcategoryResponse(new AddSubcategorySuccess(request.Name, request.ParentId), CreateSubcategoryResult(createdCategory));
+            return new ResultDto<AddSubcategoryResult>(new AddSubcategorySuccess(request.Name, request.ParentId),
+                CreateSubcategoryResult(createdCategory));
         }
 
         private Category CreateCategory(AddSubcategory request) =>

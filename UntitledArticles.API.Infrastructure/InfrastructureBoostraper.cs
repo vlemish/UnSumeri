@@ -12,6 +12,7 @@ namespace UntitledArticles.API.Infrastructure
         public static IServiceCollection ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("SqlServerDocker")));
+            services.AddScoped<IArticleRepository, ArticleRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             return services;

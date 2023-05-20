@@ -2,7 +2,9 @@
 
 namespace UntitiledArticles.API.Application.Categories.Queries.GetById
 {
-    public record GetCategoryById : IRequest<GetCategoryByIdResponse>
+    using Models.Mediatr;
+
+    public record GetCategoryById : IRequest<ResultDto<GetCategoryByIdResult>>
     {
         public GetCategoryById(int id, int? depth = null)
         {
