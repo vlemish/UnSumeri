@@ -8,11 +8,12 @@ using Microsoft.Extensions.Logging;
 using UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses;
 
 using UntitledArticles.API.Domain.Contracts;
-using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Queries.GetById
 {
-    public class GetCategoryByIdHandler : IRequestHandler<GetCategoryById, GetCategoryByIdResponse>
+    using Models.Mediatr;
+
+    public class GetCategoryByIdHandler : IRequestHandler<GetCategoryById, ResultDto<GetCategoryByIdResult>>
     {
         private readonly ILogger<GetCategoryByIdHandler> _logger;
         private readonly ICategoryRepository _categoryRepository;
@@ -25,7 +26,7 @@ namespace UntitiledArticles.API.Application.Categories.Queries.GetById
             _mapper = mapper;
         }
 
-        public async Task<GetCategoryByIdResponse> Handle(GetCategoryById request, CancellationToken cancellationToken)
+        public async Task<ResultDto<GetCategoryByIdResult>> Handle(GetCategoryById request, CancellationToken cancellationToken)
         {
             var category = await _categoryRepository.GetOneByFilter(c=> c.Id == request.Id, request.Depth);
             if (category is null)
@@ -38,37 +39,17 @@ namespace UntitiledArticles.API.Application.Categories.Queries.GetById
             return ReportSuccess(request, result);
         }
 
-       private Expression<Func<T, bool>> GetConstComparison<T, P>(string propertyNameOrPath, P value)
-        {
-            ParameterExpression paramT = Expression.Parameter(typeof(T), "x");
-            Expression expr = getPropertyPathExpression(paramT, propertyNameOrPath.Split('.'));
-            return Expression.Lambda<Func<T, bool>>(Expression.Equal(expr, Expression.Constant(value)), paramT);
-        }
-
-        private Expression getPropertyPathExpression(Expression expr, IEnumerable<string> propertyNameOrPath)
-        {
-            var mExpr = Expression.PropertyOrField(expr, propertyNameOrPath.First());
-            if (propertyNameOrPath.Count() > 1)
-            {
-                return getPropertyPathExpression(mExpr, propertyNameOrPath.Skip(1));
-            }
-            else
-            {
-                return mExpr;
-            }
-        }
-
-        private GetCategoryByIdResponse ReportNotFound(GetCategoryById request)
+        private ResultDto<GetCategoryByIdResult> ReportNotFound(GetCategoryById request)
         {
             _logger.LogDebug($"Failed to get a category where Id = {request.Id}: Category not found");
-            return new GetCategoryByIdResponse(new GetCategoryByIdNotFound(request.Id), null);
+            return new ResultDto<GetCategoryByIdResult>(new GetCategoryByIdNotFound(request.Id), null);
         }
 
 
-        private GetCategoryByIdResponse ReportSuccess(GetCategoryById request, GetCategoryByIdResult result)
+        private ResultDto<GetCategoryByIdResult>  ReportSuccess(GetCategoryById request, GetCategoryByIdResult result)
         {
             _logger.LogDebug($"Get Category where Id = {request.Id} was successfully handled");
-            return new GetCategoryByIdResponse(new GetCategoryByIdSuccess(request.Id), result);
+            return new ResultDto<GetCategoryByIdResult>(new GetCategoryByIdSuccess(request.Id), result);
         }
     }
 }

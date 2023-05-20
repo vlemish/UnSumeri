@@ -8,6 +8,8 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Models.Strategies;
 
+using Mediatr;
+
 public class MoveNestedCategoryStrategy : ICategoryMoveStrategy
 {
     private readonly ICategoryRepository _categoryRepository;
@@ -26,33 +28,33 @@ public class MoveNestedCategoryStrategy : ICategoryMoveStrategy
             throw new ArgumentNullException($"{nameof(moveToCategoryId)} was null!");
         }
 
-        GetCategoryByIdResponse parentCategoryResponse = await _mediator.Send(new GetCategoryById(moveToCategoryId.Value));
-        GetCategoryByIdResponse categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id));
+        ResultDto<GetCategoryByIdResult>  parentCategoryResponse = await _mediator.Send(new GetCategoryById(moveToCategoryId.Value));
+        ResultDto<GetCategoryByIdResult>  categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id));
 
         ValidateGetCategoryResponses(parentCategoryResponse, categoryToMoveResponse);
-        
+
         // update new parent not to relate to category to move
         await _categoryRepository.UpdateAsync(new Category()
         {
-            Id = parentCategoryResponse.Result.Id,
-            Name = parentCategoryResponse.Result.Name,
-            ParentId = categoryToMoveResponse.Result.ParentId
+            Id = parentCategoryResponse.Payload.Id,
+            Name = parentCategoryResponse.Payload.Name,
+            ParentId = categoryToMoveResponse.Payload.ParentId
         });
         await _categoryRepository.UpdateAsync(new Category()
         {
-            Id = categoryToMoveResponse.Result.Id,
-            Name = categoryToMoveResponse.Result.Name,
-            ParentId = parentCategoryResponse.Result.Id
+            Id = categoryToMoveResponse.Payload.Id,
+            Name = categoryToMoveResponse.Payload.Name,
+            ParentId = parentCategoryResponse.Payload.Id
         });
     }
 
-    private void ValidateGetCategoryResponses(params GetCategoryByIdResponse[] responses) =>
+    private void ValidateGetCategoryResponses(params ResultDto<GetCategoryByIdResult> [] responses) =>
         responses
             .Where(response => !IsGetCategoryResponseValid(response))
             .ToList()
-            .ForEach(r => throw new ArgumentOutOfRangeException(r.Status.Message));
+            .ForEach(r => throw new ArgumentOutOfRangeException(r.OperationStatus.Message));
 
-    private bool IsGetCategoryResponseValid(GetCategoryByIdResponse response) =>
-        response?.Status?.Status == OperationStatusValue.OK
-        && response.Result is not null;
+    private bool IsGetCategoryResponseValid(ResultDto<GetCategoryByIdResult> response) =>
+        response?.OperationStatus?.Status == OperationStatusValue.OK
+        && response.Payload is not null;
 }

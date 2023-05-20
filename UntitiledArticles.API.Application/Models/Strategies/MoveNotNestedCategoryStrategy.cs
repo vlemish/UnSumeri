@@ -8,6 +8,8 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Models.Strategies;
 
+using Mediatr;
+
 public class MoveNotNestedCategoryStrategy : ICategoryMoveStrategy
 {
     private readonly ICategoryRepository _categoryRepository;
@@ -18,27 +20,27 @@ public class MoveNotNestedCategoryStrategy : ICategoryMoveStrategy
         _categoryRepository = categoryRepository;
         _mediator = mediator;
     }
-    
+
     public async Task Move(int id, int? moveToCategoryId)
     {
-        GetCategoryByIdResponse categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id));
+        ResultDto<GetCategoryByIdResult>  categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id));
         ValidateGetCategoryResponses(categoryToMoveResponse);
-        
+
         await _categoryRepository.UpdateAsync(new Category()
         {
-            Id = categoryToMoveResponse.Result.Id,
-            Name = categoryToMoveResponse.Result.Name,
+            Id = categoryToMoveResponse.Payload.Id,
+            Name = categoryToMoveResponse.Payload.Name,
             ParentId = moveToCategoryId
         });
     }
-    
-    private void ValidateGetCategoryResponses(params GetCategoryByIdResponse[] responses) =>
+
+    private void ValidateGetCategoryResponses(params ResultDto<GetCategoryByIdResult> [] responses) =>
         responses
             .Where(response => !IsGetCategoryResponseValid(response))
             .ToList()
-            .ForEach(r => throw new ArgumentOutOfRangeException(r.Status.Message));
+            .ForEach(r => throw new ArgumentOutOfRangeException(r.OperationStatus.Message));
 
-    private bool IsGetCategoryResponseValid(GetCategoryByIdResponse response) =>
-        response?.Status?.Status == OperationStatusValue.OK
-        && response.Result is not null;
+    private bool IsGetCategoryResponseValid(ResultDto<GetCategoryByIdResult>  response) =>
+        response?.OperationStatus?.Status == OperationStatusValue.OK
+        && response.Payload is not null;
 }

@@ -8,6 +8,8 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
+using UntitiledArticles.API.Application.Models.Mediatr;
+
 public class AbbSubcategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepositoryMock;
@@ -22,11 +24,11 @@ public class AbbSubcategoryHandlerTest
         AddSubcategoryValidator validator = new AddSubcategoryValidator();
 
         ValidationResult result = validator.Validate(addSubcategory);
-        
+
         Assert.True(result.IsValid);
         Assert.Equal(expectedErrorCount, result.Errors.Count);
     }
-    
+
     [Theory]
     [InlineData("", 2, 1)]
     [InlineData(null, 2, 1)]
@@ -38,7 +40,7 @@ public class AbbSubcategoryHandlerTest
         AddSubcategoryValidator validator = new AddSubcategoryValidator();
 
         ValidationResult result = validator.Validate(addSubcategory);
-        
+
         Assert.False(result.IsValid);
         Assert.Equal(expectedErrorCount, result.Errors.Count);
     }
@@ -57,21 +59,20 @@ public class AbbSubcategoryHandlerTest
             Name = name,
             ParentId = parentId
         };
-        
+
         SetupMocks(category);
 
-        AddSubcategoryHandler handler = new(new Mock<ILogger<AddSubcategoryHandler>>().Object,
-            _categoryRepositoryMock.Object);
+        AddSubcategoryHandler handler = new(_categoryRepositoryMock.Object);
 
-        AddSubcategoryResponse result = await handler.Handle(request, default);
-        
-        Assert.Equal(expectedOperationStatus, result.Status.Status);
-        Assert.Equal(category.Id, result.Result.Id);
-        
+        ResultDto<AddSubcategoryResult> result = await handler.Handle(request, default);
+
+        Assert.Equal(expectedOperationStatus, result.OperationStatus.Status);
+        Assert.Equal(category.Id, result.Payload.Id);
+
         _categoryRepositoryMock
             .Verify(m=> m.AddAsync(It.IsAny<Category>()), Times.Once());
     }
-    
+
     private void SetupMocks(Category addedCategory)
     {
         _categoryRepositoryMock = new();

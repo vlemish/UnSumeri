@@ -32,11 +32,11 @@ namespace UntitledArticles.API.Infrastructure
 
         }
 
-        // /// <inheritdoc />
-        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        // {
-        //    optionsBuilder.UseSqlServer("Server=172.17.0.1,1433;Database=UnitledArticlesDB;User=sa;Password=Str0ngPa$$w0rd;Trust Server Certificate=true");
-        // }
+        /// <inheritdoc />
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+           optionsBuilder.UseSqlServer("Server=172.17.0.1,1433;Database=UnitledArticlesDB;User=sa;Password=Str0ngPa$$w0rd;Trust Server Certificate=true");
+        }
 
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -62,8 +62,9 @@ namespace UntitledArticles.API.Infrastructure
                 e.HasKey(p => p.Id);
                 e.Property(p => p.Id).ValueGeneratedOnAdd();
                 e.Property(p => p.CreatedAtTime).HasColumnType("datetime");
-                e.Property(p => p.Content).HasColumnType("nvarchar").IsFixedLength(false);
-                e.HasOne(a => a.Category).WithMany(c => c.Articles);
+                e.Property(p => p.Content).HasColumnType("nvarchar").HasMaxLength(4000);
+                e.Property(p=> p.Title).HasColumnType("nvarchar").HasMaxLength(80);
+                e.HasOne(a => a.Category).WithMany(c => c.Articles).HasForeignKey(c => c.CategoryId).OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

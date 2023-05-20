@@ -10,7 +10,9 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Commands.Update;
 
-public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, UpdateCategoryResponse>
+using Models.Mediatr;
+
+public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, ResultDto>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly IMediator _mediator;
@@ -21,18 +23,18 @@ public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, UpdateCateg
         _mediator = mediator;
     }
 
-    public async Task<UpdateCategoryResponse> Handle(UpdateCategory request, CancellationToken cancellationToken)
+    public async Task<ResultDto> Handle(UpdateCategory request, CancellationToken cancellationToken)
     {
-        GetCategoryByIdResponse getCategoryByResponse = await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
-        if (getCategoryByResponse.Status.Status != OperationStatuses.OperationStatusValue.OK)
+        ResultDto<GetCategoryByIdResult> getCategoryByResponse = await _mediator.Send(new GetCategoryById(request.Id), cancellationToken);
+        if (getCategoryByResponse.OperationStatus.Status != OperationStatuses.OperationStatusValue.OK)
         {
             return ReportNotFound(request);
         }
 
         Category category = new()
         {
-            Id = getCategoryByResponse.Result.Id,
-            ParentId = getCategoryByResponse.Result.ParentId,
+            Id = getCategoryByResponse.Payload.Id,
+            ParentId = getCategoryByResponse.Payload.ParentId,
             Name = request.Name,
         };
 
@@ -40,9 +42,9 @@ public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, UpdateCateg
         return ReportSuccess(request);
     }
 
-    private UpdateCategoryResponse ReportNotFound(UpdateCategory request) =>
+    private ResultDto ReportNotFound(UpdateCategory request) =>
         new(new UpdateCategoryNotFound(request.Id));
 
-    private UpdateCategoryResponse ReportSuccess(UpdateCategory request) =>
+    private ResultDto ReportSuccess(UpdateCategory request) =>
         new(new UpdateCategorySuccess(request.Id));
 }

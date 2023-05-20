@@ -11,6 +11,8 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Strategies;
 
+using UntitiledArticles.API.Application.Models.Mediatr;
+
 public class MoveNestedCategoryStrategyTest
 {
     private Mock<ICategoryRepository> _categoryRepositoryMock;
@@ -21,10 +23,10 @@ public class MoveNestedCategoryStrategyTest
     {
         int id = 2;
         int moveToCategoryId = 3;
-        GetCategoryByIdResponse categoryToMoveResponse =
-            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, moveToCategoryId));
-        GetCategoryByIdResponse parentCategoryResponse =
-            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(moveToCategoryId), CreateTestCategoryResult(moveToCategoryId, null));
+        ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
+            new(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, moveToCategoryId));
+        ResultDto<GetCategoryByIdResult> parentCategoryResponse =
+            new(new GetCategoryByIdSuccess(moveToCategoryId), CreateTestCategoryResult(moveToCategoryId, null));
 
         SetupMocks(id, moveToCategoryId, categoryToMoveResponse, parentCategoryResponse);
 
@@ -33,16 +35,16 @@ public class MoveNestedCategoryStrategyTest
 
         VerifyMoveSuccessMocks(id, moveToCategoryId);
     }
-    
+
     [Fact]
     public async Task TestMoveNestedCategoryStrategy_WhenCategoryNotExist_ThenArgumentOutOfRangeException()
     {
         int id = 2;
         int moveToCategoryId = 3;
-        GetCategoryByIdResponse categoryToMoveResponse =
-            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, moveToCategoryId));
-        GetCategoryByIdResponse parentCategoryResponse =
-            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(moveToCategoryId), CreateTestCategoryResult(moveToCategoryId, null));
+        ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
+            new(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, moveToCategoryId));
+        ResultDto<GetCategoryByIdResult> parentCategoryResponse =
+            new(new GetCategoryByIdSuccess(moveToCategoryId), CreateTestCategoryResult(moveToCategoryId, null));
 
         SetupMocks(id, moveToCategoryId, categoryToMoveResponse, parentCategoryResponse);
 
@@ -51,16 +53,16 @@ public class MoveNestedCategoryStrategyTest
 
         VerifyMoveSuccessMocks(id, moveToCategoryId);
     }
-    
+
     [Fact]
     public async Task TestMoveNestedCategoryStrategy_WhenBothCategoriesNotExist_ThenMoved()
     {
         int id = 2;
         int moveToCategoryId = 3;
-        GetCategoryByIdResponse categoryToMoveResponse =
-            new GetCategoryByIdResponse(new GetCategoryByIdNotFound(id), null);
-        GetCategoryByIdResponse parentCategoryResponse =
-            new GetCategoryByIdResponse(new GetCategoryByIdSuccess(id), null);
+        ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
+            new(new GetCategoryByIdNotFound(id), null);
+        ResultDto<GetCategoryByIdResult> parentCategoryResponse =
+            new(new GetCategoryByIdSuccess(id), null);
 
         SetupMocks(id, moveToCategoryId, categoryToMoveResponse, parentCategoryResponse);
 
@@ -86,7 +88,7 @@ public class MoveNestedCategoryStrategyTest
             .Verify(m => m.UpdateAsync(It.Is<Category>(x => x.Id == moveToCategoryId)),
                 Times.Never);
     }
-    
+
     private void VerifyMoveSuccessMocks(int id, int moveToCategoryId)
     {
         _mediatorMock
@@ -104,8 +106,8 @@ public class MoveNestedCategoryStrategyTest
                 Times.Once);
     }
 
-    private void SetupMocks(int id, int parentId, GetCategoryByIdResponse categoryToMoveResponse,
-        GetCategoryByIdResponse parentCategoryResponse)
+    private void SetupMocks(int id, int parentId, ResultDto<GetCategoryByIdResult> categoryToMoveResponse,
+        ResultDto<GetCategoryByIdResult> parentCategoryResponse)
     {
         _categoryRepositoryMock = new();
         _mediatorMock = new();

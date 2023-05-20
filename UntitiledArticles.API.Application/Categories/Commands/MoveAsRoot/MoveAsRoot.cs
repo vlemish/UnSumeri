@@ -2,4 +2,6 @@
 
 namespace UntitiledArticles.API.Application.Categories.Commands.MoveAsRoot;
 
-public record MoveAsRoot(int Id) : IRequest<MoveAsRootResponse>;
+using Models.Mediatr;
+
+public record MoveAsRoot(int Id) : IRequest<ResultDto>;

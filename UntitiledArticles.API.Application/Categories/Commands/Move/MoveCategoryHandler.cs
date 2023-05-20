@@ -7,19 +7,18 @@ using UntitiledArticles.API.Application.OperationStatuses;
 
 namespace UntitiledArticles.API.Application.Categories.Commands.Move
 {
-    public class MoveCategoryHandler : IRequestHandler<MoveCategory, MoveCategoryResponse>
+    using Models.Mediatr;
+
+    public class MoveCategoryHandler : IRequestHandler<MoveCategory, ResultDto>
     {
-        private readonly ILogger<MoveCategoryHandler> _logger;
         private readonly IMediator _mediator;
 
-        public MoveCategoryHandler(ILogger<MoveCategoryHandler> logger,
-            IMediator mediator)
+        public MoveCategoryHandler(IMediator mediator)
         {
-            _logger = logger;
             _mediator = mediator;
         }
 
-        public async Task<MoveCategoryResponse> Handle(MoveCategory request, CancellationToken cancellationToken)
+        public async Task<ResultDto> Handle(MoveCategory request, CancellationToken cancellationToken)
         {
             if (request.MoveToId.HasValue)
             {
@@ -34,18 +33,18 @@ namespace UntitiledArticles.API.Application.Categories.Commands.Move
         private async Task<IOperationStatus> PerformMoveAsRootCommand(MoveCategory request,
             CancellationToken cancellationToken)
         {
-            MoveAsRootResponse response =
+            ResultDto response =
                 await _mediator.Send(new MoveAsRoot.MoveAsRoot(request.Id), cancellationToken);
-            return response.Status;
+            return response.OperationStatus;
         }
 
         private async Task<IOperationStatus> PerformMoveAsSubCategoryCommand(MoveCategory request,
             CancellationToken cancellationToken)
         {
-            MoveAsSubCategoryResponse response =
+            ResultDto response =
                 await _mediator.Send(new MoveAsSubCategory.MoveAsSubCategory(request.Id, request.MoveToId.Value),
                     cancellationToken);
-            return response.Status;
+            return response.OperationStatus;
         }
     }
 }

@@ -9,7 +9,9 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Commands.Add
 {
-    public class AddCategoryHandler : IRequestHandler<AddCategory, AddCategoryResponse>
+    using Models.Mediatr;
+
+    public class AddCategoryHandler : IRequestHandler<AddCategory, ResultDto<AddCategoryResult>>
     {
         private readonly ILogger<AddCategoryHandler> _logger;
         private readonly ICategoryRepository _categoryRepository;
@@ -20,19 +22,14 @@ namespace UntitiledArticles.API.Application.Categories.Commands.Add
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<AddCategoryResponse> Handle(AddCategory request, CancellationToken cancellationToken)
+        public async Task<ResultDto<AddCategoryResult>> Handle(AddCategory request, CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Try to create a new category where name = {request.Name}");
-            Category category = CreateCategory(request.Name);
-            Category addedCategory = await _categoryRepository.AddAsync(category);
+            Category addedCategory = await _categoryRepository.AddAsync(CreateCategory(request.Name));
             return ReportSuccess(addedCategory);
         }
 
-        private AddCategoryResponse ReportSuccess(Category category)
-        {
-            _logger.LogDebug($"Add Category was successfully handled! Category Id = {category.Id}");
-            return new(new Statuses.AddCategorySuccess(category), new AddCategoryResult(category.Id));
-        }
+        private ResultDto<AddCategoryResult> ReportSuccess(Category category) =>
+            new(new Statuses.AddCategorySuccess(category), new AddCategoryResult(category.Id));
 
         private Category CreateCategory(string name) =>
             new() { Name = name };

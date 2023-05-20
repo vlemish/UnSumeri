@@ -16,6 +16,9 @@ using UntitledArticles.API.Service.Contracts.Requests;
 
 namespace UntitledArticles.API.Service.Controllers
 {
+    using Domain.Contracts;
+    using UntitiledArticles.API.Application.Models.Mediatr;
+
     [ApiController]
     [Route("api/categories")]
     public class CategoriesController : ControllerBase
@@ -36,16 +39,16 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> Add([FromBody] AddCategoryRequest request)
         {
             var command = new AddCategory(request.Name);
-            AddCategoryResponse response = await _mediator.Send(command);
-            if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
+            ResultDto<AddCategoryResult> response = await _mediator.Send(command);
+            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
             {
-                return new ObjectResult(response.Result.Id)
+                return new ObjectResult(response.Payload.Id)
                 {
                     StatusCode = StatusCodes.Status201Created,
                 };
             }
 
-            _logger.LogError($"An error occured during processing {nameof(AddCategory)} request: {response.Status.Message}");
+            _logger.LogError($"An error occured during processing {nameof(AddCategory)} request: {response.OperationStatus.Message}");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
@@ -56,16 +59,16 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> AddSubcategory([FromRoute] int id, [FromBody] AddSubcategoryRequest request)
         {
             var command = new AddSubcategory(request.Name, id);
-            AddSubcategoryResponse response = await _mediator.Send(command);
-            if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
+            ResultDto<AddSubcategoryResult> response = await _mediator.Send(command);
+            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
             {
-                return new ObjectResult(response.Result.Id)
+                return new ObjectResult(response.Payload.Id)
                 {
                     StatusCode = StatusCodes.Status201Created,
                 };
             }
 
-            _logger.LogError($"An error occured during processing {nameof(AddSubcategory)} request: {response.Status.Message}");
+            _logger.LogError($"An error occured during processing {nameof(AddSubcategory)} request: {response.OperationStatus.Message}");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
@@ -77,22 +80,22 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> GetById([FromRoute] int id, int? depth)
         {
             var query = new GetCategoryById(id);
-            GetCategoryByIdResponse response = await _mediator.Send(query);
-            if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
+            ResultDto<GetCategoryByIdResult> response = await _mediator.Send(query);
+            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
             {
-                return Ok(response.Result);
+                return Ok(response.Payload);
             }
 
-            switch (response.Status.Status)
+            switch (response.OperationStatus.Status)
             {
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
                 {
-                    _logger.LogError(response.Status.Message);
+                    _logger.LogError(response.OperationStatus.Message);
                     return NotFound();
                 }
                 default:
                 {
-                    _logger.LogError($"An error occured during processing {nameof(GetById)} request: {response.Status.Message}");
+                    _logger.LogError($"An error occured during processing {nameof(GetById)} request: {response.OperationStatus.Message}");
                     return StatusCode(StatusCodes.Status500InternalServerError);
                 }
             }
@@ -105,14 +108,14 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> GetAll([FromQuery] GetAllCategoriesRequest request, CancellationToken cancellationToken)
         {
             GetAllCategories query = new GetAllCategories(new LoadOptions(request.Offset, request.Skip), request.OrderByOption, request.Depth);
-            GetAllCategoriesResponse response = await _mediator.Send(query, cancellationToken);
-            if (response.Status.Status == OperationStatusValue.OK)
+            ResultDto<IPaginatedResult<GetAllCategoriesResult>> response = await _mediator.Send(query, cancellationToken);
+            if (response.OperationStatus.Status == OperationStatusValue.OK)
             {
-                _logger.LogInformation(response.Status.Message);
-                return Ok(response.Result);
+                _logger.LogInformation(response.OperationStatus.Message);
+                return Ok(response.Payload);
             }
 
-            _logger.LogError(response.Status.Message);
+            _logger.LogError(response.OperationStatus.Message);
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
@@ -124,27 +127,27 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> Move([FromRoute] int id, [FromRoute] int? moveToId)
         {
             var command = new MoveCategory(id, moveToId);
-            MoveCategoryResponse response = await _mediator.Send(command);
-            if (response.Status.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
+            ResultDto response = await _mediator.Send(command);
+            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
             {
                 return Ok();
             }
 
-            switch (response.Status.Status)
+            switch (response.OperationStatus.Status)
             {
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
                 {
-                    _logger.LogError(response.Status.Message);
+                    _logger.LogError(response.OperationStatus.Message);
                     return NotFound();
                 }
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.ParentNotExists:
                 {
-                    _logger.LogError(response.Status.Message);
+                    _logger.LogError(response.OperationStatus.Message);
                     return NotFound();
                 }
                 default:
                 {
-                    _logger.LogError($"An error occured during processing {nameof(Move)} request: {response.Status.Message}");
+                    _logger.LogError($"An error occured during processing {nameof(Move)} request: {response.OperationStatus.Message}");
                     return StatusCode(StatusCodes.Status500InternalServerError);
                 }
             }
@@ -158,23 +161,23 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             DeleteCategory command = new(id);
-            DeleteCategoryResponse response = await _mediator.Send(command);
+            ResultDto response = await _mediator.Send(command);
 
-            switch (response.Status.Status)
+            switch (response.OperationStatus.Status)
             {
                 case OperationStatusValue.OK:
                 {
-                    _logger.LogInformation(response.Status.Message);
+                    _logger.LogInformation(response.OperationStatus.Message);
                     return Ok(id);
                 }
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
                 {
-                    _logger.LogError(response.Status.Message);
+                    _logger.LogError(response.OperationStatus.Message);
                     return NotFound();
                 }
                 default:
                 {
-                    _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.Status.Message}");
+                    _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.OperationStatus.Message}");
                     return StatusCode(StatusCodes.Status500InternalServerError);
                 }
             }
@@ -184,26 +187,26 @@ namespace UntitledArticles.API.Service.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] string name, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCategoryRequest request, CancellationToken cancellationToken)
         {
-            UpdateCategory command = new(id, name);
-            UpdateCategoryResponse response = await _mediator.Send(command, cancellationToken);
+            UpdateCategory command = new(id, request.Name);
+            ResultDto response = await _mediator.Send(command, cancellationToken);
 
-            switch (response.Status.Status)
+            switch (response.OperationStatus.Status)
             {
                 case OperationStatusValue.OK:
                 {
-                    _logger.LogInformation(response.Status.Message);
+                    _logger.LogInformation(response.OperationStatus.Message);
                     return NoContent();
                 }
                 case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
                 {
-                    _logger.LogError(response.Status.Message);
+                    _logger.LogError(response.OperationStatus.Message);
                     return NotFound();
                 }
                 default:
                 {
-                    _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.Status.Message}");
+                    _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.OperationStatus.Message}");
                     return StatusCode(StatusCodes.Status500InternalServerError);
                 }
             }

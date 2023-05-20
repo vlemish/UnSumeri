@@ -9,6 +9,8 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
+using UntitiledArticles.API.Application.Models.Mediatr;
+
 public class AddCategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepository;
@@ -20,14 +22,14 @@ public class AddCategoryHandlerTest
     {
         int expectedErrorsCount = 0;
         AddCategory addCategory = new(name);
-        
+
         AddCategoryValidator validator = new();
         ValidationResult validationResult = validator.Validate(addCategory);
-        
+
         Assert.True(validationResult.IsValid);
         Assert.Equal(expectedErrorsCount, validationResult.Errors.Count);
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]
@@ -35,14 +37,14 @@ public class AddCategoryHandlerTest
     {
         int expectedErrorsCount = 1;
         AddCategory addCategory = new(name);
-        
+
         AddCategoryValidator validator = new();
         ValidationResult validationResult = validator.Validate(addCategory);
-        
+
         Assert.False(validationResult.IsValid);
         Assert.Equal(expectedErrorsCount, validationResult.Errors.Count);
     }
-    
+
     [Fact]
     public async Task TestAddCategoryHandler_WhenCategoryAdded_ThenSuccessStatus()
     {
@@ -55,19 +57,19 @@ public class AddCategoryHandlerTest
         };
 
         SetupMocks(addedCategory);
-        
+
         AddCategoryHandler handler = new(new Mock<ILogger<AddCategoryHandler>>().Object, _categoryRepository.Object);
 
-        AddCategoryResponse actual = await handler.Handle(request, default);
-        
+        ResultDto<AddCategoryResult> actual = await handler.Handle(request, default);
+
         Assert.NotNull(actual);
-        Assert.Equal(expectedOperationStatus, actual.Status.Status);
-        Assert.Equal(actual.Result.Id, addedCategory.Id);
-        
+        Assert.Equal(expectedOperationStatus, actual.OperationStatus.Status);
+        Assert.Equal(actual.Payload.Id, addedCategory.Id);
+
         _categoryRepository
             .Verify(m => m.AddAsync(It.IsAny<Category>()), Times.Once());
     }
-    
+
     private void SetupMocks(Category addedCategory)
     {
         _categoryRepository = new();

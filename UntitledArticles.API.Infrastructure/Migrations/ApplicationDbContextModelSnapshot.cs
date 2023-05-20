@@ -35,11 +35,16 @@ namespace UntitledArticles.API.Infrastructure.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .IsFixedLength(false);
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar");
 
                     b.Property<DateTime>("CreatedAtTime")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar");
 
                     b.HasKey("Id");
 

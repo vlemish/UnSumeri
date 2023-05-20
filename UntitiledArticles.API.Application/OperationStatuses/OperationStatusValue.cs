@@ -5,5 +5,6 @@
         OK,
         NotFound,
         ParentNotExists,
+        Duplicate,
     }
 }
