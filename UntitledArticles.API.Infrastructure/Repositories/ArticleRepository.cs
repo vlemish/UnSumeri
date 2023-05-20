@@ -31,7 +31,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
 
             await _articles.AddAsync(entity);
             await _context.SaveChangesAsync();
-            Article addedEntity = 
+            Article addedEntity =
                 await GetOneByFilter(c=> c.Title == entity.Title && c.CategoryId == entity.CategoryId && c.CreatedAtTime == entity.CreatedAtTime);
             return addedEntity;
         }
@@ -46,7 +46,9 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             .Include(a => a.Category)
             .FirstOrDefaultAsync();
 
-        public Task<Article> GetOneById(int id) => throw new NotImplementedException();
+        public async Task<Article> GetOneById(int id) =>
+            await this._articles.FindAsync(id);
+
         public Task UpdateAsync(Article entity) => throw new NotImplementedException();
     }
 }
