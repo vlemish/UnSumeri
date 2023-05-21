@@ -6,5 +6,6 @@
         NotFound,
         ParentNotExists,
         Duplicate,
+        NotModified,
     }
 }

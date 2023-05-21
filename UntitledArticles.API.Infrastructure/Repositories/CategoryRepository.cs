@@ -1,7 +1,5 @@
 ﻿using System.Linq.Expressions;
-
 using Microsoft.EntityFrameworkCore;
-
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
 using UntitledArticles.API.Domain.Enums;
@@ -29,6 +27,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             {
                 throw new ArgumentNullException(nameof(entity));
             }
+
             try
             {
                 await _categories.AddAsync(entity);
@@ -95,27 +94,22 @@ namespace UntitledArticles.API.Infrastructure.Repositories
 
         private async void LoadCategories(Category category)
         {
-            var res = _categories.Where(c => c.Id == category.Id).Include(c => c.Articles).FirstOrDefault().Articles;
+            var res = _categories
+                .Where(c => c.Id == category.Id)
+                .Include(c => c.Articles)
+                .FirstOrDefault()
+                .Articles;
             category.Articles = res;
             if (category.SubCategories is null || category.SubCategories.Count == 0)
             {
                 return;
             }
+
             foreach (var subCategory in category.SubCategories)
             {
                 LoadCategories(subCategory);
             }
         }
-        // await _categories
-        //     .Sort(p => p.Id, orderByOption)
-        //     .Where(c => !c.ParentId.HasValue)
-        //     .Skip(loadOptions.Skip)
-        //     .Take(loadOptions.Offset)
-        //     .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
-        //     .ThenInclude(c => c.Articles)
-        //     .AsNoTracking()
-        //     .ToListAsync();
-
 
         public async Task<int> GetCount(Expression<Func<Category, bool>> predicate)
         {
@@ -125,12 +119,21 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         public async Task<IList<Category>> GetManyByFilter(Expression<Func<Category, bool>> predicate) =>
             await GetManyByFilter(predicate, depth: 2);
 
-        public async Task<IList<Category>> GetManyByFilter(Expression<Func<Category, bool>> predicate, int depth) =>
-            await _categories
+        public async Task<IList<Category>> GetManyByFilter(Expression<Func<Category, bool>> predicate, int depth)
+        {
+            var categories = await _categories
                 .AsNoTracking()
                 .Where(predicate)
                 .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+                .ThenInclude(c => c.Articles)
                 .ToListAsync();
+            foreach (var category in categories)
+            {
+                LoadCategories(category);
+            }
+
+            return categories;
+        }
 
         public async Task<Category> GetOneByFilter(Expression<Func<Category, bool>> predicate)
         {
@@ -144,12 +147,18 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             }
         }
 
-        public async Task<Category> GetOneByFilter(Expression<Func<Category, bool>> predicate, int depth) =>
-            await _categories
+        public async Task<Category> GetOneByFilter(Expression<Func<Category, bool>> predicate, int depth)
+        {
+            var category = await _categories
                 .AsNoTracking()
                 .Where(predicate)
                 .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
+                .ThenInclude(c => c.Articles)
                 .FirstOrDefaultAsync();
+
+                LoadCategories(category);
+                return category;
+        }
 
         public async Task<Category> GetOneById(int id)
         {

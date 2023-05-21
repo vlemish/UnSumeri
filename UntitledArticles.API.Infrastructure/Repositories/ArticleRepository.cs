@@ -49,6 +49,16 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         public async Task<Article> GetOneById(int id) =>
             await this._articles.FindAsync(id);
 
-        public Task UpdateAsync(Article entity) => throw new NotImplementedException();
+        public async Task UpdateAsync(Article entity)
+        {
+            var entityToUpdate = await GetOneById(entity.Id);
+            if (entity is null)
+            {
+                return;
+            }
+
+            _context.Entry(entityToUpdate).CurrentValues.SetValues(entity);
+            await _context.SaveChangesAsync();
+        }
     }
 }

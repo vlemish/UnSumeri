@@ -102,15 +102,15 @@ namespace UntitledArticles.API.Service.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        [HttpPost("{categoryId:int}")]
+        [HttpPost("{id:int}/article")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddArticle([FromRoute] int categoryId, [FromBody] AddArticleRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> AddArticle([FromRoute] int id, [FromBody] AddArticleRequest request, CancellationToken cancellationToken)
         {
-            AddArticle addArticle = new(categoryId, request.Title, request.Content);
+            AddArticle addArticle = new(id, request.Title, request.Content);
             ResultDto<AddArticleResult> response = await _mediator.Send(addArticle, cancellationToken);
             switch (response.OperationStatus.Status)
             {
