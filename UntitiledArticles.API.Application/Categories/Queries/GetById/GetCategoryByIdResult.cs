@@ -1,4 +1,5 @@
-﻿using UntitledArticles.API.Domain.Entities;
+﻿using UntitiledArticles.API.Application.Models;
+using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Queries.GetById
 {
@@ -10,7 +11,7 @@ namespace UntitiledArticles.API.Application.Categories.Queries.GetById
 
         public int? ParentId { get; init; }
 
-        public IReadOnlyCollection<Article> Articles { get; set; }
+        public IReadOnlyCollection<ArticleDto> Articles { get; set; }
 
         public IReadOnlyCollection<GetCategoryByIdResult> SubCategories { get; init; }
     }

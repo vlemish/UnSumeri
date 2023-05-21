@@ -14,6 +14,7 @@ using UntitledArticles.API.Domain.Entities;
 namespace UntitledArticles.API.Application.Tests.Articles;
 
 using UntitiledArticles.API.Application.Articles.Commands;
+using UntitiledArticles.API.Application.Models;
 using UntitiledArticles.API.Application.Models.Mediatr;
 
 public class AddArticleHandlerTest
@@ -33,7 +34,7 @@ public class AddArticleHandlerTest
             Id = 1,
             Name = "category",
             SubCategories = new List<GetCategoryByIdResult>(),
-            Articles = new List<Article>() { GetDuplicateArticle() },
+            Articles = new List<ArticleDto>() { GetDuplicateArticle() },
         });
 
         SetupMocks(expectedGetcategoryByIdResponse);
@@ -54,7 +55,7 @@ public class AddArticleHandlerTest
             Id = 1,
             Name = "category",
             SubCategories = new List<GetCategoryByIdResult>(),
-            Articles = new List<Article>() { GetDuplicateArticle() },
+            Articles = new List<ArticleDto>() { GetDuplicateArticle() },
         });
 
         SetupMocks(expectedGetcategoryByIdResponse);
@@ -75,7 +76,7 @@ public class AddArticleHandlerTest
             Id = 1,
             Name = "category",
             SubCategories = new List<GetCategoryByIdResult>(),
-            Articles = new List<Article>(GetUniqueArticles()),
+            Articles = new List<ArticleDto>(GetUniqueArticles()),
         });
 
         SetupMocks(expectedGetcategoryByIdResponse);
@@ -112,34 +113,13 @@ public class AddArticleHandlerTest
     private AddArticle GetTestAddArticleRequest() =>
         new(1, "title", "content");
 
-    private Article GetDuplicateArticle() =>
-        new()
-        {
-            Id = 2,
-            CreatedAtTime = new DateTime(2023, 03, 03, 1, 0, 0),
-            CategoryId = 1,
-            Title = "title",
-            Content = "content",
-        };
+    private ArticleDto GetDuplicateArticle() =>
+        new(2, "title", "content", new DateTime(2023, 03, 03, 1, 0, 0), 1);
 
-    private List<Article> GetUniqueArticles() =>
+    private List<ArticleDto> GetUniqueArticles() =>
         new()
         {
-            new Article()
-            {
-                Id = 3,
-                CreatedAtTime = new DateTime(2023, 03, 03, 1, 0, 0),
-                CategoryId = 1,
-                Title = "title2",
-                Content = "content2",
-            },
-            new Article()
-            {
-                Id = 4,
-                CreatedAtTime = new DateTime(2023, 03, 03, 1, 0, 0),
-                CategoryId = 1,
-                Title = "title3",
-                Content = "content3",
-            }
+            new ArticleDto(3, "title2", "content2", new DateTime(2023, 03, 03, 1, 0, 0), 1),
+            new ArticleDto(4, "title3", "content3", new DateTime(2023, 03, 03, 1, 0, 0), 1),
         };
 }
