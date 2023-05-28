@@ -52,6 +52,6 @@ public class UpdateArticleHandler : IRequestHandler<UpdateArticle, ResultDto>
     private Article CreateArticleToUpdate(UpdateArticle request, ArticleDto articleDto) =>
         new()
         {
-            Id = request.Id, CategoryId = articleDto.CategoryId, Title = request.Title, Content = request.Content,
+            Id = request.Id, CategoryId = articleDto.CategoryId, Title = request.Title, Content = request.Content, CreatedAtTime = articleDto.CreatedAtTime,
         };
 }

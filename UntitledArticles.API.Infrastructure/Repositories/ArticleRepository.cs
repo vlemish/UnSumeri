@@ -70,7 +70,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
 
         public async Task<Article> GetOneById(int id) =>
-            await this._articles.FindAsync(id);
+            await this._articles.AsNoTracking().FirstAsync(p=> p.Id == id);
 
         public async Task UpdateAsync(Article entity)
         {
@@ -80,6 +80,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
                 return;
             }
 
+            _context.Attach(entityToUpdate);
             _context.Entry(entityToUpdate).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }

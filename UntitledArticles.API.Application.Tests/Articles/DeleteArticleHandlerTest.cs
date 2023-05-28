@@ -31,7 +31,7 @@ public class DeleteArticleHandlerTest
 
         this._handler = new(this._articleRepositoryMock.Object, this._mediatorMock.Object);
 
-        ResultDto result = await this._handler.Handle(request, default);
+        ResultDto<int> result = await this._handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.OK, result.OperationStatus.Status);
         VerifyMocks(Times.Once(), Times.Once());
@@ -49,7 +49,7 @@ public class DeleteArticleHandlerTest
 
         this._handler = new(this._articleRepositoryMock.Object, this._mediatorMock.Object);
 
-        ResultDto result = await this._handler.Handle(request, default);
+        ResultDto<int> result = await this._handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.NotFound, result.OperationStatus.Status);
         VerifyMocks(Times.Never(), Times.Once());

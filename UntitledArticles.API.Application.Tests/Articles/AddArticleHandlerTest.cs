@@ -85,7 +85,7 @@ public class AddArticleHandlerTest
 
         ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
 
-        Assert.Equal(OperationStatusValue.OK, actualResponse.OperationStatus.Status);
+        Assert.Equal(OperationStatusValue.Created, actualResponse.OperationStatus.Status);
     }
 
     private void SetupMocks(ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResponse)

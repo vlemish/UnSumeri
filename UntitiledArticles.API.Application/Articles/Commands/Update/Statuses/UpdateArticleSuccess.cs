@@ -11,7 +11,7 @@ public class UpdateArticleSuccess : IOperationStatus
         this._id = id;
     }
 
-    public OperationStatusValue Status => OperationStatusValue.OK;
+    public OperationStatusValue Status => OperationStatusValue.OkNoContent;
 
     public string Message => $"Article was successfully updated where id = {this._id}!";
 }

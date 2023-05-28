@@ -34,7 +34,7 @@ public class MoveArticleHandlerTest
             CreateTestGetCategoryByIdResult(categoryId));
         ResultDto<ArticleDto> expectedGetOneArticleByIdResult =
             new(new GetOneArticleByIdSuccess(id), CreateTestArticleDto(id, categoryId));
-        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OK;
+        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OkNoContent;
 
         SetupMocks(expectedGetCategoryByIdResult, expectedGetOneArticleByIdResult);
 

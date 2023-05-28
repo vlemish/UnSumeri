@@ -17,6 +17,7 @@ using UntitledArticles.API.Service.Contracts.Requests;
 namespace UntitledArticles.API.Service.Controllers
 {
     using Domain.Contracts;
+    using Extensions;
     using UntitiledArticles.API.Application.Articles.Commands;
     using UntitiledArticles.API.Application.Articles.Commands.Add;
     using UntitiledArticles.API.Application.Models.Mediatr;
@@ -43,24 +44,7 @@ namespace UntitledArticles.API.Service.Controllers
         {
             var query = new GetCategoryById(id);
             ResultDto<GetCategoryByIdResult> response = await _mediator.Send(query);
-            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
-            {
-                return Ok(response.Payload);
-            }
-
-            switch (response.OperationStatus.Status)
-            {
-                case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
-                {
-                    _logger.LogError(response.OperationStatus.Message);
-                    return NotFound();
-                }
-                default:
-                {
-                    _logger.LogError($"An error occured during processing {nameof(GetById)} request: {response.OperationStatus.Message}");
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
+            return response.ToHttpObjectResult();
         }
 
         [HttpGet("")]
@@ -71,16 +55,8 @@ namespace UntitledArticles.API.Service.Controllers
         {
             GetAllCategories query = new GetAllCategories(new LoadOptions(request.Offset, request.Skip), request.OrderByOption, request.Depth);
             ResultDto<IPaginatedResult<GetAllCategoriesResult>> response = await _mediator.Send(query, cancellationToken);
-            if (response.OperationStatus.Status == OperationStatusValue.OK)
-            {
-                _logger.LogInformation(response.OperationStatus.Message);
-                return Ok(response.Payload);
-            }
-
-            _logger.LogError(response.OperationStatus.Message);
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return response.ToHttpObjectResult();
         }
-
 
         [HttpPost("", Name = nameof(AddCategory))]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
@@ -90,16 +66,7 @@ namespace UntitledArticles.API.Service.Controllers
         {
             var command = new AddCategory(request.Name);
             ResultDto<AddCategoryResult> response = await _mediator.Send(command);
-            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
-            {
-                return new ObjectResult(response.Payload.Id)
-                {
-                    StatusCode = StatusCodes.Status201Created,
-                };
-            }
-
-            _logger.LogError($"An error occured during processing {nameof(AddCategory)} request: {response.OperationStatus.Message}");
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return response.ToHttpObjectResult();
         }
 
         [HttpPost("{id:int}/article")]
@@ -112,28 +79,7 @@ namespace UntitledArticles.API.Service.Controllers
         {
             AddArticle addArticle = new(id, request.Title, request.Content);
             ResultDto<AddArticleResult> response = await _mediator.Send(addArticle, cancellationToken);
-            switch (response.OperationStatus.Status)
-            {
-                case OperationStatusValue.OK:
-                {
-                    return new ObjectResult(response.Payload.Id)
-                    {
-                        StatusCode = StatusCodes.Status201Created,
-                    };
-                }
-                case OperationStatusValue.NotFound:
-                {
-                    return NotFound();
-                }
-                case OperationStatusValue.Duplicate:
-                {
-                    return Conflict();
-                }
-                default:
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
+            return response.ToHttpObjectResult();
         }
 
         [HttpPost("{id:int}")]
@@ -144,16 +90,7 @@ namespace UntitledArticles.API.Service.Controllers
         {
             var command = new AddSubcategory(request.Name, id);
             ResultDto<AddSubcategoryResult> response = await _mediator.Send(command);
-            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
-            {
-                return new ObjectResult(response.Payload.Id)
-                {
-                    StatusCode = StatusCodes.Status201Created,
-                };
-            }
-
-            _logger.LogError($"An error occured during processing {nameof(AddSubcategory)} request: {response.OperationStatus.Message}");
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return response.ToHttpObjectResult();
         }
 
         [HttpPut("{id:int}/move/{moveToId:int?}")]
@@ -165,29 +102,7 @@ namespace UntitledArticles.API.Service.Controllers
         {
             var command = new MoveCategory(id, moveToId);
             ResultDto response = await _mediator.Send(command);
-            if (response.OperationStatus.Status == UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK)
-            {
-                return Ok();
-            }
-
-            switch (response.OperationStatus.Status)
-            {
-                case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
-                {
-                    _logger.LogError(response.OperationStatus.Message);
-                    return NotFound();
-                }
-                case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.ParentNotExists:
-                {
-                    _logger.LogError(response.OperationStatus.Message);
-                    return NotFound();
-                }
-                default:
-                {
-                    _logger.LogError($"An error occured during processing {nameof(Move)} request: {response.OperationStatus.Message}");
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
+            return response.ToHttpObjectResult();
         }
 
         [HttpDelete("{id:int}")]
@@ -199,25 +114,7 @@ namespace UntitledArticles.API.Service.Controllers
         {
             DeleteCategory command = new(id);
             ResultDto response = await _mediator.Send(command);
-
-            switch (response.OperationStatus.Status)
-            {
-                case OperationStatusValue.OK:
-                {
-                    _logger.LogInformation(response.OperationStatus.Message);
-                    return Ok(id);
-                }
-                case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
-                {
-                    _logger.LogError(response.OperationStatus.Message);
-                    return NotFound();
-                }
-                default:
-                {
-                    _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.OperationStatus.Message}");
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
+            return response.ToHttpObjectResult();
         }
 
         [HttpPut("{id:int}")]
@@ -228,26 +125,7 @@ namespace UntitledArticles.API.Service.Controllers
         {
             UpdateCategory command = new(id, request.Name);
             ResultDto response = await _mediator.Send(command, cancellationToken);
-
-            switch (response.OperationStatus.Status)
-            {
-                case OperationStatusValue.OK:
-                {
-                    _logger.LogInformation(response.OperationStatus.Message);
-                    return NoContent();
-                }
-                case UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound:
-                {
-                    _logger.LogError(response.OperationStatus.Message);
-                    return NotFound();
-                }
-                default:
-                {
-                    _logger.LogError($"An error occured during processing {nameof(Delete)} request: {response.OperationStatus.Message}");
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-
+            return response.ToHttpObjectResult();
         }
     }
 }

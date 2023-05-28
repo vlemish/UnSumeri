@@ -74,7 +74,7 @@ public class UpdateCategoryHandlerTest
 
         ResultDto actual = await _handler.Handle(new UpdateCategory(id, name), default);
 
-        Assert.Equal(UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OK, actual.OperationStatus.Status);
+        Assert.Equal(UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.OkNoContent, actual.OperationStatus.Status);
     }
 
     [Fact]
