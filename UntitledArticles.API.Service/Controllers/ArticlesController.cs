@@ -6,6 +6,7 @@ using UntitledArticles.API.Service.Contracts.Requests;
 
 namespace UntitledArticles.API.Service.Controllers
 {
+    using System.Runtime.CompilerServices;
     using UntitiledArticles.API.Application.Articles.Commands;
     using UntitiledArticles.API.Application.Articles.Commands.Move;
     using UntitiledArticles.API.Application.Articles.Queries.GetOneById;
@@ -104,6 +105,32 @@ namespace UntitledArticles.API.Service.Controllers
                     return this.NotFound();
                 }
                 case OperationStatusValue.NotModified:
+                {
+                    return this.NotFound();
+                }
+                default:
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteArticle([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            UntitiledArticles.API.Application.Articles.Commands.Delete.DeleteArticle request = new(id);
+            ResultDto commandResult = await this._mediator.Send(request, cancellationToken);
+            switch (commandResult.OperationStatus.Status)
+            {
+                case OperationStatusValue.OK:
+                {
+                    return this.NoContent();
+                }
+                case OperationStatusValue.NotFound:
                 {
                     return this.NotFound();
                 }
