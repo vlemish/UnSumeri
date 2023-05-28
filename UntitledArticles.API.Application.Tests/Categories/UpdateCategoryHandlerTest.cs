@@ -14,6 +14,10 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
+using FluentValidation;
+using FluentValidation.Results;
+using FluentValidation.TestHelper;
+using UntitiledArticles.API.Application.Articles.Commands.Update;
 using UntitiledArticles.API.Application.Models.Mediatr;
 
 public class UpdateCategoryHandlerTest
@@ -23,8 +27,37 @@ public class UpdateCategoryHandlerTest
 
     private UpdateCategoryHandler _handler;
 
+    [Theory]
+    [InlineData(1, "content", "title")]
+    public void TestUpdateArticleValdiator_WhenCommandValid_ThenValid(int id, string content, string title)
+    {
+        UpdateArticle command = new(id, title, content);
+
+        AbstractValidator<UpdateArticle> validator = new UpdateArticleValidator();
+        var validationResult = validator.TestValidate(command);
+
+        validationResult.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Theory]
+    [InlineData(0, "", "")]
+    [InlineData(-1, "", "")]
+    [InlineData(-1, null, "")]
+    [InlineData(-1, null, null)]
+    public void TestUpdateArticleValdiator_WhenCommandNotValid_ThenInvalid(int id, string content, string title)
+    {
+        UpdateArticle command = new(id, title, content);
+
+        AbstractValidator<UpdateArticle> validator = new UpdateArticleValidator();
+        var validationResult = validator.TestValidate(command);
+
+        validationResult.ShouldHaveValidationErrorFor(p => p.Id);
+        validationResult.ShouldHaveValidationErrorFor(p => p.Content);
+        validationResult.ShouldHaveValidationErrorFor(p => p.Title);
+    }
+
     [Fact]
-    public async Task TestUpdatecategoryHandler_WhenCategoryExist_ThenSuccess()
+    public async Task TestUpdateCategoryHandler_WhenCategoryExist_ThenSuccess()
     {
         int id = 2;
         string name = "testname2";
@@ -45,7 +78,7 @@ public class UpdateCategoryHandlerTest
     }
 
     [Fact]
-    public async Task TestUpdatecategoryHandler_WhenCategoryNotExist_ThenNotFound()
+    public async Task TestUpdateCategoryHandler_WhenCategoryNotExist_ThenNotFound()
     {
         int id = 2;
         string name = "testname2";

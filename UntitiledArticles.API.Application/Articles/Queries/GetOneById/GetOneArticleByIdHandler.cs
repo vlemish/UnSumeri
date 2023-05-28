@@ -4,6 +4,7 @@ using AutoMapper;
 using MediatR;
 using Models;
 using Models.Mediatr;
+using OperationStatuses.Shared.Articles;
 using Statuses;
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
@@ -35,5 +36,5 @@ public class GetOneArticleByIdHandler : IRequestHandler<GetOneArticleById, Resul
         new(new GetOneArticleByIdSuccess(request.Id), articleDto);
 
     private ResultDto<ArticleDto> ReportNotFound(GetOneArticleById request) =>
-        new(new GetOneByIdArticleNotFound(request.Id), null);
+        new(new ArticleNotFound(request.Id), null);
 }

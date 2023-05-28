@@ -6,6 +6,7 @@ using MediatR;
 using Models;
 using Models.Mediatr;
 using OperationStatuses;
+using OperationStatuses.Shared.Articles;
 using Queries.GetOneById;
 using Statuses;
 using UntitledArticles.API.Domain.Contracts;
@@ -67,7 +68,7 @@ public class MoveArticleHandler : IRequestHandler<MoveArticle, ResultDto>
 
         if (request.CategoryToMoveId == articleResult.Payload.CategoryId)
         {
-            return new(false, new MoveArticleNotChanged(request.Id, request.CategoryToMoveId));
+            return new(false, new ArticleNotChanged(request.Id));
         }
 
         return new(true, null);
@@ -88,7 +89,7 @@ public class MoveArticleHandler : IRequestHandler<MoveArticle, ResultDto>
         new(new MoveArticleSuccess(request.Id, request.CategoryToMoveId));
 
     private ResultDto ReportNotModifiedStatus(MoveArticle request) =>
-        new(new MoveArticleNotChanged(request.Id, request.CategoryToMoveId));
+        new(new ArticleNotChanged(request.Id));
 
     private GetCategoryById CreateGetCategoryByIdRequest(int categoryId) =>
         new(categoryId, 1);

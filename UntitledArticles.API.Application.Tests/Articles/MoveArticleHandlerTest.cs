@@ -13,6 +13,7 @@ using UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses;
 using UntitiledArticles.API.Application.Models;
 using UntitiledArticles.API.Application.Models.Mediatr;
 using UntitiledArticles.API.Application.OperationStatuses;
+using UntitiledArticles.API.Application.OperationStatuses.Shared.Articles;
 
 public class MoveArticleHandlerTest
 {
@@ -55,7 +56,7 @@ public class MoveArticleHandlerTest
         int categoryMoveToId = 2;
 
         ResultDto<ArticleDto> expectedGetOneArticleByIdResult =
-            new(new GetOneByIdArticleNotFound(id), null);
+            new(new ArticleNotFound(id), null);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NotFound;
 
         SetupMocks(null, expectedGetOneArticleByIdResult);

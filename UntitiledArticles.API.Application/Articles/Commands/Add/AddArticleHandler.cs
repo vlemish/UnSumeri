@@ -11,6 +11,7 @@ using UntitledArticles.API.Domain.Entities;
 namespace UntitiledArticles.API.Application.Articles.Commands.Add;
 
 using Models.Mediatr;
+using OperationStatuses.Shared.Categories;
 
 public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticleResult>>
 {
@@ -53,7 +54,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
         switch (operationStatusValue)
         {
             case OperationStatusValue.NotFound:
-                return new AddArticleCategoryNotExist(request.CategoryId);
+                return new CategoryNotFound(request.CategoryId);
             case OperationStatusValue.Duplicate:
                 return new AddArticleArticleAlreadyExist();
             default:
