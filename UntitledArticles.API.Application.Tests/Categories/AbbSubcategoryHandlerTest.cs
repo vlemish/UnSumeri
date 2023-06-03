@@ -51,7 +51,7 @@ public class AbbSubcategoryHandlerTest
         int id = 2;
         string name = "testCategory";
         int parentId = 3;
-        OperationStatusValue expectedOperationStatus = OperationStatusValue.OK;
+        OperationStatusValue expectedOperationStatus = OperationStatusValue.Created;
         AddSubcategory request = new(name, parentId);
         Category category = new()
         {

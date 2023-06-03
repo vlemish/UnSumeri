@@ -14,7 +14,7 @@ public class MoveArticleSuccess : IOperationStatus
         _categoryId = categoryId;
     }
 
-    public OperationStatusValue Status => OperationStatusValue.OK;
+    public OperationStatusValue Status => OperationStatusValue.OkNoContent;
 
     public string Message => $"Article was successfully moved when id = {this._id} and categoryId = {this._categoryId}";
 }

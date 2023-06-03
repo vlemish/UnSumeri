@@ -50,7 +50,7 @@ public class MoveAsRootHandlerTest
     {
         int id = 2;
         MoveAsRoot request = new(id);
-        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OK;
+        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OkNoContent;
         ResultDto<GetCategoryByIdResult> expectedGetCategoryResponse = new(new GetCategoryByIdSuccess(id),
             new GetCategoryByIdResult() { Name = "name", Id = id, ParentId = 3 });
 

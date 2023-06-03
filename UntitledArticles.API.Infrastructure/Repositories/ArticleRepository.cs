@@ -32,22 +32,45 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             await _articles.AddAsync(entity);
             await _context.SaveChangesAsync();
             Article addedEntity =
-                await GetOneByFilter(c=> c.Title == entity.Title && c.CategoryId == entity.CategoryId && c.CreatedAtTime == entity.CreatedAtTime);
+                await GetOneByFilter(c =>
+                    c.Title == entity.Title && c.CategoryId == entity.CategoryId &&
+                    c.CreatedAtTime == entity.CreatedAtTime);
             return addedEntity;
         }
-        public Task<int> DeleteAsync(Article entity) => throw new NotImplementedException();
+
+        public async Task<int> DeleteAsync(Article entity)
+        {
+            try
+            {
+                Article parent = entity;
+                this._articles.Remove(entity);
+                await _context.SaveChangesAsync();
+                return entity.Id;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public Task DeleteManyAsync(IReadOnlyCollection<Article> entities) => throw new NotImplementedException();
-        public Task<IList<Article>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption) => throw new NotImplementedException();
+
+        public Task<IList<Article>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption) =>
+            throw new NotImplementedException();
+
         public Task<int> GetCount(Expression<Func<Article, bool>> predicate) => throw new NotImplementedException();
-        public Task<IList<Article>> GetManyByFilter(Expression<Func<Article, bool>> predicate) => throw new NotImplementedException();
+
+        public Task<IList<Article>> GetManyByFilter(Expression<Func<Article, bool>> predicate) =>
+            throw new NotImplementedException();
+
         public Task<Article> GetOneByFilter(Expression<Func<Article, bool>> predicate) =>
             _articles.AsNoTracking()
-            .Where(predicate)
-            .Include(a => a.Category)
-            .FirstOrDefaultAsync();
+                .Where(predicate)
+                .Include(a => a.Category)
+                .FirstOrDefaultAsync();
 
         public async Task<Article> GetOneById(int id) =>
-            await this._articles.FindAsync(id);
+            await this._articles.AsNoTracking().FirstAsync(p=> p.Id == id);
 
         public async Task UpdateAsync(Article entity)
         {
@@ -57,6 +80,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
                 return;
             }
 
+            _context.Attach(entityToUpdate);
             _context.Entry(entityToUpdate).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }

@@ -13,6 +13,7 @@ using UntitledArticles.API.Domain.Entities;
 namespace UntitiledArticles.API.Application.Categories.Commands.Delete;
 
 using Models.Mediatr;
+using OperationStatuses.Shared.Categories;
 
 public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, ResultDto>
 {
@@ -43,7 +44,7 @@ public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, ResultDto>
 
     private ResultDto ReportCategoryNotFound(DeleteCategory request)
     {
-        DeleteCategoryNotFound operationStatus = new(request.Id);
+        CategoryNotFound operationStatus = new(request.Id);
         return new(operationStatus);
     }
 

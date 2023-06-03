@@ -50,7 +50,7 @@ public class AddCategoryHandlerTest
     {
         string name = "test_name";
         AddCategory request = new AddCategory(name);
-        OperationStatusValue expectedOperationStatus = OperationStatusValue.OK;
+        OperationStatusValue expectedOperationStatus = OperationStatusValue.Created;
         Category addedCategory = new Category()
         {
             Id = 2, Articles = null, Name = name

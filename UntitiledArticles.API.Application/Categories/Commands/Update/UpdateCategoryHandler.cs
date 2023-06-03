@@ -11,6 +11,7 @@ using UntitledArticles.API.Domain.Entities;
 namespace UntitiledArticles.API.Application.Categories.Commands.Update;
 
 using Models.Mediatr;
+using OperationStatuses.Shared.Categories;
 
 public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, ResultDto>
 {
@@ -43,7 +44,7 @@ public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, ResultDto>
     }
 
     private ResultDto ReportNotFound(UpdateCategory request) =>
-        new(new UpdateCategoryNotFound(request.Id));
+        new(new CategoryNotFound(request.Id));
 
     private ResultDto ReportSuccess(UpdateCategory request) =>
         new(new UpdateCategorySuccess(request.Id));

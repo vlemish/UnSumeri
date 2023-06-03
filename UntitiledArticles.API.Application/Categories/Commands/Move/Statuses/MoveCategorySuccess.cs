@@ -13,7 +13,7 @@ namespace UntitiledArticles.API.Application.Categories.Commands.Move.Statuses
             _parentId = parentId;
         }
 
-        public OperationStatusValue Status => OperationStatusValue.OK;
+        public OperationStatusValue Status => OperationStatusValue.OkNoContent;
 
         public string Message => $"Category where Id = {_id} and Parent Id = {_parentId} was successfully moved!";
     }

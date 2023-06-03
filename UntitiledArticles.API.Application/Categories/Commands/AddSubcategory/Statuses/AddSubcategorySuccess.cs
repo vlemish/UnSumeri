@@ -13,7 +13,7 @@ namespace UntitiledArticles.API.Application.Categories.Commands.AddSubcategory.S
             _parentId = parentId;
         }
 
-        public OperationStatusValue Status => OperationStatusValue.OK;
+        public OperationStatusValue Status => OperationStatusValue.Created;
 
         public string Message => $"Add Subcategory where Name = {_name} and Parent Id {_parentId} was successfully handled";
     }

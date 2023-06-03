@@ -11,7 +11,7 @@ namespace UntitiledArticles.API.Application.Articles.Commands.Add.Statuses
             _id = id;
         }
 
-        public OperationStatusValue Status => OperationStatusValue.OK;
+        public OperationStatusValue Status => OperationStatusValue.Created;
 
         public string Message => $"Successfully added article. Id = {_id}";
     }

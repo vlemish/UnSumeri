@@ -46,7 +46,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             try
             {
                 Category parent = entity;
-                _categories.Remove(entity);
+                _categories.Remove(parent);
                 await _context.SaveChangesAsync();
                 return entity.Id;
             }
@@ -95,6 +95,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         private async void LoadCategories(Category category)
         {
             var res = _categories
+                .AsNoTracking()
                 .Where(c => c.Id == category.Id)
                 .Include(c => c.Articles)
                 .FirstOrDefault()

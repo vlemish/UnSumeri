@@ -6,6 +6,8 @@ using UntitledArticles.API.Service.Contracts.Requests;
 
 namespace UntitledArticles.API.Service.Controllers
 {
+    using System.Runtime.CompilerServices;
+    using Extensions;
     using UntitiledArticles.API.Application.Articles.Commands;
     using UntitiledArticles.API.Application.Articles.Commands.Move;
     using UntitiledArticles.API.Application.Articles.Queries.GetOneById;
@@ -32,21 +34,7 @@ namespace UntitledArticles.API.Service.Controllers
         {
             GetOneArticleById query = new(id);
             ResultDto<ArticleDto> queryResult = await this._mediator.Send(query, cancellationToken);
-            switch (queryResult.OperationStatus.Status)
-            {
-                case OperationStatusValue.OK:
-                {
-                    return this.Ok(queryResult.Payload);
-                }
-                case OperationStatusValue.NotFound:
-                {
-                    return this.NotFound();
-                }
-                default:
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
+            return queryResult.ToHttpObjectResult();
         }
 
         [HttpPatch("{id:int}")]
@@ -55,29 +43,39 @@ namespace UntitledArticles.API.Service.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> MoveArticleToCategory(int id, [FromQuery] int moveToCategoryId, CancellationToken cancellationToken)
+        public async Task<IActionResult> MoveArticleToCategory(int id, [FromQuery] int moveToCategoryId,
+            CancellationToken cancellationToken)
         {
             MoveArticle request = new(id, moveToCategoryId);
             ResultDto commandResult = await this._mediator.Send(request, cancellationToken);
-            switch (commandResult.OperationStatus.Status)
-            {
-                case OperationStatusValue.OK:
-                {
-                    return this.NoContent();
-                }
-                case OperationStatusValue.NotModified:
-                {
-                    return StatusCode(StatusCodes.Status304NotModified);
-                }
-                case OperationStatusValue.NotFound:
-                {
-                    return this.NotFound();
-                }
-                default:
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
+            return commandResult.ToHttpObjectResult();
+        }
+
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status304NotModified)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateArticle([FromRoute] int id,
+            [FromBody] UpdateArticleRequest updateArticleRequest, CancellationToken cancellationToken)
+        {
+            UntitiledArticles.API.Application.Articles.Commands.Update.UpdateArticle request = new(id,
+                updateArticleRequest.Title, updateArticleRequest.Content);
+            ResultDto commandResult = await this._mediator.Send(request, cancellationToken);
+            return commandResult.ToHttpObjectResult();
+        }
+
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteArticle([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            UntitiledArticles.API.Application.Articles.Commands.Delete.DeleteArticle request = new(id);
+            ResultDto<int> commandResult = await this._mediator.Send(request, cancellationToken);
+            return commandResult.ToHttpObjectResult();
         }
     }
 }
