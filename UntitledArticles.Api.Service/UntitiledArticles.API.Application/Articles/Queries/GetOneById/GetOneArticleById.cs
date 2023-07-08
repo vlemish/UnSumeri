@@ -4,4 +4,4 @@ using MediatR;
 using Models;
 using Models.Mediatr;
 
-public record GetOneArticleById(int Id) : IRequest<ResultDto<ArticleDto>>;
+public record GetOneArticleById(int Id, string UserId) : IRequest<ResultDto<ArticleDto>>;

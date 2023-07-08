@@ -19,7 +19,7 @@ namespace UntitledArticles.API.Infrastructure.Extensions
             {
                 includableQueryale = includableQueryale.ThenInclude(navigationInclude);
             }
-            
+
             return includableQueryale;
         }
 
@@ -38,16 +38,16 @@ namespace UntitledArticles.API.Infrastructure.Extensions
         //}
 
 
-        internal static IOrderedQueryable<T> Sort<T, TKey>(this DbSet<T> dbSet, Expression<Func<T, TKey>> keySelector,
+        internal static IOrderedQueryable<T> Sort<T, TKey>(this IQueryable<T> queryable, Expression<Func<T, TKey>> keySelector,
             OrderByOption orderByOption)
             where T : class
         {
             if (orderByOption == OrderByOption.ASC)
             {
-                return dbSet.OrderBy(keySelector);
+                return queryable.OrderBy(keySelector);
             }
 
-            return dbSet.OrderBy(keySelector);
+            return queryable.OrderBy(keySelector);
         }
     }
 }

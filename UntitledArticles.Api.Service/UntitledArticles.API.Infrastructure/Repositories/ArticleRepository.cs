@@ -55,13 +55,18 @@ namespace UntitledArticles.API.Infrastructure.Repositories
 
         public Task DeleteManyAsync(IReadOnlyCollection<Article> entities) => throw new NotImplementedException();
 
-        public Task<IList<Article>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption) =>
-            throw new NotImplementedException();
+        public async Task<IList<Article>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption,
+            Expression<Func<Article, bool>> predicate) =>
+            await this._articles.AsNoTracking()
+                .Where(predicate)
+                .ToListAsync();
 
         public Task<int> GetCount(Expression<Func<Article, bool>> predicate) => throw new NotImplementedException();
 
-        public Task<IList<Article>> GetManyByFilter(Expression<Func<Article, bool>> predicate) =>
-            throw new NotImplementedException();
+        public async Task<IList<Article>> GetManyByFilter(Expression<Func<Article, bool>> predicate) =>
+            await this._articles.AsNoTracking()
+                .Where(predicate)
+                .ToListAsync();
 
         public Task<Article> GetOneByFilter(Expression<Func<Article, bool>> predicate) =>
             _articles.AsNoTracking()

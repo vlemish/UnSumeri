@@ -30,8 +30,7 @@ public class MoveAsRootHandlerTest
 
         SetupMocks(id, expectedGetCategoryResponse);
 
-        MoveAsRootHandler handler = new(new Mock<ILogger<MoveAsRootHandler>>().Object,
-            _categoryMoveStrategyFactoryMock.Object, _mediatorMock.Object);
+        MoveAsRootHandler handler = new(_categoryMoveStrategyFactoryMock.Object, _mediatorMock.Object);
 
         ResultDto actualResponse = await handler.Handle(request, default);
 
@@ -52,7 +51,7 @@ public class MoveAsRootHandlerTest
 
         SetupMocks(id, expectedGetCategoryResponse);
 
-        MoveAsRootHandler handler = new(new Mock<ILogger<MoveAsRootHandler>>().Object,
+        MoveAsRootHandler handler = new(
             _categoryMoveStrategyFactoryMock.Object, _mediatorMock.Object);
 
         ResultDto actualResponse = await handler.Handle(request, default);

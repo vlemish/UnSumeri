@@ -25,7 +25,7 @@ public class UpdateCategoryHandlerTest
     [InlineData(1, "content", "title")]
     public void TestUpdateArticleValdiator_WhenCommandValid_ThenValid(int id, string content, string title)
     {
-        UpdateArticle command = new(id, title, content);
+        UpdateArticle command = new(id, Guid.NewGuid().ToString(), title, content);
 
         AbstractValidator<UpdateArticle> validator = new UpdateArticleValidator();
         var validationResult = validator.TestValidate(command);
@@ -40,7 +40,7 @@ public class UpdateCategoryHandlerTest
     [InlineData(-1, null, null)]
     public void TestUpdateArticleValdiator_WhenCommandNotValid_ThenInvalid(int id, string content, string title)
     {
-        UpdateArticle command = new(id, title, content);
+        UpdateArticle command = new(id, Guid.NewGuid().ToString(), title, content);
 
         AbstractValidator<UpdateArticle> validator = new UpdateArticleValidator();
         var validationResult = validator.TestValidate(command);

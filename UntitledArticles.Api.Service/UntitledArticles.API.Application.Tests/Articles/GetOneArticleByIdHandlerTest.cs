@@ -1,5 +1,6 @@
 namespace UntitledArticles.API.Application.Tests.Articles;
 
+using System.Linq.Expressions;
 using AutoMapper;
 using Domain.Contracts;
 using Domain.Entities;
@@ -28,7 +29,7 @@ public class GetOneArticleByIdHandlerTest
 
         this._handler = new(this._articleRepositoryMock.Object, this._mapper);
 
-        ResultDto<ArticleDto> result = await this._handler.Handle(new GetOneArticleById(id), default);
+        ResultDto<ArticleDto> result = await this._handler.Handle(new GetOneArticleById(id, Guid.NewGuid().ToString()), default);
 
         Assert.NotNull(result);
         Assert.Equal(expectedOperationStatus, result.OperationStatus.Status);
@@ -46,7 +47,7 @@ public class GetOneArticleByIdHandlerTest
 
         this._handler = new(this._articleRepositoryMock.Object, this._mapper);
 
-        ResultDto<ArticleDto> result = await this._handler.Handle(new GetOneArticleById(id), default);
+        ResultDto<ArticleDto> result = await this._handler.Handle(new GetOneArticleById(id, Guid.NewGuid().ToString()), default);
 
         Assert.NotNull(result);
         Assert.Equal(expectedOperationStatus, result.OperationStatus.Status);
@@ -58,7 +59,7 @@ public class GetOneArticleByIdHandlerTest
         _mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new CategoryMappings())));
         this._articleRepositoryMock = new();
         this._articleRepositoryMock
-            .Setup(m => m.GetOneById(It.IsAny<int>()))
+            .Setup(m => m.GetOneByFilter(It.IsAny<Expression<Func<Article, bool>>>()))
             .ReturnsAsync(expectedArticle);
     }
 

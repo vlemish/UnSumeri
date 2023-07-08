@@ -13,15 +13,12 @@ using Models.Mediatr;
 
 public class MoveAsRootHandler : IRequestHandler<MoveAsRoot, ResultDto>
 {
-    private readonly ILogger<MoveAsRootHandler> _logger;
     private readonly ICategoryMoveStrategyFactory _categoryMoveStrategyFactory;
     private readonly IMediator _mediator;
 
-    public MoveAsRootHandler(ILogger<MoveAsRootHandler> logger,
-        ICategoryMoveStrategyFactory categoryMoveStrategyFactory,
+    public MoveAsRootHandler(ICategoryMoveStrategyFactory categoryMoveStrategyFactory,
         IMediator mediator)
     {
-        _logger = logger;
         _categoryMoveStrategyFactory = categoryMoveStrategyFactory;
         _mediator = mediator;
     }

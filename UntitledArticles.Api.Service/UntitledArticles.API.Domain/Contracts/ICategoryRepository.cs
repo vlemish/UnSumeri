@@ -7,7 +7,7 @@ namespace UntitledArticles.API.Domain.Contracts
 {
     public interface ICategoryRepository : IRepository<Category>
     {
-        Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, int depth);
+        Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, Expression<Func<Category, bool>> predicate, int depth);
 
         Task<IList<Category>> GetManyByFilter(Expression<Func<Category, bool>> predicate, int depth);
 

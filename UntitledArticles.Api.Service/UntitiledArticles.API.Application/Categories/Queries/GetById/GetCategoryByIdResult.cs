@@ -7,6 +7,8 @@ namespace UntitiledArticles.API.Application.Categories.Queries.GetById
     {
         public int Id { get; init; }
 
+        public string UserId { get; init; }
+
         public string Name { get; init; }
 
         public int? ParentId { get; init; }

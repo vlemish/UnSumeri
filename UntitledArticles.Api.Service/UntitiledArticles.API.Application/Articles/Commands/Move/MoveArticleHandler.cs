@@ -26,7 +26,7 @@ public class MoveArticleHandler : IRequestHandler<MoveArticle, ResultDto>
     public async Task<ResultDto> Handle(MoveArticle request, CancellationToken cancellationToken)
     {
         ResultDto<ArticleDto> getArticleByIdResult =
-            await this._mediator.Send(CreateGetArticleByIdRequest(request.Id), cancellationToken);
+            await this._mediator.Send(CreateGetArticleByIdRequest(request.Id, request.userId), cancellationToken);
         (bool isSuccess, IOperationStatus operationStatus) articleValidationResult =
             ValidateArticle(request, getArticleByIdResult);
         if (!articleValidationResult.isSuccess)
@@ -94,6 +94,6 @@ public class MoveArticleHandler : IRequestHandler<MoveArticle, ResultDto>
     private GetCategoryById CreateGetCategoryByIdRequest(int categoryId) =>
         new(categoryId, null, 1);
 
-    private GetOneArticleById CreateGetArticleByIdRequest(int id) =>
-        new(id);
+    private GetOneArticleById CreateGetArticleByIdRequest(int id, string userId) =>
+        new(id, userId);
 }

@@ -23,7 +23,7 @@ public class DeleteArticleHandler : IRequestHandler<DeleteArticle, ResultDto<int
     public async Task<ResultDto<int>> Handle(DeleteArticle request, CancellationToken cancellationToken)
     {
         ResultDto<ArticleDto> articleResultDto =
-            await this._mediator.Send(new GetOneArticleById(request.Id), cancellationToken);
+            await this._mediator.Send(new GetOneArticleById(request.Id, request.UserId), cancellationToken);
         if (articleResultDto.OperationStatus.Status != OperationStatusValue.OK)
         {
             return new(articleResultDto.OperationStatus, 0);
