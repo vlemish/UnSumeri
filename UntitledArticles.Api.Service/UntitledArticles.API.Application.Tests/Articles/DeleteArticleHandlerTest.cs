@@ -23,7 +23,7 @@ public class DeleteArticleHandlerTest
     public async Task TestDeleteArticleHandler_WhenArticleExist_ThenSuccess()
     {
         int id = 2;
-        DeleteArticle request = new(id);
+        DeleteArticle request = new(id, Guid.NewGuid().ToString());
         ResultDto<ArticleDto> expetectedArticleResultDto = new ResultDto<ArticleDto>(new GetOneArticleByIdSuccess(id),
             new ArticleDto(id, "title", "content", DateTime.UtcNow, 3));
 
@@ -41,7 +41,7 @@ public class DeleteArticleHandlerTest
     public async Task TestDeleteArticleHandler_WhenArticleNotExist_ThenNotFound()
     {
         int id = 2;
-        DeleteArticle request = new(id);
+        DeleteArticle request = new(id, Guid.NewGuid().ToString());
         ResultDto<ArticleDto> expetectedArticleResultDto = new ResultDto<ArticleDto>(new ArticleNotFound(id),
             null);
 

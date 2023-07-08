@@ -13,12 +13,10 @@ namespace UntitiledArticles.API.Application.Categories.Commands.Add
 
     public class AddCategoryHandler : IRequestHandler<AddCategory, ResultDto<AddCategoryResult>>
     {
-        private readonly ILogger<AddCategoryHandler> _logger;
         private readonly ICategoryRepository _categoryRepository;
 
-        public AddCategoryHandler(ILogger<AddCategoryHandler> logger, ICategoryRepository categoryRepository)
+        public AddCategoryHandler(ICategoryRepository categoryRepository)
         {
-            _logger = logger;
             _categoryRepository = categoryRepository;
         }
 

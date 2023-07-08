@@ -22,7 +22,7 @@ public class GetOneArticleByIdHandler : IRequestHandler<GetOneArticleById, Resul
 
     public async Task<ResultDto<ArticleDto>> Handle(GetOneArticleById request, CancellationToken cancellationToken)
     {
-        Article article = await this._articleRepository.GetOneById(request.Id);
+        Article article = await this._articleRepository.GetOneByFilter(a => a.Id == request.Id && request.UserId == request.UserId);
         if (article is null)
         {
             return ReportNotFound(request);

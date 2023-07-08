@@ -111,7 +111,7 @@ public class AddArticleHandlerTest
     }
 
     private AddArticle GetTestAddArticleRequest() =>
-        new(1, "title", "content");
+        new(1, Guid.NewGuid().ToString(), "title", "content");
 
     private ArticleDto GetDuplicateArticle() =>
         new(2, "title", "content", new DateTime(2023, 03, 03, 1, 0, 0), 1);

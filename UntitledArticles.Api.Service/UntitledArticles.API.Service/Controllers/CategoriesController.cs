@@ -81,7 +81,7 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> AddArticle([FromRoute] int id, [FromBody] AddArticleRequest request,
             CancellationToken cancellationToken)
         {
-            AddArticle addArticle = new(id, request.Title, request.Content);
+            AddArticle addArticle = new(id, HttpContext.GetUserId(), request.Title, request.Content);
             ResultDto<AddArticleResult> response = await _mediator.Send(addArticle, cancellationToken);
             return response.ToHttpObjectResult();
         }

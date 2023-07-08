@@ -55,7 +55,7 @@ public class AddCategoryHandlerTest
 
         SetupMocks(addedCategory);
 
-        AddCategoryHandler handler = new(new Mock<ILogger<AddCategoryHandler>>().Object, _categoryRepository.Object);
+        AddCategoryHandler handler = new(_categoryRepository.Object);
 
         ResultDto<AddCategoryResult> actual = await handler.Handle(request, default);
 

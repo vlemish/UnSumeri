@@ -87,6 +87,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
             CategoryId = request.CategoryId,
             Title = request.Title,
             Content = request.Content,
+            UserId = request.UserId,
             CreatedAtTime = DateTime.UtcNow
         };
 }

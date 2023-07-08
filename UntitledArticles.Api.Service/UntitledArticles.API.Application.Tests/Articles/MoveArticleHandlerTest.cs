@@ -40,7 +40,7 @@ public class MoveArticleHandlerTest
 
         this._handler = new(this._mediatorMock.Object, this._articleRepositoryMock.Object);
 
-        ResultDto result = await this._handler.Handle(new MoveArticle(id, categoryMoveToId), default);
+        ResultDto result = await this._handler.Handle(new MoveArticle(id, Guid.NewGuid().ToString(), categoryMoveToId), default);
 
         Assert.Equal(expectedOperationStatusValue, result.OperationStatus.Status);
         VerifyMocks(expectedGetCategoryByIdTimesCalled: Times.Once(),
@@ -63,7 +63,7 @@ public class MoveArticleHandlerTest
 
         this._handler = new(this._mediatorMock.Object, this._articleRepositoryMock.Object);
 
-        ResultDto result = await this._handler.Handle(new MoveArticle(id, categoryMoveToId), default);
+        ResultDto result = await this._handler.Handle(new MoveArticle(id, Guid.NewGuid().ToString(), categoryMoveToId), default);
 
         Assert.Equal(expectedOperationStatusValue, result.OperationStatus.Status);
         VerifyMocks(expectedGetCategoryByIdTimesCalled: Times.Never(),
@@ -88,7 +88,7 @@ public class MoveArticleHandlerTest
 
         this._handler = new(this._mediatorMock.Object, this._articleRepositoryMock.Object);
 
-        ResultDto result = await this._handler.Handle(new MoveArticle(id, categoryMoveToId), default);
+        ResultDto result = await this._handler.Handle(new MoveArticle(id,Guid.NewGuid().ToString(), categoryMoveToId), default);
 
         Assert.Equal(expectedOperationStatusValue, result.OperationStatus.Status);
         VerifyMocks(expectedGetCategoryByIdTimesCalled: Times.Once(),
@@ -113,7 +113,7 @@ public class MoveArticleHandlerTest
 
         this._handler = new(this._mediatorMock.Object, this._articleRepositoryMock.Object);
 
-        ResultDto result = await this._handler.Handle(new MoveArticle(id, categoryMoveToId), default);
+        ResultDto result = await this._handler.Handle(new MoveArticle(id,Guid.NewGuid().ToString(), categoryMoveToId), default);
 
         Assert.Equal(expectedOperationStatusValue, result.OperationStatus.Status);
         VerifyMocks(expectedGetCategoryByIdTimesCalled: Times.Never(),

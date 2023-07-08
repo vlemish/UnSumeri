@@ -8,12 +8,14 @@ namespace UntitledArticles.API.Service.Controllers
 {
     using System.Runtime.CompilerServices;
     using Extensions;
+    using Microsoft.AspNetCore.Authorization;
     using UntitiledArticles.API.Application.Articles.Commands;
     using UntitiledArticles.API.Application.Articles.Commands.Move;
     using UntitiledArticles.API.Application.Articles.Queries.GetOneById;
     using UntitiledArticles.API.Application.Models;
     using UntitiledArticles.API.Application.Models.Mediatr;
 
+    [Authorize]
     [ApiController]
     [Route("api/articles")]
     public class ArticlesController : ControllerBase
@@ -32,7 +34,7 @@ namespace UntitledArticles.API.Service.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetArticleById([FromRoute] int id, CancellationToken cancellationToken)
         {
-            GetOneArticleById query = new(id);
+            GetOneArticleById query = new(id, HttpContext.GetUserId());
             ResultDto<ArticleDto> queryResult = await this._mediator.Send(query, cancellationToken);
             return queryResult.ToHttpObjectResult();
         }
@@ -46,7 +48,7 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> MoveArticleToCategory(int id, [FromQuery] int moveToCategoryId,
             CancellationToken cancellationToken)
         {
-            MoveArticle request = new(id, moveToCategoryId);
+            MoveArticle request = new(id, HttpContext.GetUserId(), moveToCategoryId);
             ResultDto commandResult = await this._mediator.Send(request, cancellationToken);
             return commandResult.ToHttpObjectResult();
         }
@@ -60,7 +62,7 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> UpdateArticle([FromRoute] int id,
             [FromBody] UpdateArticleRequest updateArticleRequest, CancellationToken cancellationToken)
         {
-            UntitiledArticles.API.Application.Articles.Commands.Update.UpdateArticle request = new(id,
+            UntitiledArticles.API.Application.Articles.Commands.Update.UpdateArticle request = new(id, HttpContext.GetUserId(),
                 updateArticleRequest.Title, updateArticleRequest.Content);
             ResultDto commandResult = await this._mediator.Send(request, cancellationToken);
             return commandResult.ToHttpObjectResult();
@@ -73,7 +75,7 @@ namespace UntitledArticles.API.Service.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteArticle([FromRoute] int id, CancellationToken cancellationToken)
         {
-            UntitiledArticles.API.Application.Articles.Commands.Delete.DeleteArticle request = new(id);
+            UntitiledArticles.API.Application.Articles.Commands.Delete.DeleteArticle request = new(id, HttpContext.GetUserId());
             ResultDto<int> commandResult = await this._mediator.Send(request, cancellationToken);
             return commandResult.ToHttpObjectResult();
         }

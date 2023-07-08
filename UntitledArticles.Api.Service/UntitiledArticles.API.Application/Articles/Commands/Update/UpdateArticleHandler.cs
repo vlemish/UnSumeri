@@ -24,7 +24,7 @@ public class UpdateArticleHandler : IRequestHandler<UpdateArticle, ResultDto>
     public async Task<ResultDto> Handle(UpdateArticle request, CancellationToken cancellationToken)
     {
         ResultDto<ArticleDto> getOneArticleByIdResult =
-            await this._mediator.Send(new GetOneArticleById(request.Id), cancellationToken);
+            await this._mediator.Send(new GetOneArticleById(request.Id, request.UserId), cancellationToken);
         if (getOneArticleByIdResult.OperationStatus.Status != OperationStatusValue.OK)
         {
             return new ResultDto(getOneArticleByIdResult.OperationStatus);

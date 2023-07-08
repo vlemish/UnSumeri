@@ -23,6 +23,6 @@ namespace UntitledArticles.API.Domain.Contracts
 
         Task<IList<T>> GetManyByFilter(Expression<Func<T, bool>> predicate);
 
-        Task<IList<T>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption);
+        Task<IList<T>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, Expression<Func<T, bool>> predicate);
     }
 }

@@ -69,13 +69,14 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             }
         }
 
-        public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption) =>
-            await GetAll(loadOptions, orderByOption, depth: 8);
+        public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, Expression<Func<Category, bool>> predicate) =>
+            await GetAll(loadOptions, orderByOption, predicate, depth: 8);
 
-        public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, int depth)
+        public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, Expression<Func<Category, bool>> predicate, int depth)
         {
             var categories = await _categories
                 .Sort(p => p.Id, orderByOption)
+                .Where(predicate)
                 .Where(c => !c.ParentId.HasValue)
                 .Skip(loadOptions.Skip)
                 .Take(loadOptions.Offset)
