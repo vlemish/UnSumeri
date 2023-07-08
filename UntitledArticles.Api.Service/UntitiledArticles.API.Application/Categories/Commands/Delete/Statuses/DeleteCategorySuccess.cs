@@ -1,0 +1,16 @@
+﻿using UntitiledArticles.API.Application.OperationStatuses;
+
+namespace UntitiledArticles.API.Application.Categories.Commands.Delete.Statuses;
+
+public class DeleteCategorySuccess : IOperationStatus
+{
+    private readonly int _id;
+
+    public DeleteCategorySuccess(int id)
+    {
+        _id = id;
+    }
+
+    public OperationStatusValue Status => OperationStatusValue.OkNoContent;
+    public string Message => $"Category when Category Id = {_id} was successfully deleted!";
+}
