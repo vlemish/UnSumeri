@@ -75,13 +75,13 @@ namespace UntitledArticles.API.Infrastructure.Repositories
         public async Task<IList<Category>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption, Expression<Func<Category, bool>> predicate, int depth)
         {
             var categories = await _categories
-                .Sort(p => p.Id, orderByOption)
                 .Where(predicate)
                 .Where(c => !c.ParentId.HasValue)
                 .Skip(loadOptions.Skip)
                 .Take(loadOptions.Offset)
                 .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
                 .ThenInclude(c => c.Articles)
+                .OrderBy(p=> p.Id)
                 .AsNoTracking()
                 .ToListAsync();
 
