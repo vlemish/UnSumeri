@@ -9,9 +9,9 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY . .
 # COPY ["/UntitledArticles.API.Service/UntitledArticles.API.Service.csproj", "/UntitledArticles.API.Service/"]
-RUN dotnet restore "UntitledArticles.API.Service/UntitledArticles.API.Service.csproj"
+RUN dotnet restore "UntitledArticles.Api.Service/UntitledArticles.API.Service/UntitledArticles.API.Service.csproj"
 COPY . .
-WORKDIR "/src/UntitledArticles.API.Service"
+WORKDIR "/src/UntitledArticles.Api.Service/UntitledArticles.API.Service"
 RUN dotnet build "UntitledArticles.API.Service.csproj" -c Release -o /app/build
 
 FROM build AS publish
