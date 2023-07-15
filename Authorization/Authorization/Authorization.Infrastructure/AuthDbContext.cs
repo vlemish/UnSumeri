@@ -8,10 +8,10 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>
 {
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-    // public AuthDbContext()
-    // {
-    //
-    // }
+    public AuthDbContext()
+    {
+
+    }
 
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
     {
@@ -19,6 +19,6 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("Server=172.17.0.1,1433;Database=UntitledArticlesAuthenticationDB;User=sa;Password=Str0ngPa$$w0rd;Trust Server Certificate=true");
+        optionsBuilder.UseSqlServer("Server=172.17.0.1,1433;Database=UntitledArticlesAuthenticationDB;User=sa;Password=S3cur3P@ssW0rd!;Trust Server Certificate=true");
     }
 }
