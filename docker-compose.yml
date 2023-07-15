@@ -1,8 +1,30 @@
 version: "3.4"
 
 services:
+    api:
+        build: "UntitledArticles.Api.Service"
+        image: docker-untitled-api-dev
+        ports: 
+          - "5000:5000"
+          - "5001:5001"
+        environment: 
+            ASPNETCORE_HTTP_PORT: https://+:5001
+            ASPNETCORE_URLS: http://+:5000
+            ASPNETCORE_ENVIRONMENT: development
+        depends_on:
+          - authentication
+    authentication:
+        build: "Authorization/Authorization"
+        image: docker-authentication-api-dev
+        ports: 
+          - "5002:5002"
+          - "5003:5003"
+        environment: 
+            ASPNETCORE_HTTP_PORT: https://+:5003
+            ASPNETCORE_URLS: http://+:5002
+            ASPNETCORE_ENVIRONMENT: development
     db:
-        image: "mcr.microsoft.com/mssql/server:2022-latest"
+        image: "mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04"
         ports:
           - "1433:1433"
         environment:
