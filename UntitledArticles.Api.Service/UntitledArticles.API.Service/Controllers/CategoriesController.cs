@@ -14,6 +14,7 @@ using UntitledArticles.API.Service.Contracts.Requests;
 namespace UntitledArticles.API.Service.Controllers
 {
     using System.Security.Claims;
+    using System.Text;
     using Domain.Contracts;
     using Extensions;
     using Microsoft.AspNetCore.Authorization;
