@@ -15,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - working-directory: UntitledArticles.Api.Service
     - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -23,7 +22,10 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
+      working-directory: UntitledArticles.Api.Service
     - name: Build
       run: dotnet build --no-restore
+      working-directory: UntitledArticles.Api.Service
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      working-directory: UntitledArticles.Api.Service
