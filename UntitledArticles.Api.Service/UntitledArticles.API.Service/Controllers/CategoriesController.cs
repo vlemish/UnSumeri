@@ -65,6 +65,7 @@ namespace UntitledArticles.API.Service.Controllers
         [HttpPost("", Name = nameof(AddCategory))]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Add([FromBody] AddCategoryRequest request)
         {
@@ -90,6 +91,7 @@ namespace UntitledArticles.API.Service.Controllers
         [HttpPost("{id:int}")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(int))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddSubcategory([FromRoute] int id, [FromBody] AddSubcategoryRequest request)
         {

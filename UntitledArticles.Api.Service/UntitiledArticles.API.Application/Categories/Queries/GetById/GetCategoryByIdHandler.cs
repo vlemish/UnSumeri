@@ -28,7 +28,7 @@ namespace UntitiledArticles.API.Application.Categories.Queries.GetById
 
         public async Task<ResultDto<GetCategoryByIdResult>> Handle(GetCategoryById request, CancellationToken cancellationToken)
         {
-            var category = await _categoryRepository.GetOneByFilter(c=> c.Id == request.Id, request.Depth);
+            var category = await _categoryRepository.GetOneByFilter(c=> c.Id == request.Id && c.UserId == request.UserId, request.Depth);
             if (category is null)
             {
                 return ReportNotFound(request);

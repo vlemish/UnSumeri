@@ -9,5 +9,6 @@
         ParentNotExists,
         Duplicate,
         NotModified,
+        NoContent,
     }
 }

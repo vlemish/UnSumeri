@@ -47,7 +47,7 @@ namespace UntitledArticles.API.Infrastructure.Extensions
                 return queryable.OrderBy(keySelector);
             }
 
-            return queryable.OrderBy(keySelector);
+            return queryable.OrderByDescending(keySelector);
         }
     }
 }
