@@ -81,7 +81,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
                 .Take(loadOptions.Offset)
                 .IncludeSelfReferencingCollectionWithDepth(c => c.SubCategories, depth)
                 .ThenInclude(c => c.Articles)
-                .OrderBy(p=> p.Id)
+                .Sort(p=> p.Id, orderByOption)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -93,8 +93,12 @@ namespace UntitledArticles.API.Infrastructure.Repositories
             return categories;
         }
 
-        private async void LoadCategories(Category category)
+        private void LoadCategories(Category category)
         {
+            if (category is null)
+            {
+                return;
+            }
             var res = _categories
                 .AsNoTracking()
                 .Where(c => c.Id == category.Id)
@@ -102,7 +106,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
                 .FirstOrDefault()
                 .Articles;
             category.Articles = res;
-            if (category.SubCategories is null || category.SubCategories.Count == 0)
+            if (category?.SubCategories is null || category?.SubCategories.Count == 0)
             {
                 return;
             }

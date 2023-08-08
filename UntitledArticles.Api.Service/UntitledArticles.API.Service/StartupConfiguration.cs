@@ -9,6 +9,7 @@ using UntitledArticles.API.Service.Middlewares;
 namespace UntitledArticles.API.Service
 {
     using System.Text;
+    using System.Text.Json.Serialization;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.IdentityModel.Tokens;
     using Microsoft.OpenApi.Models;
@@ -45,7 +46,11 @@ namespace UntitledArticles.API.Service
                 options.TokenValidationParameters = tokenValidationParameters;
             });
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>

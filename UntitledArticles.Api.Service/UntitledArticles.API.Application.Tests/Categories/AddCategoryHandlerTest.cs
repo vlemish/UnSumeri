@@ -9,11 +9,18 @@ using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
+using System.Linq.Expressions;
+using AutoMapper;
+using MediatR;
+using UntitiledArticles.API.Application.Categories.Queries.FindOne;
+using UntitiledArticles.API.Application.Categories.Queries.FindOne.Statuses;
 using UntitiledArticles.API.Application.Models.Mediatr;
+using UntitiledArticles.API.Application.OperationStatuses.Shared.Categories;
 
 public class AddCategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepository;
+    private Mock<IMediator> _mediatorMock;
 
     [Theory]
     [InlineData("testName")]
@@ -55,7 +62,7 @@ public class AddCategoryHandlerTest
 
         SetupMocks(addedCategory);
 
-        AddCategoryHandler handler = new(_categoryRepository.Object);
+        AddCategoryHandler handler = new(_categoryRepository.Object, this._mediatorMock.Object);
 
         ResultDto<AddCategoryResult> actual = await handler.Handle(request, default);
 
@@ -63,8 +70,34 @@ public class AddCategoryHandlerTest
         Assert.Equal(expectedOperationStatus, actual.OperationStatus.Status);
         Assert.Equal(actual.Payload.Id, addedCategory.Id);
 
+        this._mediatorMock
+            .Verify(m => m.Send(It.IsAny<FindOneByFilter>(), It.IsAny<CancellationToken>()),
+                Times.Once());
         _categoryRepository
             .Verify(m => m.AddAsync(It.IsAny<Category>()), Times.Once());
+    }
+
+    [Fact]
+    public async Task TestAddCategoryHandler_WhenCategoryAlreadyExists_ThenDuplicateStatus()
+    {
+        string name = "test_name";
+        AddCategory request = new AddCategory(name, Guid.NewGuid().ToString());
+        OperationStatusValue expectedOperationStatus = OperationStatusValue.Duplicate;
+
+        this.SetupDuplicateMocks();
+
+        AddCategoryHandler handler = new(_categoryRepository.Object, this._mediatorMock.Object);
+
+        ResultDto<AddCategoryResult> actual = await handler.Handle(request, default);
+
+        Assert.NotNull(actual);
+        Assert.Equal(expectedOperationStatus, actual.OperationStatus.Status);
+
+        this._mediatorMock
+            .Verify(m => m.Send(It.IsAny<FindOneByFilter>(), It.IsAny<CancellationToken>()),
+                Times.Once());
+        _categoryRepository
+            .Verify(m => m.AddAsync(It.IsAny<Category>()), Times.Never());
     }
 
     private void SetupMocks(Category addedCategory)
@@ -73,5 +106,18 @@ public class AddCategoryHandlerTest
         _categoryRepository
             .Setup(m => m.AddAsync(It.IsAny<Category>()))
             .ReturnsAsync(addedCategory);
+        this._mediatorMock = new();
+        this._mediatorMock
+            .Setup(m => m.Send(It.IsAny<FindOneByFilter>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ResultDto<FindOneByFilterResult>(new CategoryNoContent(), null));
+    }
+
+    private void SetupDuplicateMocks()
+    {
+        SetupMocks(null);
+        this._mediatorMock
+            .Setup(m => m.Send(It.IsAny<FindOneByFilter>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ResultDto<FindOneByFilterResult>(new FindOneByFilterSuccess(),
+                new FindOneByFilterResult() { Name = "name", Id = 2, }));
     }
 }
