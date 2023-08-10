@@ -45,7 +45,7 @@ public class MoveAsRootHandlerTest
     {
         int id = 2;
         MoveAsRoot request = new(id, Guid.NewGuid().ToString());
-        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OkNoContent;
+        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NoContent;
         ResultDto<GetCategoryByIdResult> expectedGetCategoryResponse = new(new GetCategoryByIdSuccess(id),
             new GetCategoryByIdResult() { Name = "name", Id = id, ParentId = 3 });
 

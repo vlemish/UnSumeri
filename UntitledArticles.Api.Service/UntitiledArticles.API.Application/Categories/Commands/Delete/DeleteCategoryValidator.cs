@@ -4,7 +4,7 @@ namespace UntitiledArticles.API.Application.Categories.Commands.Delete;
 
 using Models.Mediatr;
 
-public class DeleteCategoryValidator : CategoryBaseRequestValidator<DeleteCategory, ResultDto>
+public class DeleteCategoryValidator : CategoryBaseRequestValidator<DeleteCategory, ResultDto<DeleteCategoryResult>>
 {
     public DeleteCategoryValidator()
     {

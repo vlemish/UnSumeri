@@ -1,21 +1,17 @@
 ﻿using AutoMapper;
-
 using MediatR;
-
-using Microsoft.Extensions.Logging;
 
 using UntitiledArticles.API.Application.Categories.Commands.Delete.Statuses;
 using UntitiledArticles.API.Application.Categories.Queries.GetById;
-
+using UntitiledArticles.API.Application.Models.Mediatr;
+using UntitiledArticles.API.Application.OperationStatuses;
+using UntitiledArticles.API.Application.OperationStatuses.Shared.Categories;
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Categories.Commands.Delete;
 
-using Models.Mediatr;
-using OperationStatuses.Shared.Categories;
-
-public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, ResultDto>
+public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, ResultDto<DeleteCategoryResult>>
 {
     private readonly ICategoryRepository _repository;
     private readonly IMediator _mediator;
@@ -28,37 +24,30 @@ public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, ResultDto>
         _mapper = mapper;
     }
 
-    public async Task<ResultDto> Handle(DeleteCategory request, CancellationToken cancellationToken)
+    public async Task<ResultDto<DeleteCategoryResult>> Handle(DeleteCategory request,
+        CancellationToken cancellationToken)
     {
-        ResultDto<GetCategoryByIdResult> response = await _mediator.Send(new GetCategoryById(request.Id, request.UserId), cancellationToken);
-        Category category = _mapper.Map<Category>(response.Payload);
-        if (category is null)
+        ResultDto<GetCategoryByIdResult> response =
+            await _mediator.Send(new GetCategoryById(request.Id, request.UserId), cancellationToken);
+        if (response.OperationStatus.Status != OperationStatusValue.OK)
         {
             return ReportCategoryNotFound(request);
         }
 
+        Category category = _mapper.Map<Category>(response.Payload);
         await _repository.DeleteAsync(category);
-
         return ReportSuccess(request);
     }
 
-    private ResultDto ReportCategoryNotFound(DeleteCategory request)
+    private ResultDto<DeleteCategoryResult> ReportCategoryNotFound(DeleteCategory request)
     {
         CategoryNotFound operationStatus = new(request.Id);
-        return new(operationStatus);
+        return new(operationStatus, null);
     }
 
-    private ResultDto ReportSuccess(DeleteCategory request)
+    private ResultDto<DeleteCategoryResult> ReportSuccess(DeleteCategory request)
     {
         DeleteCategorySuccess operationStatus = new(request.Id);
-        return new(operationStatus);
+        return new(operationStatus, new(request.Id));
     }
-
-    private Category CreateCategory(GetCategoryByIdResult categoryResult) =>
-        new()
-        {
-            Id = categoryResult.Id,
-            Name = categoryResult.Name,
-            ParentId = categoryResult.ParentId,
-        };
 }

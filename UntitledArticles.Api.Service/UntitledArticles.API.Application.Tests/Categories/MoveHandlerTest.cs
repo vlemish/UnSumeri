@@ -21,7 +21,7 @@ public class MoveHandlerTest
         int id = 2;
         int? moveToId = null;
         MoveCategory moveCategoryRequest = new MoveCategory(id, Guid.NewGuid().ToString(), moveToId);
-        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OkNoContent;
+        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NoContent;
 
         SetupMocks(id, moveToId);
 
@@ -40,7 +40,7 @@ public class MoveHandlerTest
         int id = 2;
         int? moveToId = 3;
         MoveCategory moveCategoryRequest = new MoveCategory(id,Guid.NewGuid().ToString(), moveToId);
-        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OkNoContent;
+        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NoContent;
 
         SetupMocks(id, moveToId);
 
