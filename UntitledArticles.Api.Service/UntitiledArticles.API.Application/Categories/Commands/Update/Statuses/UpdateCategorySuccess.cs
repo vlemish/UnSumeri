@@ -10,7 +10,7 @@ public class UpdateCategorySuccess : IOperationStatus
         _id = id;
     }
 
-    public OperationStatusValue Status => OperationStatusValue.OkNoContent;
+    public OperationStatusValue Status => OperationStatusValue.NoContent;
 
     public string Message => $"Category where id = {_id} was successfully updated!";
 }

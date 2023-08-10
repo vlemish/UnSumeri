@@ -11,6 +11,6 @@ public class DeleteCategorySuccess : IOperationStatus
         _id = id;
     }
 
-    public OperationStatusValue Status => OperationStatusValue.OkNoContent;
+    public OperationStatusValue Status => OperationStatusValue.OK;
     public string Message => $"Category when Category Id = {_id} was successfully deleted!";
 }

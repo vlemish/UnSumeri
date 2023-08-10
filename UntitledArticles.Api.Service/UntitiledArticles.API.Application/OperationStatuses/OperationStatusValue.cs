@@ -4,7 +4,6 @@
     {
         OK,
         Created,
-        OkNoContent,
         NotFound,
         ParentNotExists,
         Duplicate,

@@ -9,7 +9,7 @@ public static class ResultDtoHttpStatusExtensions
     private static Dictionary<OperationStatusValue, int> operationToHttpStatusMappings = new()
     {
         { OperationStatusValue.OK, StatusCodes.Status200OK },
-        { OperationStatusValue.OkNoContent, StatusCodes.Status204NoContent },
+        { OperationStatusValue.NoContent, StatusCodes.Status204NoContent },
         { OperationStatusValue.Created, StatusCodes.Status201Created },
         { OperationStatusValue.NotModified, StatusCodes.Status304NotModified },
         { OperationStatusValue.NotFound, StatusCodes.Status404NotFound },

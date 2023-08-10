@@ -120,7 +120,7 @@ namespace UntitledArticles.API.Service.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             DeleteCategory command = new(id, HttpContext.GetUserId());
-            ResultDto response = await _mediator.Send(command);
+            ResultDto<DeleteCategoryResult> response = await _mediator.Send(command);
             return response.ToHttpObjectResult();
         }
 

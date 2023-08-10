@@ -25,7 +25,7 @@ public class MoveAsSubCategoryHandlerTest
         int id = 2;
         int parentId = 3;
         MoveAsSubCategory request = new(id, Guid.NewGuid().ToString(), parentId);
-        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.OkNoContent;
+        OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NoContent;
         ResultDto<GetCategoryByIdResult> expectedCategoryResponse =
             new(new GetCategoryByIdSuccess(id), GetTestCategoryResult(id));
         ResultDto<GetCategoryByIdResult> expectedParentCategoryResponse =
