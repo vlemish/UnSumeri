@@ -1,103 +1,154 @@
 using MediatR;
 using Moq;
 using UntitiledArticles.API.Application.Categories.Commands.Update;
-using UntitiledArticles.API.Application.Categories.Queries.GetById;
-using UntitiledArticles.API.Application.Categories.Queries.GetById.Statuses;
+using UntitiledArticles.API.Application.Categories.Commands.Update.Statuses;
+using UntitiledArticles.API.Application.Categories.Queries.FindMany;
+using UntitiledArticles.API.Application.Categories.Queries.FindMany.Statuses;
+using UntitiledArticles.API.Application.Categories.Queries.FindOne;
+using UntitiledArticles.API.Application.Models.Mediatr;
+using UntitiledArticles.API.Application.OperationStatuses;
+using UntitiledArticles.API.Application.OperationStatuses.Shared.Categories;
 using UntitledArticles.API.Domain.Contracts;
 using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Application.Tests.Categories;
 
-using FluentValidation;
-using FluentValidation.Results;
-using FluentValidation.TestHelper;
-using UntitiledArticles.API.Application.Articles.Commands.Update;
-using UntitiledArticles.API.Application.Models.Mediatr;
-
 public class UpdateCategoryHandlerTest
 {
-    private Mock<ICategoryRepository> _categoryRepositoryMock;
     private Mock<IMediator> _mediatorMock;
+    private Mock<ICategoryRepository> _categoryRepositoryMock;
 
-    private UpdateCategoryHandler _handler;
-
-    [Theory]
-    [InlineData(1, "content", "title")]
-    public void TestUpdateArticleValdiator_WhenCommandValid_ThenValid(int id, string content, string title)
+    [Fact]
+    public async Task TestUpdateCategoryHandler_WhenCategoryValid_ThenSuccess()
     {
-        UpdateArticle command = new(id, Guid.NewGuid().ToString(), title, content);
+        var testData = GetTestData();
+        UpdateCategory request = new(testData.id, testData.userId, testData.name);
 
-        AbstractValidator<UpdateArticle> validator = new UpdateArticleValidator();
-        var validationResult = validator.TestValidate(command);
+        ResultDto<FindManyByFilterResult> expectedFilterResult = new(
+            new FindManyByFilterSuccess(),
+            new()
+            {
+                Categories = new List<FindOneByFilterResult>()
+                {
+                    new() { Name = "prev_name", Id = testData.id, UserId = testData.userId },
+                    new() { Name = "newName", Id = testData.id + 1, UserId = testData.userId },
+                }
+            });
+        SetupMocks(expectedFilterResult);
 
-        validationResult.ShouldNotHaveAnyValidationErrors();
-    }
+        UpdateCategoryHandler handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
 
-    [Theory]
-    [InlineData(0, "", "")]
-    [InlineData(-1, "", "")]
-    [InlineData(-1, null, "")]
-    [InlineData(-1, null, null)]
-    public void TestUpdateArticleValdiator_WhenCommandNotValid_ThenInvalid(int id, string content, string title)
-    {
-        UpdateArticle command = new(id, Guid.NewGuid().ToString(), title, content);
+        ResultDto actual = await handler.Handle(request, default);
 
-        AbstractValidator<UpdateArticle> validator = new UpdateArticleValidator();
-        var validationResult = validator.TestValidate(command);
+        Assert.NotNull(actual);
+        Assert.Equal(OperationStatusValue.NoContent, actual.OperationStatus.Status);
 
-        validationResult.ShouldHaveValidationErrorFor(p => p.Id);
-        validationResult.ShouldHaveValidationErrorFor(p => p.Content);
-        validationResult.ShouldHaveValidationErrorFor(p => p.Title);
+        VerifySuccessMocks();
     }
 
     [Fact]
-    public async Task TestUpdateCategoryHandler_WhenCategoryExist_ThenSuccess()
+    public async Task TestUpdateCategoryHandler_WhenCategoryNotExists_ThenNotFoundResult()
     {
-        int id = 2;
-        string name = "testname2";
+        var testData = GetTestData();
+        UpdateCategory request = new(testData.id, testData.userId, testData.name);
 
-        ResultDto<GetCategoryByIdResult> expectedGetByIdResponse = new(new GetCategoryByIdSuccess(id),
-            new GetCategoryByIdResult() { Id = 2, Name = "testname1", });
+        ResultDto<FindManyByFilterResult> expectedFilterResult = new(new CategoryNoContent(), null);
+        SetupMocks(expectedFilterResult);
 
-        SetupMocks(expectedGetByIdResponse);
+        UpdateCategoryHandler handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
 
-        _handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
+        ResultDto actual = await handler.Handle(request, default);
 
-        ResultDto actual = await _handler.Handle(new UpdateCategory(id, Guid.NewGuid().ToString(), name), default);
+        Assert.NotNull(actual);
+        Assert.Equal(expectedFilterResult.OperationStatus.Status, actual.OperationStatus.Status);
 
-        Assert.Equal(UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NoContent,
-            actual.OperationStatus.Status);
+        VerifyValidationFailedMocks();
     }
 
     [Fact]
-    public async Task TestUpdateCategoryHandler_WhenCategoryNotExist_ThenNotFound()
+    public async Task TestUpdateCategoryHandler_WhenCategoryDuplicateName_ThenDuplicateResult()
     {
-        int id = 2;
-        string name = "testname2";
+        var testData = GetTestData();
+        UpdateCategory request = new(testData.id, testData.userId, testData.name);
 
-        ResultDto<GetCategoryByIdResult> expectedGetByIdResponse = new(new GetCategoryByIdNotFound(id), null);
+        ResultDto<FindManyByFilterResult> expectedFilterResult = new(new DuplicateCategory(testData.name),
+            new()
+            {
+                Categories = new List<FindOneByFilterResult>()
+                {
+                    new() { Name = "previous_name", Id = testData.id, UserId = testData.userId },
+                    new() { Name = testData.name, Id = testData.id + 1, UserId = testData.userId },
+                }
+            });
+        SetupMocks(expectedFilterResult);
 
-        SetupMocks(expectedGetByIdResponse);
+        UpdateCategoryHandler handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
 
-        _handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
+        ResultDto actual = await handler.Handle(request, default);
 
-        ResultDto actual = await _handler.Handle(new UpdateCategory(id, Guid.NewGuid().ToString(), name), default);
+        Assert.NotNull(actual);
+        Assert.Equal(expectedFilterResult.OperationStatus.Status, actual.OperationStatus.Status);
 
-        Assert.Equal(UntitiledArticles.API.Application.OperationStatuses.OperationStatusValue.NotFound,
-            actual.OperationStatus.Status);
+        VerifyValidationFailedMocks();
     }
 
-    private void SetupMocks(ResultDto<GetCategoryByIdResult> expectedGetByIdResponse)
+    [Fact]
+    public async Task TestUpdateCategoryHandler_WhenCategorySameName_ThenNotModifiedResult()
     {
-        _categoryRepositoryMock = new();
+        var testData = GetTestData();
+        UpdateCategory request = new(testData.id, testData.userId, testData.name);
+
+        ResultDto<FindManyByFilterResult> expectedFilterResult = new(
+            new CategoryNotModified(testData.id, testData.userId, testData.name),
+            new()
+            {
+                Categories = new List<FindOneByFilterResult>()
+                {
+                    new() { Name = testData.name, Id = testData.id, UserId = testData.userId },
+                    new() { Name = "newName", Id = testData.id + 1, UserId = testData.userId },
+                }
+            });
+        SetupMocks(expectedFilterResult);
+
+        UpdateCategoryHandler handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
+
+        ResultDto actual = await handler.Handle(request, default);
+
+        Assert.NotNull(actual);
+        Assert.Equal(expectedFilterResult.OperationStatus.Status, actual.OperationStatus.Status);
+
+        VerifyValidationFailedMocks();
+    }
+
+    private void SetupMocks(ResultDto<FindManyByFilterResult> expectedFilterResult)
+    {
         _mediatorMock = new();
+        _categoryRepositoryMock = new();
 
         _mediatorMock
-            .Setup(m => m.Send(It.IsAny<GetCategoryById>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedGetByIdResponse);
-
+            .Setup(m => m.Send(It.IsAny<FindManyByFilter>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedFilterResult);
         _categoryRepositoryMock
             .Setup(m => m.UpdateAsync(It.IsAny<Category>()))
             .Returns(Task.CompletedTask);
     }
+
+    private void VerifyValidationFailedMocks()
+    {
+        _mediatorMock
+            .Verify(m => m.Send(It.IsAny<FindManyByFilter>(), It.IsAny<CancellationToken>()), Times.Once());
+        _categoryRepositoryMock
+            .Verify(m => m.UpdateAsync(It.IsAny<Category>()), Times.Never());
+    }
+
+    private void VerifySuccessMocks()
+    {
+        _mediatorMock
+            .Verify(m => m.Send(It.IsAny<FindManyByFilter>(), It.IsAny<CancellationToken>()), Times.Once());
+        _categoryRepositoryMock
+            .Verify(m => m.UpdateAsync(It.IsAny<Category>()), Times.Once());
+    }
+
+    private (int id, string userId, string name) GetTestData() =>
+        new(2, "userId", "category_name");
 }

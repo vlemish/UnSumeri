@@ -124,9 +124,12 @@ namespace UntitledArticles.API.Service.Controllers
             return response.ToHttpObjectResult();
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPatch("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status304NotModified)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCategoryRequest request,
             CancellationToken cancellationToken)

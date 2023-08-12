@@ -14,7 +14,7 @@ using UntitiledArticles.API.Application.Categories.Queries.FindOne.Statuses;
 using UntitiledArticles.API.Application.Models.Mediatr;
 using UntitiledArticles.API.Application.OperationStatuses.Shared.Categories;
 
-public class AbbSubcategoryHandlerTest
+public class AddSubcategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepositoryMock;
     private Mock<IMediator> _mediatorMock;

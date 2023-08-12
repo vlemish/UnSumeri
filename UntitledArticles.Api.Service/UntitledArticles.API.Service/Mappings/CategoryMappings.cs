@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-
+using Microsoft.AspNetCore.SignalR;
+using UntitiledArticles.API.Application.Categories.Queries.FindMany;
 using UntitiledArticles.API.Application.Categories.Queries.GetAll;
 using UntitiledArticles.API.Application.Categories.Queries.GetById;
-
 using UntitledArticles.API.Domain.Entities;
 
 namespace UntitledArticles.API.Service.Mappings
