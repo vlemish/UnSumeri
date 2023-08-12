@@ -173,7 +173,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
 
         public async Task UpdateAsync(Category entity)
         {
-            var entityToUpdate = await GetOneById(entity.Id);
+            var entityToUpdate = await _categories.FindAsync(entity.Id, entity.UserId);
             if (entity is null)
             {
                 return;

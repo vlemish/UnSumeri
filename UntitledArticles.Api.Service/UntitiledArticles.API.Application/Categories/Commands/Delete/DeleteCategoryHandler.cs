@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation.Results;
 using MediatR;
 
 using UntitiledArticles.API.Application.Categories.Commands.Delete.Statuses;
@@ -38,6 +39,11 @@ public class DeleteCategoryHandler : IRequestHandler<DeleteCategory, ResultDto<D
         await _repository.DeleteAsync(category);
         return ReportSuccess(request);
     }
+
+    // private (bool isValid, IOperationStatus operationStatus) ValidateCategory(GetCategoryByIdResult result)
+    // {
+    //
+    // }
 
     private ResultDto<DeleteCategoryResult> ReportCategoryNotFound(DeleteCategory request)
     {
