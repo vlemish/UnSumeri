@@ -119,7 +119,7 @@ namespace UntitledArticles.API.Infrastructure.Repositories
 
         public async Task<int> GetCount(Expression<Func<Category, bool>> predicate)
         {
-            return _categories.Count();
+            return _categories.Count(predicate);
         }
 
         public async Task<IList<Category>> GetManyByFilter(Expression<Func<Category, bool>> predicate) =>

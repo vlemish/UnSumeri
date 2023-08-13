@@ -21,14 +21,15 @@ public class MoveNotNestedCategoryStrategy : ICategoryMoveStrategy
         _mediator = mediator;
     }
 
-    public async Task Move(int id, int? moveToCategoryId)
+    public async Task Move(int id, string userId, int? moveToCategoryId)
     {
-        ResultDto<GetCategoryByIdResult>  categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id, null));
+        ResultDto<GetCategoryByIdResult>  categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id, userId));
         ValidateGetCategoryResponses(categoryToMoveResponse);
 
         await _categoryRepository.UpdateAsync(new Category()
         {
             Id = categoryToMoveResponse.Payload.Id,
+            UserId = userId,
             Name = categoryToMoveResponse.Payload.Name,
             ParentId = moveToCategoryId
         });

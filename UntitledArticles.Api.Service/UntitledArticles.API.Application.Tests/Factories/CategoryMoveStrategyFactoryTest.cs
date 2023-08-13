@@ -13,18 +13,15 @@ public class CategoryMoveStrategyFactoryTest
     private Mock<IMediator> _mediatorMock;
 
     [Theory]
-    [InlineData(2, 3, null)]
-    [InlineData(2, 3, 4)]
-    [InlineData(2, null, 4)]
+    [InlineData(2, 3)]
+    [InlineData(2,  null)]
     public void
         TestCreateCategoryMoveStrategy_WhenCategoryParentNotSameAsMoveToId_ThenMoveNotNestedCategoryStrategyCreated(
-            int id, int? parentId, int? moveToId)
+            int categoryToMoveId, int? destinationParentId)
     {
-        Category categoryToMove = CreateTestCategory(id, parentId);
-
         SetupMocks();
         CategoryMoveStrategyFactory factory = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
-        ICategoryMoveStrategy actual = factory.CreateCategoryMoveStrategy(categoryToMove, moveToId);
+        ICategoryMoveStrategy actual = factory.CreateCategoryMoveStrategy(categoryToMoveId, destinationParentId);
 
         Assert.NotNull(actual);
         Assert.Equal(typeof(MoveNotNestedCategoryStrategy), actual.GetType());
@@ -35,28 +32,17 @@ public class CategoryMoveStrategyFactoryTest
     public void
         TestCreateCategoryMoveStrategy_WhenCategoryParentSameAsMoveToId_ThenMoveNestedCategoryStrategyCreated()
     {
-        int id = 2;
-        int parentId = 3;
-        int moveToId = parentId;
-
-        Category categoryToMove = CreateTestCategory(id, parentId);
+        int categoryToMoveId = 2;
+        int destinationParentId = 2;
 
         SetupMocks();
         CategoryMoveStrategyFactory factory = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
-        ICategoryMoveStrategy actual = factory.CreateCategoryMoveStrategy(categoryToMove, moveToId);
+        ICategoryMoveStrategy actual = factory.CreateCategoryMoveStrategy(categoryToMoveId, destinationParentId);
 
         Assert.NotNull(actual);
         Assert.Equal(typeof(MoveNestedCategoryStrategy), actual.GetType());
         Assert.NotEqual(typeof(MoveNotNestedCategoryStrategy), actual.GetType());
     }
-
-    private Category CreateTestCategory(int id, int? parentId) =>
-        new()
-        {
-            Id = id,
-            Name = "testCategory",
-            ParentId = parentId,
-        };
 
     private void SetupMocks()
     {

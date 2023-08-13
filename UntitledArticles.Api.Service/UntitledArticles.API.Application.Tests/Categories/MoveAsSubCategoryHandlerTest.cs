@@ -23,69 +23,70 @@ public class MoveAsSubCategoryHandlerTest
     public async Task TestMoveAsSubCategoryHandler_WhenCategoriesExist_ThenMoveSuccessStatus()
     {
         int id = 2;
-        int parentId = 3;
-        MoveAsSubCategory request = new(id, Guid.NewGuid().ToString(), parentId);
+        int parentId = 1;
+        int moveToId = 3;
+        MoveAsSubCategory request = new(id, Guid.NewGuid().ToString(), moveToId);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NoContent;
         ResultDto<GetCategoryByIdResult> expectedCategoryResponse =
-            new(new GetCategoryByIdSuccess(id), GetTestCategoryResult(id));
+            new(new GetCategoryByIdSuccess(id), GetTestCategoryResult(id, null));
         ResultDto<GetCategoryByIdResult> expectedParentCategoryResponse =
-            new(new GetCategoryByIdSuccess(parentId), GetTestCategoryResult(parentId));
+            new(new GetCategoryByIdSuccess(moveToId), GetTestCategoryResult(moveToId, parentId));
 
-        SetupMocks(id, parentId, expectedCategoryResponse, expectedParentCategoryResponse);
+        SetupMocks(id, moveToId, expectedCategoryResponse, expectedParentCategoryResponse);
 
         MoveAsSubCategoryHandler handler = new(_categoryMoveStrategyFactoryMock.Object, _mediatorMock.Object);
         ResultDto actual = await handler.Handle(request, default);
 
         Assert.NotNull(actual);
         Assert.Equal(expectedOperationStatusValue, actual.OperationStatus.Status);
-        VerifyMoveSuccessMocks(id, parentId);
+        VerifyMoveSuccessMocks(id, moveToId);
     }
 
     [Fact]
     public async Task TestMoveAsSubCategoryHandler_WhenCategoryNotExist_ThenNotFoundStatus()
     {
         int id = 2;
-        int parentId = 3;
-        MoveAsSubCategory request = new(id, Guid.NewGuid().ToString(), parentId);
+        int moveToId = 3;
+        MoveAsSubCategory request = new(id, Guid.NewGuid().ToString(), moveToId);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NotFound;
         ResultDto<GetCategoryByIdResult> expectedCategoryResponse =
             new(new GetCategoryByIdNotFound(id), null);
         ResultDto<GetCategoryByIdResult> expectedParentCategoryResponse = null;
 
-        SetupMocks(id, parentId, expectedCategoryResponse, expectedParentCategoryResponse);
+        SetupMocks(id, moveToId, expectedCategoryResponse, expectedParentCategoryResponse);
 
         MoveAsSubCategoryHandler handler = new(_categoryMoveStrategyFactoryMock.Object, _mediatorMock.Object);
         ResultDto actual = await handler.Handle(request, default);
 
         Assert.NotNull(actual);
         Assert.Equal(expectedOperationStatusValue, actual.OperationStatus.Status);
-        VerifyCategoryNotFoundMocks(id, parentId);
+        VerifyCategoryNotFoundMocks(id, moveToId);
     }
 
     [Fact]
     public async Task TestMoveAsSubCategoryHandler_WhenParentCategoryNotExist_ThenNotFoundStatus()
     {
         int id = 2;
-        int parentId = 3;
-        MoveAsSubCategory request = new(id,Guid.NewGuid().ToString(), parentId);
+        int moveToId = 3;
+        MoveAsSubCategory request = new(id,Guid.NewGuid().ToString(), moveToId);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.ParentNotExists;
         ResultDto<GetCategoryByIdResult> expectedCategoryResponse =
-            new(new GetCategoryByIdSuccess(id), GetTestCategoryResult(id));
+            new(new GetCategoryByIdSuccess(id), GetTestCategoryResult(id, null));
         ResultDto<GetCategoryByIdResult> expectedParentCategoryResponse =
-            new(new GetCategoryByIdNotFound(parentId), null);
+            new(new GetCategoryByIdNotFound(moveToId), null);
 
-        SetupMocks(id, parentId, expectedCategoryResponse, expectedParentCategoryResponse);
+        SetupMocks(id, moveToId, expectedCategoryResponse, expectedParentCategoryResponse);
 
         MoveAsSubCategoryHandler handler = new(_categoryMoveStrategyFactoryMock.Object, _mediatorMock.Object);
         ResultDto actual = await handler.Handle(request, default);
 
         Assert.NotNull(actual);
         Assert.Equal(expectedOperationStatusValue, actual.OperationStatus.Status);
-        VerifyParentCategoryNotFoundMocks(id, parentId);
+        VerifyParentCategoryNotFoundMocks(id, moveToId);
     }
 
-    private GetCategoryByIdResult GetTestCategoryResult(int id) =>
-        new() { Name = "testname", Id = id, };
+    private GetCategoryByIdResult GetTestCategoryResult(int id, int? parentId) =>
+        new() { Name = "testname", Id = id, ParentId = parentId };
 
     private void VerifyCategoryNotFoundMocks(int id, int parentId)
     {
@@ -96,10 +97,10 @@ public class MoveAsSubCategoryHandlerTest
             .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
                 Times.Never());
         _categoryMoveStrategyFactoryMock
-            .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()),
+            .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<int>(), It.IsAny<int?>()),
                 Times.Never());
         _categoryMoveStrategyMock
-            .Verify(m => m.Move(It.Is<int>(x => x == id), It.IsAny<int?>()),
+            .Verify(m => m.Move(It.Is<int>(x => x == id), It.IsAny<string>(), It.IsAny<int?>()),
                 Times.Never());
     }
 
@@ -112,10 +113,10 @@ public class MoveAsSubCategoryHandlerTest
             .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
                 Times.Once());
         _categoryMoveStrategyFactoryMock
-            .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()),
+            .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<int>(), It.IsAny<int?>()),
                 Times.Never());
         _categoryMoveStrategyMock
-            .Verify(m => m.Move(It.Is<int>(x => x == id), It.IsAny<int?>()),
+            .Verify(m => m.Move(It.Is<int>(x => x == id), It.IsAny<string>(), It.IsAny<int?>()),
                 Times.Never());
     }
 
@@ -128,10 +129,10 @@ public class MoveAsSubCategoryHandlerTest
             .Verify(m => m.Send(It.Is<GetCategoryById>(x => x.Id == parentId), It.IsAny<CancellationToken>()),
                 Times.Once());
         _categoryMoveStrategyFactoryMock
-            .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()),
+            .Verify(m => m.CreateCategoryMoveStrategy(It.IsAny<int>(), It.IsAny<int?>()),
                 Times.Once());
         _categoryMoveStrategyMock
-            .Verify(m => m.Move(It.Is<int>(x => x == id), It.IsAny<int?>()),
+            .Verify(m => m.Move(It.Is<int>(x => x == id), It.IsAny<string>(), It.IsAny<int?>()),
                 Times.Once());
     }
 
@@ -149,10 +150,10 @@ public class MoveAsSubCategoryHandlerTest
             .Setup(m => m.Send(It.Is<GetCategoryById>(x => x.Id == parentId), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedParentCategoryResponse);
         _categoryMoveStrategyFactoryMock
-            .Setup(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()))
+            .Setup(m => m.CreateCategoryMoveStrategy(It.IsAny<int>(), It.IsAny<int?>()))
             .Returns(_categoryMoveStrategyMock.Object);
         _categoryMoveStrategyMock
-            .Setup(m => m.Move(It.Is<int>(x => x == id), It.IsAny<int?>()))
+            .Setup(m => m.Move(It.Is<int>(x => x == id), It.IsAny<string>(), It.IsAny<int?>()))
             .Returns(Task.CompletedTask);
     }
 }

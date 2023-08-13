@@ -22,13 +22,14 @@ public class MoveNotNestedCategoryStrategyTest
     public async Task TestMoveNotNestedCategoryStrategy_WhenCategoryExist_ThenMoved()
     {
         int id = 2;
+        string userId = Guid.NewGuid().ToString();
         ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
             new(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, null));
 
         SetupMocks(id, categoryToMoveResponse);
 
         MoveNotNestedCategoryStrategy strategy = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
-        await strategy.Move(id, null);
+        await strategy.Move(id, userId,null);
 
         VerifyMoveSuccessMocks(id);
     }
@@ -37,13 +38,14 @@ public class MoveNotNestedCategoryStrategyTest
     public async Task TestMoveNotNestedCategoryStrategy_WhenCategoryNotExist_ThenArgumentOutOfRangeException()
     {
         int id = 2;
+        string userId = Guid.NewGuid().ToString();
         ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
             new(new GetCategoryByIdNotFound(id), null);
 
         SetupMocks(id, categoryToMoveResponse);
 
         MoveNotNestedCategoryStrategy strategy = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => strategy.Move(id, null));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => strategy.Move(id, userId, null));
 
         VerifyMoveCategoryNotFoundMocks(id);
     }

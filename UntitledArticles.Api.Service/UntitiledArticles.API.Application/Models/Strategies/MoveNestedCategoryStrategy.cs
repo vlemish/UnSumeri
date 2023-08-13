@@ -19,7 +19,7 @@ public class MoveNestedCategoryStrategy : ICategoryMoveStrategy
         _mediator = mediator;
     }
 
-    public async Task Move(int id, int? moveToCategoryId)
+    public async Task Move(int id, string userId, int? moveToCategoryId)
     {
         if (!moveToCategoryId.HasValue)
         {
@@ -27,8 +27,8 @@ public class MoveNestedCategoryStrategy : ICategoryMoveStrategy
         }
 
         ResultDto<GetCategoryByIdResult> parentCategoryResponse =
-            await _mediator.Send(new GetCategoryById(moveToCategoryId.Value, null));
-        ResultDto<GetCategoryByIdResult> categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id, null));
+            await _mediator.Send(new GetCategoryById(moveToCategoryId.Value, userId));
+        ResultDto<GetCategoryByIdResult> categoryToMoveResponse = await _mediator.Send(new GetCategoryById(id, userId));
 
         ValidateGetCategoryResponses(parentCategoryResponse, categoryToMoveResponse);
 
@@ -36,12 +36,14 @@ public class MoveNestedCategoryStrategy : ICategoryMoveStrategy
         await _categoryRepository.UpdateAsync(new Category()
         {
             Id = parentCategoryResponse.Payload.Id,
+            UserId = userId,
             Name = parentCategoryResponse.Payload.Name,
             ParentId = categoryToMoveResponse.Payload.ParentId
         });
         await _categoryRepository.UpdateAsync(new Category()
         {
             Id = categoryToMoveResponse.Payload.Id,
+            UserId = userId,
             Name = categoryToMoveResponse.Payload.Name,
             ParentId = parentCategoryResponse.Payload.Id
         });

@@ -23,6 +23,7 @@ public class MoveNestedCategoryStrategyTest
     {
         int id = 2;
         int moveToCategoryId = 3;
+        string userId = Guid.NewGuid().ToString();
         ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
             new(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, moveToCategoryId));
         ResultDto<GetCategoryByIdResult> parentCategoryResponse =
@@ -31,7 +32,7 @@ public class MoveNestedCategoryStrategyTest
         SetupMocks(id, moveToCategoryId, categoryToMoveResponse, parentCategoryResponse);
 
         MoveNestedCategoryStrategy strategy = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
-        await strategy.Move(id, moveToCategoryId);
+        await strategy.Move(id, userId, moveToCategoryId);
 
         VerifyMoveSuccessMocks(id, moveToCategoryId);
     }
@@ -41,6 +42,7 @@ public class MoveNestedCategoryStrategyTest
     {
         int id = 2;
         int moveToCategoryId = 3;
+        string userId = Guid.NewGuid().ToString();
         ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
             new(new GetCategoryByIdSuccess(id), CreateTestCategoryResult(id, moveToCategoryId));
         ResultDto<GetCategoryByIdResult> parentCategoryResponse =
@@ -49,7 +51,7 @@ public class MoveNestedCategoryStrategyTest
         SetupMocks(id, moveToCategoryId, categoryToMoveResponse, parentCategoryResponse);
 
         MoveNestedCategoryStrategy strategy = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
-        await strategy.Move(id, moveToCategoryId);
+        await strategy.Move(id, userId, moveToCategoryId);
 
         VerifyMoveSuccessMocks(id, moveToCategoryId);
     }
@@ -59,6 +61,7 @@ public class MoveNestedCategoryStrategyTest
     {
         int id = 2;
         int moveToCategoryId = 3;
+        string userId = Guid.NewGuid().ToString();
         ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
             new(new GetCategoryByIdNotFound(id), null);
         ResultDto<GetCategoryByIdResult> parentCategoryResponse =
@@ -67,7 +70,7 @@ public class MoveNestedCategoryStrategyTest
         SetupMocks(id, moveToCategoryId, categoryToMoveResponse, parentCategoryResponse);
 
         MoveNestedCategoryStrategy strategy = new(_categoryRepositoryMock.Object, _mediatorMock.Object);
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => strategy.Move(id, moveToCategoryId));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => strategy.Move(id, userId, moveToCategoryId));
 
         VerifyMoveCategoriesNotFoundMocks(id, moveToCategoryId);
     }

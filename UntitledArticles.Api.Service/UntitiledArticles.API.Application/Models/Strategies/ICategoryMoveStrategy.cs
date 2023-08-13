@@ -4,5 +4,5 @@ namespace UntitiledArticles.API.Application.Models.Strategies;
 
 public interface ICategoryMoveStrategy
 {
-    Task Move(int id, int? moveToCategoryId);
+    Task Move(int id, string userId, int? moveToCategoryId);
 }
