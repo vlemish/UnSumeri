@@ -37,14 +37,16 @@ public class
         GetAllCategories request,
         CancellationToken cancellationToken)
     {
-        int totalRecordsCountTask = await _repository.GetCount(c => c.Id > 0);
-        IList<Category> categoriesTask =
+        int totalRecordsCount = await _repository.GetCount(c => c.UserId == request.UserId);
+        if (totalRecordsCount < 1)
+        {
+            return new(Enumerable.Empty<Category>().ToList(), totalRecordsCount);
+        }
+        IList<Category> categories =
             await _repository.GetAll(request.LoadOptions, request.OrderByOption, c => c.UserId == request.UserId,
                 request.Depth);
 
-        //await Task.WhenAll(totalRecordsCountTask, categoriesTask);
-
-        return new(categoriesTask, totalRecordsCountTask);
+        return new(categories, totalRecordsCount);
     }
 
     private IPaginatedResult<GetAllCategoriesResult> CreatePaginatedResult(IList<Category> categories,

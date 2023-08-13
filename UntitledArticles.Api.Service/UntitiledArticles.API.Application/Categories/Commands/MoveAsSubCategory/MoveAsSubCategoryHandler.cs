@@ -28,24 +28,29 @@ public class MoveAsSubCategoryHandler : IRequestHandler<MoveAsSubCategory, Resul
 
     public async Task<ResultDto> Handle(MoveAsSubCategory request, CancellationToken cancellationToken)
     {
-        ResultDto<GetCategoryByIdResult> categoryResponse =
+        ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
             await _mediator.Send(new GetCategoryById(request.Id, request.UserId), cancellationToken);
-        if (categoryResponse.OperationStatus.Status != OperationStatusValue.OK)
+        if (categoryToMoveResponse.OperationStatus.Status != OperationStatusValue.OK)
         {
-            return ReportNotFound(categoryResponse.OperationStatus);
+            return ReportNotFound(categoryToMoveResponse.OperationStatus);
         }
 
-        ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
+        ResultDto<GetCategoryByIdResult> destinationCategoryResponse =
             await _mediator.Send(new GetCategoryById(request.MoveToId, request.UserId), cancellationToken);
-        if (categoryToMoveResponse.OperationStatus.Status != OperationStatusValue.OK)
+        if (request.MoveToId == categoryToMoveResponse.Payload.ParentId)
+        {
+            return ReportNotModified(request);
+        }
+
+        if (destinationCategoryResponse.OperationStatus.Status != OperationStatusValue.OK)
         {
             return ReportParentCategoryNotExist(request);
         }
 
-        ICategoryMoveStrategy categoryMoveStrategy = _categoryMoveStrategyFactory.CreateCategoryMoveStrategy(
-            new Category() { Id = request.Id, Name = categoryResponse.Payload.Name, ParentId = request.MoveToId },
-            request.Id);
-        await categoryMoveStrategy.Move(request.Id, request.MoveToId);
+        ICategoryMoveStrategy categoryMoveStrategy =
+            _categoryMoveStrategyFactory.CreateCategoryMoveStrategy(request.Id,
+                destinationCategoryResponse.Payload.ParentId);
+        await categoryMoveStrategy.Move(request.Id, request.UserId, request.MoveToId);
         return ReportSuccess(request);
     }
 
@@ -54,6 +59,9 @@ public class MoveAsSubCategoryHandler : IRequestHandler<MoveAsSubCategory, Resul
 
     private ResultDto ReportNotFound(IOperationStatus status) =>
         new(status);
+
+    private ResultDto ReportNotModified(MoveAsSubCategory request) =>
+        new(new MoveCategoryNotModified(request.Id, request.MoveToId));
 
     private ResultDto ReportSuccess(MoveAsSubCategory request) =>
         new(new MoveCategorySuccess(request.Id, request.MoveToId));

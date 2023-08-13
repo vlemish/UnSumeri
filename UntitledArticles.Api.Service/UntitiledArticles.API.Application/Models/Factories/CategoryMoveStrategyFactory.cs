@@ -1,9 +1,6 @@
 ﻿using MediatR;
-
 using UntitiledArticles.API.Application.Models.Strategies;
-
 using UntitledArticles.API.Domain.Contracts;
-
 using UntitledArticles.API.Domain.Entities;
 
 namespace UntitiledArticles.API.Application.Models.Factories;
@@ -19,14 +16,16 @@ public class CategoryMoveStrategyFactory : ICategoryMoveStrategyFactory
         _mediator = mediator;
     }
 
-    public ICategoryMoveStrategy CreateCategoryMoveStrategy(Category categoryToMove, int? moveToParentId)
+    public ICategoryMoveStrategy CreateCategoryMoveStrategy(int categoryToMoveId, int? destinationParentId)
     {
-        bool isPreviousParentMovedToSubcategory = categoryToMove.ParentId == moveToParentId;
-        if (isPreviousParentMovedToSubcategory)
+        if (IsMoveToSubCategory(categoryToMoveId, destinationParentId))
         {
             return new MoveNestedCategoryStrategy(_categoryRepository, _mediator);
         }
 
         return new MoveNotNestedCategoryStrategy(_categoryRepository, _mediator);
     }
+
+    private bool IsMoveToSubCategory(int categoryToMoveId, int? destinationParentId) =>
+        categoryToMoveId == destinationParentId;
 }

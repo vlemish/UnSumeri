@@ -5,5 +5,5 @@ namespace UntitiledArticles.API.Application.Models.Factories;
 
 public interface ICategoryMoveStrategyFactory
 {
-    ICategoryMoveStrategy CreateCategoryMoveStrategy(Category categoryToMove, int? moveToId);
+    ICategoryMoveStrategy CreateCategoryMoveStrategy(int categoryToMoveId, int? destinationParentId);
 }

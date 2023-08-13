@@ -22,7 +22,6 @@ public class MoveAsRootHandlerTest
     [Fact]
     public async Task TestMoveAsRootHandler_WhenParticipantNotFound_ThenNotFoundStatus()
     {
-        // trigger workflow to run
         int id = 2;
         MoveAsRoot request = new(id, Guid.NewGuid().ToString());
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NotFound;
@@ -62,20 +61,6 @@ public class MoveAsRootHandlerTest
             categoryMoveStrategyTimesCalled: Times.Once());
     }
 
-    private void VerifyMocks(Times mediatorTimesCalled, Times categoryMoveStrategyFactoryTimesCalled,
-        Times categoryMoveStrategyTimesCalled)
-    {
-        _mediatorMock
-            .Verify(m => m.Send(It.IsAny<GetCategoryById>(),
-                It.IsAny<CancellationToken>()), mediatorTimesCalled);
-        _categoryMoveStrategyFactoryMock
-            .Verify(m =>
-                    m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()),
-                categoryMoveStrategyFactoryTimesCalled);
-        _categoryMoveStrategyMock
-            .Verify(m => m.Move(It.IsAny<int>(), It.IsAny<int?>()), categoryMoveStrategyTimesCalled);
-    }
-
     private void SetupMocks(int id, ResultDto<GetCategoryByIdResult> expectedGetCategoryResponse)
     {
         _mediatorMock = new();
@@ -87,10 +72,24 @@ public class MoveAsRootHandlerTest
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedGetCategoryResponse);
         _categoryMoveStrategyFactoryMock
-            .Setup(m => m.CreateCategoryMoveStrategy(It.IsAny<Category>(), It.IsAny<int?>()))
+            .Setup(m => m.CreateCategoryMoveStrategy(It.IsAny<int>(), It.IsAny<int?>()))
             .Returns(_categoryMoveStrategyMock.Object);
         _categoryMoveStrategyMock
-            .Setup(m => m.Move(It.Is<int>(x => x == id), It.IsAny<int?>()))
+            .Setup(m => m.Move(It.Is<int>(x => x == id), It.IsAny<string>(), It.IsAny<int?>()))
             .Returns(Task.CompletedTask);
+    }
+
+    private void VerifyMocks(Times mediatorTimesCalled, Times categoryMoveStrategyFactoryTimesCalled,
+        Times categoryMoveStrategyTimesCalled)
+    {
+        _mediatorMock
+            .Verify(m => m.Send(It.IsAny<GetCategoryById>(),
+                It.IsAny<CancellationToken>()), mediatorTimesCalled);
+        _categoryMoveStrategyFactoryMock
+            .Verify(m =>
+                    m.CreateCategoryMoveStrategy(It.IsAny<int>(), It.IsAny<int?>()),
+                categoryMoveStrategyFactoryTimesCalled);
+        _categoryMoveStrategyMock
+            .Verify(m => m.Move(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int?>()), categoryMoveStrategyTimesCalled);
     }
 }

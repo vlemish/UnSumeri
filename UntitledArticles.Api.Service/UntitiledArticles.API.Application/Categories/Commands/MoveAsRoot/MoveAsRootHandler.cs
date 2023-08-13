@@ -32,14 +32,22 @@ public class MoveAsRootHandler : IRequestHandler<MoveAsRoot, ResultDto>
             return ReportNotFound(request, categoryResponse.OperationStatus);
         }
 
-        ICategoryMoveStrategy categoryMoveStrategy = _categoryMoveStrategyFactory.CreateCategoryMoveStrategy(
-            new Category() { Id = request.Id, Name = categoryResponse.Payload.Name, ParentId = null, }, moveToId: null);
-        await categoryMoveStrategy.Move(request.Id, null);
+        if (!categoryResponse.Payload.ParentId.HasValue)
+        {
+            return ReportNotModified(request);
+        }
+
+        ICategoryMoveStrategy categoryMoveStrategy =
+            _categoryMoveStrategyFactory.CreateCategoryMoveStrategy(categoryResponse.Payload.Id, null);
+        await categoryMoveStrategy.Move(request.Id, request.UserId, null);
         return ReportSuccess(request);
     }
 
     private ResultDto ReportSuccess(MoveAsRoot request) =>
         new(new MoveCategorySuccess(request.Id, null));
+
+    private ResultDto ReportNotModified(MoveAsRoot request) =>
+        new(new MoveCategoryNotModified(request.Id, null));
 
     private ResultDto ReportNotFound(MoveAsRoot request, IOperationStatus status) =>
         new(status);

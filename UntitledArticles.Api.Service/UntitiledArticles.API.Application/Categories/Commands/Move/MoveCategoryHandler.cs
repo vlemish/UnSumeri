@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Diagnostics;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 using UntitiledArticles.API.Application.Categories.Commands.MoveAsRoot;
@@ -20,31 +21,14 @@ namespace UntitiledArticles.API.Application.Categories.Commands.Move
 
         public async Task<ResultDto> Handle(MoveCategory request, CancellationToken cancellationToken)
         {
-            if (request.MoveToId.HasValue)
-            {
-                var moveAsSubCategoryStatus = await PerformMoveAsSubCategoryCommand(request, cancellationToken);
-                return new(moveAsSubCategoryStatus);
-            }
-
-            var moveAsRootStatus = await PerformMoveAsRootCommand(request, cancellationToken);
-            return new(moveAsRootStatus);
+            CategoryBaseRequest<ResultDto> moveRequest = GetMoveOperation(request);
+            ResultDto result = await _mediator.Send(moveRequest, cancellationToken);
+            return new(result?.OperationStatus);
         }
 
-        private async Task<IOperationStatus> PerformMoveAsRootCommand(MoveCategory request,
-            CancellationToken cancellationToken)
-        {
-            ResultDto response =
-                await _mediator.Send(new MoveAsRoot.MoveAsRoot(request.Id, request.UserId), cancellationToken);
-            return response.OperationStatus;
-        }
-
-        private async Task<IOperationStatus> PerformMoveAsSubCategoryCommand(MoveCategory request,
-            CancellationToken cancellationToken)
-        {
-            ResultDto response =
-                await _mediator.Send(new MoveAsSubCategory.MoveAsSubCategory(request.Id, request.UserId, request.MoveToId.Value),
-                    cancellationToken);
-            return response.OperationStatus;
-        }
+        private CategoryBaseRequest<ResultDto> GetMoveOperation(MoveCategory request) =>
+            request.MoveToId.HasValue
+                ? new MoveAsSubCategory.MoveAsSubCategory(request.Id, request.UserId, request.MoveToId.Value)
+                : new MoveAsRoot.MoveAsRoot(request.Id, request.UserId);
     }
 }

@@ -100,12 +100,12 @@ namespace UntitledArticles.API.Service.Controllers
             return response.ToHttpObjectResult();
         }
 
-        [HttpPut("{id:int}/move/{moveToId:int?}")]
+        [HttpPut("{id:int}/move")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Move([FromRoute] int id, [FromRoute] int? moveToId)
+        public async Task<IActionResult> Move([FromRoute] int id, [FromQuery] int? moveToId)
         {
             var command = new MoveCategory(id, HttpContext.GetUserId(), moveToId);
             ResultDto response = await _mediator.Send(command);
