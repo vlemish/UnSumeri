@@ -2,8 +2,8 @@ version: "3.4"
 
 services:
     api:
-        build: "UntitledArticles.Api.Service"
-        image: docker-untitled-api-dev
+        build: "AnSumeri.Api.Service"
+        image: docker-ansumeri-api-dev
         ports: 
           - "5000:5000"
           - "5001:5001"
