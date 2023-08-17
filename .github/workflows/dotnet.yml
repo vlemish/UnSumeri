@@ -22,10 +22,10 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: UntitledArticles.Api.Service
+      working-directory: AnSumeri.Api.Service
     - name: Build
       run: dotnet build --no-restore
-      working-directory: UntitledArticles.Api.Service
+      working-directory: AnSumeri.Api.Service
     - name: Test
       run: dotnet test --no-build --verbosity normal
-      working-directory: UntitledArticles.Api.Service
+      working-directory: AnSumeri.Api.Service
