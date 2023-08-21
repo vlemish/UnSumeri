@@ -1,11 +1,10 @@
-﻿using System.Linq.Expressions;
-using AnSumeri.API.Application.Categories.Queries.GetById.Statuses;
-using AutoMapper;
+﻿using AutoMapper;
 
 using MediatR;
 
-using Microsoft.Extensions.Logging;
 using AnSumeri.API.Domain.Contracts;
+using AnSumeri.API.Application.Categories.Queries.GetById.Statuses;
+using AnSumeri.API.Application.OperationStatuses.Shared.Categories;
 
 namespace AnSumeri.API.Application.Categories.Queries.GetById
 {
@@ -13,13 +12,11 @@ namespace AnSumeri.API.Application.Categories.Queries.GetById
 
     public class GetCategoryByIdHandler : IRequestHandler<GetCategoryById, ResultDto<GetCategoryByIdResult>>
     {
-        private readonly ILogger<GetCategoryByIdHandler> _logger;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
 
-        public GetCategoryByIdHandler(ILogger<GetCategoryByIdHandler> logger, ICategoryRepository categoryRepository, IMapper mapper)
+        public GetCategoryByIdHandler(ICategoryRepository categoryRepository, IMapper mapper)
         {
-            _logger = logger;
             _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
@@ -33,21 +30,13 @@ namespace AnSumeri.API.Application.Categories.Queries.GetById
             }
 
             var result = _mapper.Map<GetCategoryByIdResult>(category);
-
             return ReportSuccess(request, result);
         }
 
-        private ResultDto<GetCategoryByIdResult> ReportNotFound(GetCategoryById request)
-        {
-            _logger.LogDebug($"Failed to get a category where Id = {request.Id}: Category not found");
-            return new ResultDto<GetCategoryByIdResult>(new GetCategoryByIdNotFound(request.Id), null);
-        }
+        private ResultDto<GetCategoryByIdResult> ReportNotFound(GetCategoryById request) =>
+            new(new CategoryNotFound(request.Id), null);
 
-
-        private ResultDto<GetCategoryByIdResult>  ReportSuccess(GetCategoryById request, GetCategoryByIdResult result)
-        {
-            _logger.LogDebug($"Get Category where Id = {request.Id} was successfully handled");
-            return new ResultDto<GetCategoryByIdResult>(new GetCategoryByIdSuccess(request.Id), result);
-        }
+        private ResultDto<GetCategoryByIdResult>  ReportSuccess(GetCategoryById request, GetCategoryByIdResult result) =>
+            new(new GetCategoryByIdSuccess(request.Id), result);
     }
 }

@@ -7,6 +7,7 @@ using AnSumeri.API.Application.Categories.Queries.GetById.Statuses;
 using AnSumeri.API.Application.Models.Factories;
 using AnSumeri.API.Application.Models.Strategies;
 using AnSumeri.API.Application.OperationStatuses;
+using AnSumeri.API.Application.OperationStatuses.Shared.Categories;
 
 namespace AnSumeri.API.Application.Tests.Categories;
 
@@ -49,7 +50,7 @@ public class MoveAsSubCategoryHandlerTest
         MoveAsSubCategory request = new(id, Guid.NewGuid().ToString(), moveToId);
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NotFound;
         ResultDto<GetCategoryByIdResult> expectedCategoryResponse =
-            new(new GetCategoryByIdNotFound(id), null);
+            new(new CategoryNotFound(id), null);
         ResultDto<GetCategoryByIdResult> expectedParentCategoryResponse = null;
 
         SetupMocks(id, moveToId, expectedCategoryResponse, expectedParentCategoryResponse);
@@ -72,7 +73,7 @@ public class MoveAsSubCategoryHandlerTest
         ResultDto<GetCategoryByIdResult> expectedCategoryResponse =
             new(new GetCategoryByIdSuccess(id), GetTestCategoryResult(id, null));
         ResultDto<GetCategoryByIdResult> expectedParentCategoryResponse =
-            new(new GetCategoryByIdNotFound(moveToId), null);
+            new(new CategoryNotFound(moveToId), null);
 
         SetupMocks(id, moveToId, expectedCategoryResponse, expectedParentCategoryResponse);
 

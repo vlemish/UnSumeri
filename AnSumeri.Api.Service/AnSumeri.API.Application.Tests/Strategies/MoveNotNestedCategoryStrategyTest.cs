@@ -5,6 +5,7 @@ using Moq;
 using AnSumeri.API.Application.Categories.Queries.GetById;
 using AnSumeri.API.Application.Categories.Queries.GetById.Statuses;
 using AnSumeri.API.Application.Models.Strategies;
+using AnSumeri.API.Application.OperationStatuses.Shared.Categories;
 using AnSumeri.API.Domain.Contracts;
 using AnSumeri.API.Domain.Entities;
 
@@ -39,7 +40,7 @@ public class MoveNotNestedCategoryStrategyTest
         int id = 2;
         string userId = Guid.NewGuid().ToString();
         ResultDto<GetCategoryByIdResult> categoryToMoveResponse =
-            new(new GetCategoryByIdNotFound(id), null);
+            new(new CategoryNotFound(id), null);
 
         SetupMocks(id, categoryToMoveResponse);
 

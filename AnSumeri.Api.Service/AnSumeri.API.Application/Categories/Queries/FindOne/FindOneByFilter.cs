@@ -1,5 +1,3 @@
-using AnSumeri.API.Application.Models.Mediatr;
-
 namespace AnSumeri.API.Application.Categories.Queries.FindOne;
 
 using System.Linq.Expressions;

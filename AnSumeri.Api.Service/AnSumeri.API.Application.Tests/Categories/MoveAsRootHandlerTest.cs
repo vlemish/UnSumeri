@@ -7,6 +7,7 @@ using AnSumeri.API.Application.Categories.Queries.GetById.Statuses;
 using AnSumeri.API.Application.Models.Factories;
 using AnSumeri.API.Application.Models.Strategies;
 using AnSumeri.API.Application.OperationStatuses;
+using AnSumeri.API.Application.OperationStatuses.Shared.Categories;
 
 namespace AnSumeri.API.Application.Tests.Categories;
 
@@ -24,7 +25,7 @@ public class MoveAsRootHandlerTest
         int id = 2;
         MoveAsRoot request = new(id, Guid.NewGuid().ToString());
         OperationStatusValue expectedOperationStatusValue = OperationStatusValue.NotFound;
-        ResultDto<GetCategoryByIdResult> expectedGetCategoryResponse = new(new GetCategoryByIdNotFound(id), null);
+        ResultDto<GetCategoryByIdResult> expectedGetCategoryResponse = new(new CategoryNotFound(id), null);
 
         SetupMocks(id, expectedGetCategoryResponse);
 
