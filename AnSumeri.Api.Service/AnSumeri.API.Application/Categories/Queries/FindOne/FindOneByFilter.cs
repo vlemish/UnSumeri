@@ -6,4 +6,4 @@ using Application.Categories.Queries.GetById;
 using Application.Models.Mediatr;
 using Domain.Entities;
 
-public record FindOneByFilter(Expression<Func<Category, bool>> FilterExpression) : IRequest<ResultDto<FindOneByFilterResult>>;
+public record FindOneByFilter(Expression<Func<Category, bool>> FilterExpression, int Depth = 2) : IRequest<ResultDto<FindOneByFilterResult>>;

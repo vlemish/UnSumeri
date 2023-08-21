@@ -25,7 +25,7 @@ public class FindOneByFilterHandler : IRequestHandler<FindOneByFilter, ResultDto
 
     public async Task<ResultDto<FindOneByFilterResult>> Handle(FindOneByFilter request, CancellationToken cancellationToken)
     {
-        Category category = await this._categoryRepository.GetOneByFilter(request.FilterExpression);
+        Category category = await _categoryRepository.GetOneByFilter(request.FilterExpression, request.Depth);
         if (category is null)
         {
             return this.ReportNoContent();

@@ -22,7 +22,7 @@ public class FindManyByFilterHandler : IRequestHandler<FindManyByFilter, ResultD
 
     public async Task<ResultDto<FindManyByFilterResult>> Handle(FindManyByFilter request, CancellationToken cancellationToken)
     {
-        var filterResult = await _categoryRepository.GetManyByFilter(request.FilterExpression);
+        var filterResult = await _categoryRepository.GetManyByFilter(request.FilterExpression, request.Depth);
         if (filterResult is null)
         {
             return ReportNoContent();
