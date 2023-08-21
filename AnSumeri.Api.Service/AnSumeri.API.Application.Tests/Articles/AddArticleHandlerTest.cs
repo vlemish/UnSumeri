@@ -8,6 +8,7 @@ using AnSumeri.API.Application.Articles.Commands.Add;
 using AnSumeri.API.Application.Categories.Queries.GetById;
 using AnSumeri.API.Application.Categories.Queries.GetById.Statuses;
 using AnSumeri.API.Application.OperationStatuses;
+using AnSumeri.API.Application.OperationStatuses.Shared.Categories;
 using AnSumeri.API.Domain.Contracts;
 using AnSumeri.API.Domain.Entities;
 
@@ -29,7 +30,7 @@ public class AddArticleHandlerTest
     public async Task TestAddArticleHandler_WhenCategoryNotExist_ThenNotFoundStatus()
     {
         AddArticle request = GetTestAddArticleRequest();
-        ResultDto<GetCategoryByIdResult> expectedGetcategoryByIdResponse = new(new GetCategoryByIdNotFound(1), new GetCategoryByIdResult()
+        ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResponse = new(new CategoryNotFound(1), new GetCategoryByIdResult()
         {
             Id = 1,
             Name = "category",
@@ -37,7 +38,7 @@ public class AddArticleHandlerTest
             Articles = new List<ArticleDto>() { GetDuplicateArticle() },
         });
 
-        SetupMocks(expectedGetcategoryByIdResponse);
+        SetupMocks(expectedGetCategoryByIdResponse);
 
         _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object);
 

@@ -6,6 +6,7 @@ using AnSumeri.API.Application.Categories.Queries.GetById;
 using AnSumeri.API.Application.Categories.Queries.GetById.Statuses;
 using AnSumeri.API.Application.Models.Mediatr;
 using AnSumeri.API.Application.OperationStatuses;
+using AnSumeri.API.Application.OperationStatuses.Shared.Categories;
 using AnSumeri.API.Domain.Contracts;
 using AnSumeri.API.Domain.Entities;
 using AnSumeri.API.Service.Mappings;
@@ -83,7 +84,7 @@ public class DeleteCategoryHandlerTest
         _mediatorMock
             .Setup(m => m.Send(It.IsAny<GetCategoryById>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ResultDto<GetCategoryByIdResult>(new GetCategoryByIdNotFound(id), null));
+            .ReturnsAsync(new ResultDto<GetCategoryByIdResult>(new CategoryNotFound(id), null));
     }
 
     private void VerifyPositiveMocks()

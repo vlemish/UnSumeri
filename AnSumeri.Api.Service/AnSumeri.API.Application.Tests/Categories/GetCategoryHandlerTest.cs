@@ -37,8 +37,7 @@ public class GetCategoryHandlerTest
 
         SetupMocks(category);
 
-        GetCategoryByIdHandler handler = new(new Mock<ILogger<GetCategoryByIdHandler>>().Object,
-            _categoryRepositoryMock.Object, _mapper);
+        GetCategoryByIdHandler handler = new(_categoryRepositoryMock.Object, _mapper);
 
         ResultDto<GetCategoryByIdResult> result = await handler.Handle(request, default);
 
@@ -56,8 +55,7 @@ public class GetCategoryHandlerTest
 
         SetupMocks(category);
 
-        GetCategoryByIdHandler handler = new(new Mock<ILogger<GetCategoryByIdHandler>>().Object,
-            _categoryRepositoryMock.Object, _mapper);
+        GetCategoryByIdHandler handler = new(_categoryRepositoryMock.Object, _mapper);
 
         ResultDto<GetCategoryByIdResult> result = await handler.Handle(request, default);
 

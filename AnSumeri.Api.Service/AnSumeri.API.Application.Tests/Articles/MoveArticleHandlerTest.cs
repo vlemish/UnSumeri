@@ -1,3 +1,5 @@
+using AnSumeri.API.Application.OperationStatuses.Shared.Categories;
+
 namespace AnSumeri.API.Application.Tests.Articles;
 
 using Domain.Contracts;
@@ -78,7 +80,7 @@ public class MoveArticleHandlerTest
 
         int categoryMoveToId = 2;
 
-        ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResult = new(new GetCategoryByIdNotFound(categoryId),
+        ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResult = new(new CategoryNotFound(categoryId),
             null);
         ResultDto<ArticleDto> expectedGetOneArticleByIdResult =
             new(new GetOneArticleByIdSuccess(id), CreateTestArticleDto(id, categoryId));
@@ -103,7 +105,7 @@ public class MoveArticleHandlerTest
 
         int categoryMoveToId = 1;
 
-        ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResult = new(new GetCategoryByIdNotFound(categoryId),
+        ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResult = new(new CategoryNotFound(categoryId),
             null);
         ResultDto<ArticleDto> expectedGetOneArticleByIdResult =
             new(new GetOneArticleByIdSuccess(id), CreateTestArticleDto(id, categoryId));

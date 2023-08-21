@@ -1,5 +1,3 @@
-using AnSumeri.API.Application.Models.Mediatr;
-
 namespace AnSumeri.API.Application.Categories.Queries.FindOne;
 
 using System.Linq.Expressions;
@@ -8,4 +6,4 @@ using Application.Categories.Queries.GetById;
 using Application.Models.Mediatr;
 using Domain.Entities;
 
-public record FindOneByFilter(Expression<Func<Category, bool>> FilterExpression) : IRequest<ResultDto<FindOneByFilterResult>>;
+public record FindOneByFilter(Expression<Func<Category, bool>> FilterExpression, int Depth = 2) : IRequest<ResultDto<FindOneByFilterResult>>;
