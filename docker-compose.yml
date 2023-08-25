@@ -23,6 +23,8 @@ services:
             ASPNETCORE_HTTP_PORT: https://+:5003
             ASPNETCORE_URLS: http://+:5002
             ASPNETCORE_ENVIRONMENT: development
+        depends_on: 
+          - db
     db:
         image: "mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04"
         ports:
