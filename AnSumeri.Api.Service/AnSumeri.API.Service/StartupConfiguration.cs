@@ -5,6 +5,7 @@ using AnSumeri.API.Application;
 using AnSumeri.API.Infrastructure;
 using AnSumeri.API.Service.Mappings;
 using AnSumeri.API.Service.Middlewares;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnSumeri.API.Service
 {
@@ -91,6 +92,8 @@ namespace AnSumeri.API.Service
         {
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+            ApplyPendingMigrations(app);
+
             // Configure the HTTP request pipeline.
             // if (app.Environment.IsDevelopment())
             // {
@@ -132,5 +135,17 @@ namespace AnSumeri.API.Service
                     $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
                     true)
                 .Build();
+
+        private static void ApplyPendingMigrations(WebApplication app)
+        {
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider
+                    .GetRequiredService<ApplicationDbContext>();
+
+                // Here is the migration executed
+                dbContext.Database.Migrate();
+            }
+        }
     }
 }

@@ -35,7 +35,7 @@ namespace AnSumeri.API.Infrastructure
         /// <inheritdoc />
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-           optionsBuilder.UseSqlServer("Server=172.17.0.1,1433;Database=UnitledArticlesDB;User=sa;Password=S3cur3P@ssW0rd!;Trust Server Certificate=true");
+           optionsBuilder.UseSqlServer("Server=db;Database=UnitledArticlesDB;User=sa;Password=S3cur3P@ssW0rd!;Trust Server Certificate=true");
         }
 
         /// <inheritdoc />
