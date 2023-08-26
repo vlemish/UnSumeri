@@ -1,7 +1,6 @@
 using AnSumeri.API.Application.Articles.Commands.Add.Statuses;
 using AnSumeri.API.Application.Categories.Queries.GetById;
 using AnSumeri.API.Application.OperationStatuses;
-using AutoMapper;
 
 using MediatR;
 using AnSumeri.API.Domain.Contracts;
@@ -15,14 +14,12 @@ using OperationStatuses.Shared.Categories;
 public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticleResult>>
 {
     private readonly IArticleRepository _articleRepository;
-    private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AddArticleHandler(IArticleRepository articleRepository, IMapper mapper, IMediator mediator, IDateTimeProvider dateTimeProvider)
+    public AddArticleHandler(IArticleRepository articleRepository, IMediator mediator, IDateTimeProvider dateTimeProvider)
     {
         _articleRepository = articleRepository;
-        _mapper = mapper;
         _mediator = mediator;
         _dateTimeProvider = dateTimeProvider;
     }
