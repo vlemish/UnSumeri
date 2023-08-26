@@ -24,22 +24,22 @@ public class UpdateArticleHandler : IRequestHandler<UpdateArticle, ResultDto>
     public async Task<ResultDto> Handle(UpdateArticle request, CancellationToken cancellationToken)
     {
         ResultDto<ArticleDto> getOneArticleByIdResult =
-            await this._mediator.Send(new GetOneArticleById(request.Id, request.UserId), cancellationToken);
+            await _mediator.Send(new GetOneArticleById(request.Id, request.UserId), cancellationToken);
         if (getOneArticleByIdResult.OperationStatus.Status != OperationStatusValue.OK)
         {
             return new ResultDto(getOneArticleByIdResult.OperationStatus);
         }
 
-        if (!IsUpdatesAnyOfFields(getOneArticleByIdResult.Payload, request))
+        if (!UpdatesAnyOfFields(getOneArticleByIdResult.Payload, request))
         {
             return ReportNotModified(request);
         }
 
-        await this._articleRepository.UpdateAsync(CreateArticleToUpdate(request, getOneArticleByIdResult.Payload));
+        await _articleRepository.UpdateAsync(CreateArticleToUpdate(request, getOneArticleByIdResult.Payload));
         return ReportSuccess(request);
     }
 
-    private bool IsUpdatesAnyOfFields(ArticleDto articleDto, UpdateArticle updateArticle) =>
+    private bool UpdatesAnyOfFields(ArticleDto articleDto, UpdateArticle updateArticle) =>
         articleDto.Content != updateArticle.Content ||
         articleDto.Title != updateArticle.Title;
 
