@@ -17,12 +17,14 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
     private readonly IArticleRepository _articleRepository;
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AddArticleHandler(IArticleRepository articleRepository, IMapper mapper, IMediator mediator)
+    public AddArticleHandler(IArticleRepository articleRepository, IMapper mapper, IMediator mediator, IDateTimeProvider dateTimeProvider)
     {
         _articleRepository = articleRepository;
         _mapper = mapper;
         _mediator = mediator;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<ResultDto<AddArticleResult>> Handle(AddArticle request, CancellationToken cancellationToken)
@@ -87,6 +89,6 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
             Title = request.Title,
             Content = request.Content,
             UserId = request.UserId,
-            CreatedAtTime = DateTime.UtcNow
+            CreatedAtTime = _dateTimeProvider.Current
         };
 }

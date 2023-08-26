@@ -7,7 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 using System.Reflection;
 using AnSumeri.API.Application.Models.Factories;
+using AnSumeri.API.Application.Models.Providers;
 using AnSumeri.API.Application.PipelineBehaviours;
+using AnSumeri.API.Domain.Contracts;
 
 namespace AnSumeri.API.Application
 {
@@ -16,6 +18,7 @@ namespace AnSumeri.API.Application
         public static IServiceCollection ConfigureApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddTransient<ICategoryMoveStrategyFactory, CategoryMoveStrategyFactory>();
+            services.AddTransient<IDateTimeProvider, UtcDateTimeProvider>();
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
             services.ConfigurePipelineBehaviors(configuration);

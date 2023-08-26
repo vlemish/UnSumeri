@@ -18,6 +18,9 @@ public class AddSubcategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepositoryMock;
     private Mock<IMediator> _mediatorMock;
+    private Mock<IDateTimeProvider> _dateTimeProviderMock;
+
+    private readonly DateTime _testDateTime = new(1999, 5, 26, 1, 1, 1);
 
     [Theory]
     [InlineData("a", 2)]
@@ -39,7 +42,8 @@ public class AddSubcategoryHandlerTest
     [InlineData(null, 2, 1)]
     [InlineData("asd", -2, 1)]
     [InlineData(null, -2, 2)]
-    public void TestAddSubcategoryValidator_WhenNameAndIdNotValid_ThenSuccess(string name, int parentId, int expectedErrorCount)
+    public void TestAddSubcategoryValidator_WhenNameAndIdNotValid_ThenSuccess(string name, int parentId,
+        int expectedErrorCount)
     {
         AddSubcategory addSubcategory = new(name, Guid.NewGuid().ToString(), parentId);
         AddSubcategoryValidator validator = new AddSubcategoryValidator();
@@ -58,16 +62,12 @@ public class AddSubcategoryHandlerTest
         int parentId = 3;
         OperationStatusValue expectedOperationStatus = OperationStatusValue.Created;
         AddSubcategory request = new(name, Guid.NewGuid().ToString(), parentId);
-        Category category = new()
-        {
-            Id = 2,
-            Name = name,
-            ParentId = parentId
-        };
+        Category category = new() { Id = 2, Name = name, ParentId = parentId };
 
         SetupMocks(category);
 
-        AddSubcategoryHandler handler = new(_categoryRepositoryMock.Object, this._mediatorMock.Object);
+        AddSubcategoryHandler handler = new(_categoryRepositoryMock.Object, _mediatorMock.Object,
+            _dateTimeProviderMock.Object);
 
         ResultDto<AddSubcategoryResult> result = await handler.Handle(request, default);
 
@@ -78,7 +78,7 @@ public class AddSubcategoryHandlerTest
             .Verify(m => m.Send(It.IsAny<FindOneByFilter>(), It.IsAny<CancellationToken>()),
                 Times.Once());
         _categoryRepositoryMock
-            .Verify(m=> m.AddAsync(It.IsAny<Category>()), Times.Once());
+            .Verify(m => m.AddAsync(It.IsAny<Category>()), Times.Once());
     }
 
     [Fact]
@@ -92,7 +92,8 @@ public class AddSubcategoryHandlerTest
 
         this.SetupDuplicateMocks();
 
-        AddSubcategoryHandler handler = new(this._categoryRepositoryMock.Object, this._mediatorMock.Object);
+        AddSubcategoryHandler handler = new(_categoryRepositoryMock.Object, this._mediatorMock.Object,
+            _dateTimeProviderMock.Object);
 
         ResultDto<AddSubcategoryResult> actual = await handler.Handle(request, default);
 
@@ -114,15 +115,18 @@ public class AddSubcategoryHandlerTest
         _categoryRepositoryMock
             .Setup(m => m.AddAsync(It.IsAny<Category>()))
             .ReturnsAsync(addedCategory);
-        this._mediatorMock
+        _mediatorMock
             .Setup(m => m.Send(It.IsAny<FindOneByFilter>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ResultDto<FindOneByFilterResult>(new CategoryNoContent(), null));
+        _dateTimeProviderMock = new();
+        _dateTimeProviderMock.Setup(m => m.Current)
+            .Returns(_testDateTime);
     }
 
     private void SetupDuplicateMocks()
     {
         SetupMocks(null);
-        this._mediatorMock
+        _mediatorMock
             .Setup(m => m.Send(It.IsAny<FindOneByFilter>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ResultDto<FindOneByFilterResult>(new FindOneByFilterSuccess(),
                 new FindOneByFilterResult() { Name = "name", Id = 2, }));
