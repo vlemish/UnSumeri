@@ -18,7 +18,6 @@ using AnSumeri.API.Application.Models.Mediatr;
 public class AddArticleHandlerTest
 {
     private Mock<IArticleRepository> _articleRepositoryMock;
-    private Mock<IMapper> _mapperMock;
     private Mock<IMediator> _mediatorMock;
     private Mock<IDateTimeProvider> _dateTimeProviderMock;
 
@@ -41,7 +40,7 @@ public class AddArticleHandlerTest
 
         SetupMocks(expectedGetCategoryByIdResponse);
 
-        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object,
+        _handler = new(_articleRepositoryMock.Object, _mediatorMock.Object,
             _dateTimeProviderMock.Object);
 
         ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
@@ -64,7 +63,7 @@ public class AddArticleHandlerTest
 
         SetupMocks(expectedGetcategoryByIdResponse);
 
-        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object,
+        _handler = new(_articleRepositoryMock.Object, _mediatorMock.Object,
             _dateTimeProviderMock.Object);
 
         ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
@@ -87,7 +86,7 @@ public class AddArticleHandlerTest
 
         SetupMocks(expectedGetcategoryByIdResponse);
 
-        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object,
+        _handler = new(_articleRepositoryMock.Object, _mediatorMock.Object,
             _dateTimeProviderMock.Object);
 
         ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
@@ -98,7 +97,6 @@ public class AddArticleHandlerTest
     private void SetupMocks(ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResponse)
     {
         _articleRepositoryMock = new();
-        _mapperMock = new();
         _mediatorMock = new();
 
         _articleRepositoryMock
