@@ -40,9 +40,9 @@ public class MoveArticleHandlerTest
 
         SetupMocks(expectedGetCategoryByIdResult, expectedGetOneArticleByIdResult);
 
-        this._handler = new(this._mediatorMock.Object, this._articleRepositoryMock.Object);
+        _handler = new(_mediatorMock.Object, _articleRepositoryMock.Object);
 
-        ResultDto result = await this._handler.Handle(new MoveArticle(id, Guid.NewGuid().ToString(), categoryMoveToId), default);
+        ResultDto result = await _handler.Handle(new MoveArticle(id, Guid.NewGuid().ToString(), categoryMoveToId), default);
 
         Assert.Equal(expectedOperationStatusValue, result.OperationStatus.Status);
         VerifyMocks(expectedGetCategoryByIdTimesCalled: Times.Once(),
@@ -63,9 +63,9 @@ public class MoveArticleHandlerTest
 
         SetupMocks(null, expectedGetOneArticleByIdResult);
 
-        this._handler = new(this._mediatorMock.Object, this._articleRepositoryMock.Object);
+        _handler = new(_mediatorMock.Object, _articleRepositoryMock.Object);
 
-        ResultDto result = await this._handler.Handle(new MoveArticle(id, Guid.NewGuid().ToString(), categoryMoveToId), default);
+        ResultDto result = await _handler.Handle(new MoveArticle(id, Guid.NewGuid().ToString(), categoryMoveToId), default);
 
         Assert.Equal(expectedOperationStatusValue, result.OperationStatus.Status);
         VerifyMocks(expectedGetCategoryByIdTimesCalled: Times.Never(),
@@ -88,9 +88,9 @@ public class MoveArticleHandlerTest
 
         SetupMocks(expectedGetCategoryByIdResult, expectedGetOneArticleByIdResult);
 
-        this._handler = new(this._mediatorMock.Object, this._articleRepositoryMock.Object);
+        _handler = new(_mediatorMock.Object, _articleRepositoryMock.Object);
 
-        ResultDto result = await this._handler.Handle(new MoveArticle(id,Guid.NewGuid().ToString(), categoryMoveToId), default);
+        ResultDto result = await _handler.Handle(new MoveArticle(id,Guid.NewGuid().ToString(), categoryMoveToId), default);
 
         Assert.Equal(expectedOperationStatusValue, result.OperationStatus.Status);
         VerifyMocks(expectedGetCategoryByIdTimesCalled: Times.Once(),
@@ -113,9 +113,9 @@ public class MoveArticleHandlerTest
 
         SetupMocks(expectedGetCategoryByIdResult, expectedGetOneArticleByIdResult);
 
-        this._handler = new(this._mediatorMock.Object, this._articleRepositoryMock.Object);
+        _handler = new(_mediatorMock.Object, _articleRepositoryMock.Object);
 
-        ResultDto result = await this._handler.Handle(new MoveArticle(id,Guid.NewGuid().ToString(), categoryMoveToId), default);
+        ResultDto result = await _handler.Handle(new MoveArticle(id,Guid.NewGuid().ToString(), categoryMoveToId), default);
 
         Assert.Equal(expectedOperationStatusValue, result.OperationStatus.Status);
         VerifyMocks(expectedGetCategoryByIdTimesCalled: Times.Never(),
@@ -124,28 +124,28 @@ public class MoveArticleHandlerTest
 
     private void VerifyMocks(Times expectedGetCategoryByIdTimesCalled, Times expectedGetOneArticleByIdTimesCalled, Times expectedArticleRepositoryTimesCalled)
     {
-        this._mediatorMock.Verify(m => m.Send(It.IsAny<GetCategoryById>(), It.IsAny<CancellationToken>()),
+        _mediatorMock.Verify(m => m.Send(It.IsAny<GetCategoryById>(), It.IsAny<CancellationToken>()),
             expectedGetCategoryByIdTimesCalled);
-        this._mediatorMock
+        _mediatorMock
             .Verify(m => m.Send(It.IsAny<GetOneArticleById>(), It.IsAny<CancellationToken>()),
                 expectedGetOneArticleByIdTimesCalled);
-        this._articleRepositoryMock
+        _articleRepositoryMock
             .Verify(m => m.UpdateAsync(It.IsAny<Article>()), expectedArticleRepositoryTimesCalled);
     }
 
     private void SetupMocks(ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResult,
         ResultDto<ArticleDto> expectedGetOneArticleByIdResult)
     {
-        this._mediatorMock = new();
-        this._articleRepositoryMock = new();
+        _mediatorMock = new();
+        _articleRepositoryMock = new();
 
-        this._mediatorMock.Setup(m => m.Send(It.IsAny<GetCategoryById>(), It.IsAny<CancellationToken>()))
+        _mediatorMock.Setup(m => m.Send(It.IsAny<GetCategoryById>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedGetCategoryByIdResult);
-        this._mediatorMock
+        _mediatorMock
             .Setup(m => m.Send(It.IsAny<GetOneArticleById>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedGetOneArticleByIdResult);
 
-        this._articleRepositoryMock
+        _articleRepositoryMock
             .Setup(m => m.UpdateAsync(It.IsAny<Article>()))
             .Returns(Task.CompletedTask);
     }

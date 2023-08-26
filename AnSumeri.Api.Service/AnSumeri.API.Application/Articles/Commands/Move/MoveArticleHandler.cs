@@ -1,6 +1,5 @@
 namespace AnSumeri.API.Application.Articles.Commands.Move;
 
-using AutoMapper;
 using Categories.Queries.GetById;
 using MediatR;
 using Models;
@@ -26,7 +25,7 @@ public class MoveArticleHandler : IRequestHandler<MoveArticle, ResultDto>
     public async Task<ResultDto> Handle(MoveArticle request, CancellationToken cancellationToken)
     {
         ResultDto<ArticleDto> getArticleByIdResult =
-            await this._mediator.Send(CreateGetArticleByIdRequest(request.Id, request.userId), cancellationToken);
+            await _mediator.Send(CreateGetArticleByIdRequest(request.Id, request.UserId), cancellationToken);
         (bool isSuccess, IOperationStatus operationStatus) articleValidationResult =
             ValidateArticle(request, getArticleByIdResult);
         if (!articleValidationResult.isSuccess)
@@ -35,15 +34,15 @@ public class MoveArticleHandler : IRequestHandler<MoveArticle, ResultDto>
         }
 
         ResultDto<GetCategoryByIdResult> getCategoryByIdResult =
-            await this._mediator.Send(CreateGetCategoryByIdRequest(request.CategoryToMoveId), cancellationToken);
+            await _mediator.Send(CreateGetCategoryByIdRequest(request.CategoryToMoveId), cancellationToken);
         (bool isSuccess, IOperationStatus operationStatus) categoryValidationResult =
-            this.ValidateCategory(request, getCategoryByIdResult);
+            ValidateCategory(request, getCategoryByIdResult);
         if (!categoryValidationResult.isSuccess)
         {
             return new(categoryValidationResult.operationStatus);
         }
 
-        await this._articleRepository.UpdateAsync(CreateArticleForUpdate(getArticleByIdResult.Payload,
+        await _articleRepository.UpdateAsync(CreateArticleForUpdate(getArticleByIdResult.Payload,
                 request.CategoryToMoveId));
         return ReportSuccess(request);
     }
@@ -87,9 +86,6 @@ public class MoveArticleHandler : IRequestHandler<MoveArticle, ResultDto>
 
     private ResultDto ReportSuccess(MoveArticle request) =>
         new(new MoveArticleSuccess(request.Id, request.CategoryToMoveId));
-
-    private ResultDto ReportNotModifiedStatus(MoveArticle request) =>
-        new(new ArticleNotChanged(request.Id));
 
     private GetCategoryById CreateGetCategoryByIdRequest(int categoryId) =>
         new(categoryId, null, 1);
