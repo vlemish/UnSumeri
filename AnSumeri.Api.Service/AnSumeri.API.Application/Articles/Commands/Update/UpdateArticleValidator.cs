@@ -9,6 +9,9 @@ public class UpdateArticleValidator : AbstractValidator<UpdateArticle>
         RuleFor(p => p.Id)
             .GreaterThan(0)
             .WithMessage("Id must be a positive integer greater than 0!");
+        RuleFor(p => p.UserId)
+            .NotEmpty()
+            .WithMessage("User Id must be present!");
         RuleFor(p => p.Content).NotEmpty()
             .WithMessage("Content can't be null or empty!");
         RuleFor(p => p.Title).NotEmpty()
