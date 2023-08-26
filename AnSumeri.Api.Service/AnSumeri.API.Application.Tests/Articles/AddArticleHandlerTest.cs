@@ -1,9 +1,6 @@
 using AutoMapper;
-
 using MediatR;
-
 using Moq;
-
 using AnSumeri.API.Application.Articles.Commands.Add;
 using AnSumeri.API.Application.Categories.Queries.GetById;
 using AnSumeri.API.Application.Categories.Queries.GetById.Statuses;
@@ -23,6 +20,9 @@ public class AddArticleHandlerTest
     private Mock<IArticleRepository> _articleRepositoryMock;
     private Mock<IMapper> _mapperMock;
     private Mock<IMediator> _mediatorMock;
+    private Mock<IDateTimeProvider> _dateTimeProviderMock;
+
+    private readonly DateTime _testDateTime = new(1999, 5, 26, 1, 1, 1);
 
     private AddArticleHandler _handler;
 
@@ -30,17 +30,19 @@ public class AddArticleHandlerTest
     public async Task TestAddArticleHandler_WhenCategoryNotExist_ThenNotFoundStatus()
     {
         AddArticle request = GetTestAddArticleRequest();
-        ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResponse = new(new CategoryNotFound(1), new GetCategoryByIdResult()
-        {
-            Id = 1,
-            Name = "category",
-            SubCategories = new List<GetCategoryByIdResult>(),
-            Articles = new List<ArticleDto>() { GetDuplicateArticle() },
-        });
+        ResultDto<GetCategoryByIdResult> expectedGetCategoryByIdResponse = new(new CategoryNotFound(1),
+            new GetCategoryByIdResult()
+            {
+                Id = 1,
+                Name = "category",
+                SubCategories = new List<GetCategoryByIdResult>(),
+                Articles = new List<ArticleDto>() { GetDuplicateArticle() },
+            });
 
         SetupMocks(expectedGetCategoryByIdResponse);
 
-        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object);
+        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object,
+            _dateTimeProviderMock.Object);
 
         ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
 
@@ -51,17 +53,19 @@ public class AddArticleHandlerTest
     public async Task TestAddArticleArticleHandler_WhenArticleAlreadyExist_ThenDuplicateStatus()
     {
         AddArticle request = GetTestAddArticleRequest();
-        ResultDto<GetCategoryByIdResult> expectedGetcategoryByIdResponse = new(new GetCategoryByIdSuccess(1), new GetCategoryByIdResult()
-        {
-            Id = 1,
-            Name = "category",
-            SubCategories = new List<GetCategoryByIdResult>(),
-            Articles = new List<ArticleDto>() { GetDuplicateArticle() },
-        });
+        ResultDto<GetCategoryByIdResult> expectedGetcategoryByIdResponse = new(new GetCategoryByIdSuccess(1),
+            new GetCategoryByIdResult()
+            {
+                Id = 1,
+                Name = "category",
+                SubCategories = new List<GetCategoryByIdResult>(),
+                Articles = new List<ArticleDto>() { GetDuplicateArticle() },
+            });
 
         SetupMocks(expectedGetcategoryByIdResponse);
 
-        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object);
+        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object,
+            _dateTimeProviderMock.Object);
 
         ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
 
@@ -72,17 +76,19 @@ public class AddArticleHandlerTest
     public async Task TestAddArticleHandler_WhenCategoryExistAndArticleUnique_ThenSuccessStatus()
     {
         AddArticle request = GetTestAddArticleRequest();
-        ResultDto<GetCategoryByIdResult> expectedGetcategoryByIdResponse = new(new GetCategoryByIdSuccess(1), new GetCategoryByIdResult()
-        {
-            Id = 1,
-            Name = "category",
-            SubCategories = new List<GetCategoryByIdResult>(),
-            Articles = new List<ArticleDto>(GetUniqueArticles()),
-        });
+        ResultDto<GetCategoryByIdResult> expectedGetcategoryByIdResponse = new(new GetCategoryByIdSuccess(1),
+            new GetCategoryByIdResult()
+            {
+                Id = 1,
+                Name = "category",
+                SubCategories = new List<GetCategoryByIdResult>(),
+                Articles = new List<ArticleDto>(GetUniqueArticles()),
+            });
 
         SetupMocks(expectedGetcategoryByIdResponse);
 
-        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object);
+        _handler = new(_articleRepositoryMock.Object, _mapperMock.Object, _mediatorMock.Object,
+            _dateTimeProviderMock.Object);
 
         ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
 
@@ -109,6 +115,9 @@ public class AddArticleHandlerTest
         _mediatorMock
             .Setup(m => m.Send(It.IsAny<GetCategoryById>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedGetCategoryByIdResponse);
+        _dateTimeProviderMock = new();
+        _dateTimeProviderMock.Setup(m => m.Current)
+            .Returns(_testDateTime);
     }
 
     private AddArticle GetTestAddArticleRequest() =>

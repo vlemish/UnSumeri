@@ -17,11 +17,13 @@ namespace AnSumeri.API.Application.Categories.Commands.AddSubcategory
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMediator _mediator;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public AddSubcategoryHandler(ICategoryRepository categoryRepository, IMediator mediator)
+        public AddSubcategoryHandler(ICategoryRepository categoryRepository, IMediator mediator, IDateTimeProvider dateTimeProvider)
         {
             _categoryRepository = categoryRepository;
             _mediator = mediator;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<ResultDto<AddSubcategoryResult>> Handle(AddSubcategory request,
@@ -48,7 +50,7 @@ namespace AnSumeri.API.Application.Categories.Commands.AddSubcategory
             c => c.UserId == request.UserId && c.ParentId == request.ParentId && c.Name == request.Name;
 
         private Category CreateCategory(AddSubcategory request) =>
-            new() { Name = request.Name, ParentId = request.ParentId, UserId = request.UserId };
+            new() { Name = request.Name, ParentId = request.ParentId, UserId = request.UserId, CreatedAtTime = _dateTimeProvider.Current };
 
         private AddSubcategoryResult CreateSubcategoryResult(Category category) =>
             new(category.Id);

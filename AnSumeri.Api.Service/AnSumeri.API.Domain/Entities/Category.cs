@@ -10,7 +10,7 @@ namespace AnSumeri.API.Domain.Entities
 
         public string Name { get; set; }
 
-        public DateTime CreatedAtTime { get; } = DateTime.UtcNow;
+        public DateTime CreatedAtTime { get; set; }
 
         public virtual Category Parent { get; set; }
 

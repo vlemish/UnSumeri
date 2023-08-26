@@ -21,6 +21,9 @@ public class AddCategoryHandlerTest
 {
     private Mock<ICategoryRepository> _categoryRepository;
     private Mock<IMediator> _mediatorMock;
+    private Mock<IDateTimeProvider> _dateTimeProviderMock;
+
+    private readonly DateTime _testDateTime = new(1999, 5, 26, 1, 1, 1);
 
     [Theory]
     [InlineData("testName")]
@@ -62,7 +65,8 @@ public class AddCategoryHandlerTest
 
         SetupMocks(addedCategory);
 
-        AddCategoryHandler handler = new(_categoryRepository.Object, this._mediatorMock.Object);
+        AddCategoryHandler handler = new(_categoryRepository.Object, this._mediatorMock.Object,
+            _dateTimeProviderMock.Object);
 
         ResultDto<AddCategoryResult> actual = await handler.Handle(request, default);
 
@@ -86,7 +90,8 @@ public class AddCategoryHandlerTest
 
         this.SetupDuplicateMocks();
 
-        AddCategoryHandler handler = new(_categoryRepository.Object, this._mediatorMock.Object);
+        AddCategoryHandler handler = new(_categoryRepository.Object, this._mediatorMock.Object,
+            _dateTimeProviderMock.Object);
 
         ResultDto<AddCategoryResult> actual = await handler.Handle(request, default);
 
@@ -106,10 +111,13 @@ public class AddCategoryHandlerTest
         _categoryRepository
             .Setup(m => m.AddAsync(It.IsAny<Category>()))
             .ReturnsAsync(addedCategory);
-        this._mediatorMock = new();
-        this._mediatorMock
+        _mediatorMock = new();
+        _mediatorMock
             .Setup(m => m.Send(It.IsAny<FindOneByFilter>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ResultDto<FindOneByFilterResult>(new CategoryNoContent(), null));
+        _dateTimeProviderMock = new();
+        _dateTimeProviderMock.Setup(m => m.Current)
+            .Returns(_testDateTime);
     }
 
     private void SetupDuplicateMocks()

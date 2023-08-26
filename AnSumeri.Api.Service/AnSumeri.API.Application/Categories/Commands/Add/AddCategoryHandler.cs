@@ -17,11 +17,13 @@ namespace AnSumeri.API.Application.Categories.Commands.Add
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMediator _mediator;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public AddCategoryHandler(ICategoryRepository categoryRepository, IMediator mediator)
+        public AddCategoryHandler(ICategoryRepository categoryRepository, IMediator mediator, IDateTimeProvider dateTimeProvider)
         {
             _mediator = mediator;
             _categoryRepository = categoryRepository;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<ResultDto<AddCategoryResult>> Handle(AddCategory request, CancellationToken cancellationToken)
@@ -45,6 +47,6 @@ namespace AnSumeri.API.Application.Categories.Commands.Add
             new(new Statuses.AddCategorySuccess(category), new AddCategoryResult(category.Id));
 
         private Category CreateCategory(string name, string userId) =>
-            new() { Name = name, UserId = userId };
+            new() { Name = name, UserId = userId, CreatedAtTime = _dateTimeProvider.Current };
     }
 }
