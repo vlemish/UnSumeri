@@ -9,5 +9,8 @@ public class DeleteArticleValidator : AbstractValidator<DeleteArticle>
         RuleFor(p => p.Id)
             .GreaterThan(0)
             .WithMessage("Id must be a positive integer greater than 0!");
+        RuleFor(p => p.UserId)
+            .NotEmpty()
+            .WithMessage("User Id should be present");
     }
 }

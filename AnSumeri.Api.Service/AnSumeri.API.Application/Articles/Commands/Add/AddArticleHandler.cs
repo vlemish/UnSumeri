@@ -11,7 +11,7 @@ namespace AnSumeri.API.Application.Articles.Commands.Add;
 using Models.Mediatr;
 using OperationStatuses.Shared.Categories;
 
-public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticleResult>>
+public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<int>>
 {
     private readonly IArticleRepository _articleRepository;
     private readonly IMediator _mediator;
@@ -24,7 +24,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<ResultDto<AddArticleResult>> Handle(AddArticle request, CancellationToken cancellationToken)
+    public async Task<ResultDto<int>> Handle(AddArticle request, CancellationToken cancellationToken)
     {
         ResultDto<GetCategoryByIdResult> getCategoryByIdResponse =
             await _mediator.Send(CreateGetCategoryById(request), cancellationToken);
@@ -32,7 +32,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
         var validationResult = ValidateCategory(request, getCategoryByIdResponse);
         if (!validationResult.Success)
         {
-            return new (GetFailureOperationStatus(request, validationResult.Status), null);
+            return new (GetFailureOperationStatus(request, validationResult.Status), 0);
         }
 
         int addedArticleId = await AddCategoryAsync(request);
@@ -73,9 +73,6 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
         : new(true, OperationStatusValue.OK);
     }
 
-    private ResultDto<AddArticleResult> ReportSuccess(int addedArticleId) =>
-        new(new AddArticleSuccessStatus(addedArticleId), new AddArticleResult(addedArticleId));
-
     private GetCategoryById CreateGetCategoryById(AddArticle request) =>
         new(request.CategoryId, null);
 
@@ -88,4 +85,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
             UserId = request.UserId,
             CreatedAtTime = _dateTimeProvider.Current
         };
+
+    private ResultDto<int> ReportSuccess(int addedArticleId) =>
+        new(new AddArticleSuccessStatus(addedArticleId), addedArticleId);
 }

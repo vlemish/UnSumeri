@@ -43,7 +43,7 @@ public class AddArticleHandlerTest
         _handler = new(_articleRepositoryMock.Object, _mediatorMock.Object,
             _dateTimeProviderMock.Object);
 
-        ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
+        ResultDto<int> actualResponse = await _handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.NotFound, actualResponse.OperationStatus.Status);
     }
@@ -66,7 +66,7 @@ public class AddArticleHandlerTest
         _handler = new(_articleRepositoryMock.Object, _mediatorMock.Object,
             _dateTimeProviderMock.Object);
 
-        ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
+        ResultDto<int> actualResponse = await _handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.Duplicate, actualResponse.OperationStatus.Status);
     }
@@ -89,7 +89,7 @@ public class AddArticleHandlerTest
         _handler = new(_articleRepositoryMock.Object, _mediatorMock.Object,
             _dateTimeProviderMock.Object);
 
-        ResultDto<AddArticleResult> actualResponse = await _handler.Handle(request, default);
+        ResultDto<int> actualResponse = await _handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.Created, actualResponse.OperationStatus.Status);
     }

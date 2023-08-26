@@ -82,7 +82,7 @@ namespace AnSumeri.API.Service.Controllers
             CancellationToken cancellationToken)
         {
             AddArticle addArticle = new(id, HttpContext.GetUserId(), request.Title, request.Content);
-            ResultDto<AddArticleResult> response = await _mediator.Send(addArticle, cancellationToken);
+            ResultDto<int> response = await _mediator.Send(addArticle, cancellationToken);
             return response.ToHttpObjectResult();
         }
 

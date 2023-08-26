@@ -23,26 +23,27 @@ public class DeleteArticleHandler : IRequestHandler<DeleteArticle, ResultDto<int
     public async Task<ResultDto<int>> Handle(DeleteArticle request, CancellationToken cancellationToken)
     {
         ResultDto<ArticleDto> articleResultDto =
-            await this._mediator.Send(new GetOneArticleById(request.Id, request.UserId), cancellationToken);
+            await _mediator.Send(new GetOneArticleById(request.Id, request.UserId), cancellationToken);
         if (articleResultDto.OperationStatus.Status != OperationStatusValue.OK)
         {
             return new(articleResultDto.OperationStatus, 0);
         }
 
-        await this._articleRepository.DeleteAsync(CreateArticle(articleResultDto));
+        await _articleRepository.DeleteAsync(CreateArticle(articleResultDto, request));
         return ReportSuccess(request.Id);
     }
 
-    private ResultDto<int> ReportSuccess(int id) =>
-        new(new DeleteArticleSuccess(id), id);
-
-    private Article CreateArticle(ResultDto<ArticleDto> resultDto) =>
+    private Article CreateArticle(ResultDto<ArticleDto> resultDto, DeleteArticle request) =>
         new()
         {
             Id = resultDto.Payload.Id,
+            UserId = request.UserId,
             Title = resultDto.Payload.Title,
             Content = resultDto.Payload.Content,
             CategoryId = resultDto.Payload.CategoryId,
             CreatedAtTime = resultDto.Payload.CreatedAtTime,
         };
+
+    private ResultDto<int> ReportSuccess(int id) =>
+        new(new DeleteArticleSuccess(id), id);
 }

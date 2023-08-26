@@ -29,9 +29,9 @@ public class DeleteArticleHandlerTest
 
         SetupMocks(expetectedArticleResultDto, id);
 
-        this._handler = new(this._articleRepositoryMock.Object, this._mediatorMock.Object);
+        _handler = new(_articleRepositoryMock.Object, _mediatorMock.Object);
 
-        ResultDto<int> result = await this._handler.Handle(request, default);
+        ResultDto<int> result = await _handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.OK, result.OperationStatus.Status);
         VerifyMocks(Times.Once(), Times.Once());
@@ -47,9 +47,9 @@ public class DeleteArticleHandlerTest
 
         SetupMocks(expetectedArticleResultDto, id);
 
-        this._handler = new(this._articleRepositoryMock.Object, this._mediatorMock.Object);
+        _handler = new(_articleRepositoryMock.Object, _mediatorMock.Object);
 
-        ResultDto<int> result = await this._handler.Handle(request, default);
+        ResultDto<int> result = await _handler.Handle(request, default);
 
         Assert.Equal(OperationStatusValue.NotFound, result.OperationStatus.Status);
         VerifyMocks(Times.Never(), Times.Once());
@@ -57,22 +57,22 @@ public class DeleteArticleHandlerTest
 
     private void VerifyMocks(Times expectedArticleRepositoryTimesCalled, Times expectedMediatorTimesCalled)
     {
-        this._mediatorMock
+        _mediatorMock
             .Verify(m => m.Send(It.IsAny<GetOneArticleById>(), It.IsAny<CancellationToken>()),
                 expectedMediatorTimesCalled);
-        this._articleRepositoryMock
+        _articleRepositoryMock
             .Verify(m => m.DeleteAsync(It.IsAny<Article>()), expectedArticleRepositoryTimesCalled);
     }
 
     private void SetupMocks(ResultDto<ArticleDto> expectedGetOneArticleByIdResponse, int id)
     {
-        this._mediatorMock = new();
-        this._articleRepositoryMock = new();
+        _mediatorMock = new();
+        _articleRepositoryMock = new();
 
-        this._mediatorMock
+        _mediatorMock
             .Setup(m => m.Send(It.IsAny<GetOneArticleById>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedGetOneArticleByIdResponse);
-        this._articleRepositoryMock
+        _articleRepositoryMock
             .Setup(m => m.DeleteAsync(It.IsAny<Article>()))
             .ReturnsAsync(id);
     }
