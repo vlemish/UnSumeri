@@ -27,12 +27,10 @@ namespace AnSumeri.API.Service.Controllers
     [Route("api/categories")]
     public class CategoriesController : ControllerBase
     {
-        private readonly ILogger<CategoriesController> _logger;
         private readonly IMediator _mediator;
 
-        public CategoriesController(ILogger<CategoriesController> logger, IMediator mediator)
+        public CategoriesController(IMediator mediator)
         {
-            _logger = logger;
             _mediator = mediator;
         }
 
