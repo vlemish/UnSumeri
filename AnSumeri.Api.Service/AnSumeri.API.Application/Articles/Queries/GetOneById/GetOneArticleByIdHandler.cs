@@ -22,13 +22,14 @@ public class GetOneArticleByIdHandler : IRequestHandler<GetOneArticleById, Resul
 
     public async Task<ResultDto<ArticleDto>> Handle(GetOneArticleById request, CancellationToken cancellationToken)
     {
-        Article article = await this._articleRepository.GetOneByFilter(a => a.Id == request.Id && request.UserId == request.UserId);
+        Article article =
+            await _articleRepository.GetOneByFilter(a => a.Id == request.Id && request.UserId == request.UserId);
         if (article is null)
         {
             return ReportNotFound(request);
         }
 
-        ArticleDto articleDto = this._mapper.Map<ArticleDto>(article);
+        ArticleDto articleDto = _mapper.Map<ArticleDto>(article);
         return ReportSuccess(request, articleDto);
     }
 
