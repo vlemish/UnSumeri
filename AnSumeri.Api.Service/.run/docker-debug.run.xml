@@ -32,6 +32,7 @@
             </DockerPortBindingImpl>
           </list>
         </option>
+        <option name="commandLineOptions" value="--network=untitled-self-articles_default" />
         <option name="sourceFilePath" value="Dockerfile" />
       </settings>
     </deployment>
