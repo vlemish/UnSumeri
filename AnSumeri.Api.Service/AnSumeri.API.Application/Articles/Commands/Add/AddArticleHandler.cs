@@ -77,7 +77,7 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
         new(new AddArticleSuccessStatus(addedArticleId), new AddArticleResult(addedArticleId));
 
     private GetCategoryById CreateGetCategoryById(AddArticle request) =>
-        new(request.CategoryId, null);
+        new(request.CategoryId, request.UserId);
 
     private Article CreateArticle(AddArticle request) =>
         new()

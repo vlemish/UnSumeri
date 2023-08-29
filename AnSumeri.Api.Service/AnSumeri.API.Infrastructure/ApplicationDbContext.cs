@@ -64,7 +64,7 @@ namespace AnSumeri.API.Infrastructure
                 e.Property(p => p.Id).ValueGeneratedOnAdd();
                 e.Property(p => p.UserId).HasColumnType("nvarchar").HasMaxLength(37);
                 e.Property(p => p.CreatedAtTime).HasColumnType("datetime");
-                e.Property(p => p.Content).HasColumnType("nvarchar").HasMaxLength(4000);
+                e.Property(p => p.Content).HasColumnType("nvarchar(max)");
                 e.Property(p => p.Title).HasColumnType("nvarchar").HasMaxLength(80);
                 e.HasOne(a => a.Category).WithMany(c => c.Articles).HasForeignKey(c =>
                     new { c.CategoryId, c.UserId }).OnDelete(DeleteBehavior.Cascade);

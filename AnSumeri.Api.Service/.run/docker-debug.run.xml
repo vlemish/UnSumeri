@@ -3,7 +3,7 @@
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="docker-untitled-api-dev" />
-        <option name="containerName" value="untitled-self-articles-api-1" />
+        <option name="containerName" value="unsumeri-api-1" />
         <option name="envVars">
           <list>
             <DockerEnvVarImpl>
@@ -32,7 +32,11 @@
             </DockerPortBindingImpl>
           </list>
         </option>
+<<<<<<< Updated upstream
         <option name="commandLineOptions" value="--network=untitled-self-articles_default" />
+=======
+        <option name="commandLineOptions" value="-itd --network=unsumeri_default" />
+>>>>>>> Stashed changes
         <option name="sourceFilePath" value="Dockerfile" />
       </settings>
     </deployment>
