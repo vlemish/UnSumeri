@@ -19,12 +19,12 @@ namespace AnSumeri.API.Infrastructure
         /// </summary>
         public DbSet<Article> Articles { get; set; }
 
-        /// <summary>
-        /// .ctor
-        /// </summary>
-        public ApplicationDbContext()
-        {
-        }
+        // /// <summary>
+        // /// .ctor
+        // /// </summary>
+        // public ApplicationDbContext()
+        // {
+        // }
 
         public ApplicationDbContext(DbContextOptions options)
             : base(options)
