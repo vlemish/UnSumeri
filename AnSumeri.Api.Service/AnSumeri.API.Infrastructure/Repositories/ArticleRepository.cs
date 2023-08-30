@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+
 using Microsoft.EntityFrameworkCore;
 using AnSumeri.API.Domain.Contracts;
 using AnSumeri.API.Domain.Entities;
@@ -53,7 +50,18 @@ namespace AnSumeri.API.Infrastructure.Repositories
             }
         }
 
-        public Task DeleteManyAsync(IReadOnlyCollection<Article> entities) => throw new NotImplementedException();
+        public async Task DeleteManyAsync(IReadOnlyCollection<Article> entities)
+        {
+            try
+            {
+                this._articles.RemoveRange(entities);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
 
         public async Task<IList<Article>> GetAll(LoadOptions loadOptions, OrderByOption orderByOption,
             Expression<Func<Article, bool>> predicate) =>
@@ -61,7 +69,7 @@ namespace AnSumeri.API.Infrastructure.Repositories
                 .Where(predicate)
                 .ToListAsync();
 
-        public Task<int> GetCount(Expression<Func<Article, bool>> predicate) => throw new NotImplementedException();
+        public Task<int> GetCount(Expression<Func<Article, bool>> predicate) => this._articles.CountAsync(predicate);
 
         public async Task<IList<Article>> GetManyByFilter(Expression<Func<Article, bool>> predicate) =>
             await this._articles.AsNoTracking()
