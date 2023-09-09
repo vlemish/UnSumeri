@@ -12,7 +12,8 @@ public class ArticleElasticSearchRepository : IArticleSearchRepository
     private readonly IElasticClient _client;
     private readonly IQueryContainerProvider<ArticleSearchDto, ArticleSearchFilter> _queryContainerProvider;
 
-    public ArticleElasticSearchRepository(IElasticClient client, IQueryContainerProvider<ArticleSearchDto, ArticleSearchFilter> queryContainerProvider)
+    public ArticleElasticSearchRepository(IElasticClient client,
+        IQueryContainerProvider<ArticleSearchDto, ArticleSearchFilter> queryContainerProvider)
     {
         _queryContainerProvider = queryContainerProvider;
         _client = client;
@@ -72,6 +73,9 @@ public class ArticleElasticSearchRepository : IArticleSearchRepository
     private void DefineIndexes()
     {
         _client.Indices.Create(ElasticSearchIndexConstants.ArticleIndex, c => c.Map<ArticleSearchDto>(m => m.AutoMap()
+            .Properties(p => p.Text(t => t
+                .Name(x => x.UserId)
+                .Analyzer("standard")))
             .Properties(p => p.Text(t => t
                     .Name(x => x.Title)
                     .Analyzer("standard")

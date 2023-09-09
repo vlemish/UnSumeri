@@ -1,7 +1,7 @@
 using AnSumeri.API.Application.Articles.Commands.Add.Statuses;
+using AnSumeri.API.Application.Articles.Events.ArticleAdded;
 using AnSumeri.API.Application.Categories.Queries.GetById;
 using AnSumeri.API.Application.OperationStatuses;
-
 using MediatR;
 using AnSumeri.API.Domain.Contracts;
 using AnSumeri.API.Domain.Entities;
@@ -17,7 +17,8 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
     private readonly IMediator _mediator;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AddArticleHandler(IArticleRepository articleRepository, IMediator mediator, IDateTimeProvider dateTimeProvider)
+    public AddArticleHandler(IArticleRepository articleRepository, IMediator mediator,
+        IDateTimeProvider dateTimeProvider)
     {
         _articleRepository = articleRepository;
         _mediator = mediator;
@@ -32,12 +33,16 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
         var validationResult = ValidateCategory(request, getCategoryByIdResponse);
         if (!validationResult.Success)
         {
-            return new (GetFailureOperationStatus(request, validationResult.Status), null);
+            return new(GetFailureOperationStatus(request, validationResult.Status), null);
         }
 
         int addedArticleId = await AddCategoryAsync(request);
+        await PublishEvent(request, addedArticleId);
         return ReportSuccess(addedArticleId);
     }
+
+    private Task PublishEvent(AddArticle request, int addedArticleId) =>
+        _mediator.Publish(new ArticleAdded(Guid.Parse(request.UserId), addedArticleId, request.Title, request.Content));
 
     private async Task<int> AddCategoryAsync(AddArticle request)
     {
@@ -60,7 +65,8 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
         }
     }
 
-    private (bool Success, OperationStatusValue Status) ValidateCategory(AddArticle request, ResultDto<GetCategoryByIdResult> response)
+    private (bool Success, OperationStatusValue Status) ValidateCategory(AddArticle request,
+        ResultDto<GetCategoryByIdResult> response)
     {
         if (response.OperationStatus.Status is OperationStatusValue.NotFound)
         {
@@ -69,8 +75,8 @@ public class AddArticleHandler : IRequestHandler<AddArticle, ResultDto<AddArticl
 
         bool articleExist = response.Payload.Articles.Any(a => a.Title == request.Title);
         return articleExist
-        ? new(false, OperationStatusValue.Duplicate)
-        : new(true, OperationStatusValue.OK);
+            ? new(false, OperationStatusValue.Duplicate)
+            : new(true, OperationStatusValue.OK);
     }
 
     private ResultDto<AddArticleResult> ReportSuccess(int addedArticleId) =>
