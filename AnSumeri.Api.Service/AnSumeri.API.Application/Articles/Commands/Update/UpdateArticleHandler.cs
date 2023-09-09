@@ -60,6 +60,7 @@ public class UpdateArticleHandler : IRequestHandler<UpdateArticle, ResultDto>
         {
             Id = request.Id,
             CategoryId = articleDto.CategoryId,
+            UserId = request.UserId,
             Title = request.Title,
             Content = request.Content,
             CreatedAtTime = articleDto.CreatedAtTime,

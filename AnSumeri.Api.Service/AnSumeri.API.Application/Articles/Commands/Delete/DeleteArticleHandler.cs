@@ -1,3 +1,5 @@
+using AnSumeri.API.Application.Articles.Events.ArticleDeleted;
+
 namespace AnSumeri.API.Application.Articles.Commands.Delete;
 
 using MediatR;
@@ -29,12 +31,16 @@ public class DeleteArticleHandler : IRequestHandler<DeleteArticle, ResultDto<int
             return new(articleResultDto.OperationStatus, 0);
         }
 
-        await this._articleRepository.DeleteAsync(CreateArticle(articleResultDto));
+        await _articleRepository.DeleteAsync(CreateArticle(articleResultDto));
+        await PublishEvent(request.Id);
         return ReportSuccess(request.Id);
     }
 
     private ResultDto<int> ReportSuccess(int id) =>
         new(new DeleteArticleSuccess(id), id);
+
+    private Task PublishEvent(int id) =>
+        _mediator.Publish(new ArticleDeleted(id));
 
     private Article CreateArticle(ResultDto<ArticleDto> resultDto) =>
         new()

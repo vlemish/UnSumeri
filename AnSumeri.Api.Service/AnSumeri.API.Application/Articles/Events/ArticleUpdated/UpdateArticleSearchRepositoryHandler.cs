@@ -1,14 +1,15 @@
 using AnSumeri.API.Domain.Contracts;
 using AnSumeri.API.Domain.Search;
+using AnSumeri.API.Domain.Search.Enums;
 using MediatR;
 
 namespace AnSumeri.API.Application.Articles.Events.ArticleUpdated;
 
-public class UpdateSearchRepositoryHandler : INotificationHandler<ArticleUpdated>
+public class UpdateArticleSearchRepositoryHandler : INotificationHandler<ArticleUpdated>
 {
     private readonly IArticleSearchRepository _articleSearchRepository;
 
-    public UpdateSearchRepositoryHandler(IArticleSearchRepository articleSearchRepository)
+    public UpdateArticleSearchRepositoryHandler(IArticleSearchRepository articleSearchRepository)
     {
         _articleSearchRepository = articleSearchRepository;
     }
