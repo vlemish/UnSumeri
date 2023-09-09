@@ -4,11 +4,11 @@ using MediatR;
 
 namespace AnSumeri.API.Application.Articles.Events.ArticleAdded;
 
-public class AddArticleToSearchRepositoryHandler : INotificationHandler<ArticleAdded>
+public class SearchRepositoryHandler : INotificationHandler<ArticleAdded>
 {
     private readonly IArticleSearchRepository _articleSearchRepository;
 
-    public AddArticleToSearchRepositoryHandler(IArticleSearchRepository articleSearchRepository)
+    public SearchRepositoryHandler(IArticleSearchRepository articleSearchRepository)
     {
         _articleSearchRepository = articleSearchRepository;
     }

@@ -1,3 +1,5 @@
+using AnSumeri.API.Application.Articles.Events.ArticleUpdated;
+
 namespace AnSumeri.API.Application.Articles.Commands.Update;
 
 using MediatR;
@@ -36,6 +38,7 @@ public class UpdateArticleHandler : IRequestHandler<UpdateArticle, ResultDto>
         }
 
         await _articleRepository.UpdateAsync(CreateArticleToUpdate(request, getOneArticleByIdResult.Payload));
+        await PublishEvent(request);
         return ReportSuccess(request);
     }
 
@@ -49,9 +52,16 @@ public class UpdateArticleHandler : IRequestHandler<UpdateArticle, ResultDto>
     private ResultDto ReportSuccess(UpdateArticle request) =>
         new(new UpdateArticleSuccess(request.Id));
 
+    private Task PublishEvent(UpdateArticle request) =>
+        _mediator.Publish(new ArticleUpdated(Guid.Parse(request.UserId), request.Id, request.Title, request.Content));
+
     private Article CreateArticleToUpdate(UpdateArticle request, ArticleDto articleDto) =>
         new()
         {
-            Id = request.Id, CategoryId = articleDto.CategoryId, Title = request.Title, Content = request.Content, CreatedAtTime = articleDto.CreatedAtTime,
+            Id = request.Id,
+            CategoryId = articleDto.CategoryId,
+            Title = request.Title,
+            Content = request.Content,
+            CreatedAtTime = articleDto.CreatedAtTime,
         };
 }
