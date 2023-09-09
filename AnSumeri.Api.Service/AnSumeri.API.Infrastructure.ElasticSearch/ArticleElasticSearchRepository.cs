@@ -41,9 +41,9 @@ public class ArticleElasticSearchRepository : IArticleSearchRepository
                     .Document(document)));
     }
 
-    public Task RemoveAsync(int id)
+    public async Task RemoveAsync(int id)
     {
-        return _client.DeleteAsync<ArticleSearchDto>(id);
+         return _client.DeleteAsync<ArticleSearchDto>(id);
     }
 
     public async Task RemoveManyAsync(IEnumerable<int> identifiers)
