@@ -64,12 +64,6 @@ public class ArticleElasticSearchRepository : IArticleSearchRepository
 
     public async Task<IImmutableList<ArticleSearchDto>> Find(ArticleSearchFilter filter)
     {
-        // var searchResponse = await _client.SearchAsync<ArticleSearchDto>(s =>
-        //     s.Query(q => q
-        //         .Match(m => m
-        //             .Field(f => f.Title)
-        //             .Query(filter.Title))).Size(1));
-
         var searchResponse = await _client.SearchAsync<ArticleSearchDto>(s =>
             s.Query(q => _queryContainerProvider.Provide(q, filter)));
         return searchResponse.Hits.Select(s => s.Source).ToImmutableList();
