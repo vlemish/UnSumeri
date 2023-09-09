@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnSumeri.API.Infrastructure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnSumeri.API.Application.Tests", "AnSumeri.API.Application.Tests\AnSumeri.API.Application.Tests.csproj", "{69686916-4A90-4BD7-8D6B-26670E2F46AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnSumeri.API.Infrastructure.ElasticSearch", "AnSumeri.API.Infrastructure.ElasticSearch\AnSumeri.API.Infrastructure.ElasticSearch.csproj", "{5EE2F294-2242-456A-BBCC-695C7589C835}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{69686916-4A90-4BD7-8D6B-26670E2F46AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69686916-4A90-4BD7-8D6B-26670E2F46AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69686916-4A90-4BD7-8D6B-26670E2F46AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EE2F294-2242-456A-BBCC-695C7589C835}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EE2F294-2242-456A-BBCC-695C7589C835}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EE2F294-2242-456A-BBCC-695C7589C835}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EE2F294-2242-456A-BBCC-695C7589C835}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

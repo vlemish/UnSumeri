@@ -3,6 +3,7 @@ using Serilog;
 using System.Reflection;
 using AnSumeri.API.Application;
 using AnSumeri.API.Infrastructure;
+using AnSumeri.API.Infrastructure.ElasticSearch;
 using AnSumeri.API.Service.Mappings;
 using AnSumeri.API.Service.Middlewares;
 using Microsoft.EntityFrameworkCore;
@@ -81,6 +82,7 @@ namespace AnSumeri.API.Service
 
             builder.Services.ConfigureInfrastructure(builder.Configuration);
             builder.Services.ConfigureApplication(builder.Configuration);
+            builder.Services.ConfigureElasticSearch(builder.Configuration);
 
             builder.Services.AddAutoMapper(configAction =>
                 configAction.AddProfiles(new List<Profile>() { new CategoryMappings(), }));

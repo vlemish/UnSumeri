@@ -25,6 +25,7 @@ services:
             ASPNETCORE_ENVIRONMENT: development
         depends_on: 
           - db
+          - elasticsearch
     db:
         image: "mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04"
         ports:
@@ -32,3 +33,16 @@ services:
         environment:
             SA_PASSWORD: 'S3cur3P@ssW0rd!'
             ACCEPT_EULA: 'Y'
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+        container_name: elasticsearch
+        environment:
+          - discovery.type=single-node
+        ports:
+          - "9200:9200"
+          - "9300:9300"
+        volumes:
+           - esdata:/usr/share/elasticsearch/data
+
+volumes:
+  esdata:
