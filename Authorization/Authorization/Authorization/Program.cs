@@ -26,6 +26,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
+// var db = builder.Services.BuildServiceProvider().GetService<AuthDbContext>();
+// db.Database.Migrate();
+
 TokenValidationParameters tokenValidationParameters = new TokenValidationParameters()
 {
     ValidateIssuerSigningKey = true,

@@ -15,6 +15,9 @@ namespace AnSumeri.API.Infrastructure
             services.AddScoped<IArticleRepository, ArticleRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+            // var db = services.BuildServiceProvider().GetService<ApplicationDbContext>();
+            // db.Database.Migrate();
+
             return services;
         }
     }

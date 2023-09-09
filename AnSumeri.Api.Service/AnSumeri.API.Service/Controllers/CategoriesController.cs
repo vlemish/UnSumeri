@@ -9,6 +9,8 @@ using AnSumeri.API.Application.Categories.Queries.GetAll;
 using AnSumeri.API.Application.Categories.Queries.GetById;
 using AnSumeri.API.Application.OperationStatuses;
 using AnSumeri.API.Domain.Pagination;
+using AnSumeri.API.Domain.Search;
+using AnSumeri.API.Domain.Search.Enums;
 using AnSumeri.API.Service.Contracts.Requests;
 
 namespace AnSumeri.API.Service.Controllers
@@ -28,10 +30,12 @@ namespace AnSumeri.API.Service.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IArticleSearchRepository _searchRepository;
 
-        public CategoriesController(IMediator mediator)
+        public CategoriesController(IMediator mediator, IArticleSearchRepository searchRepository)
         {
             _mediator = mediator;
+            _searchRepository = searchRepository;
         }
 
         [HttpGet("{id:int}")]
@@ -83,6 +87,7 @@ namespace AnSumeri.API.Service.Controllers
         {
             AddArticle addArticle = new(id, HttpContext.GetUserId(), request.Title, request.Content);
             ResultDto<AddArticleResult> response = await _mediator.Send(addArticle, cancellationToken);
+
             return response.ToHttpObjectResult();
         }
 

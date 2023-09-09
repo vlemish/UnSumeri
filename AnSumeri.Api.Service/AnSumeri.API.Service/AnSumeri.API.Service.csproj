@@ -31,6 +31,7 @@
     <ProjectReference Include="..\AnSumeri.API.Application\AnSumeri.API.Application.csproj" />
     <ProjectReference Include="..\AnSumeri.API.Domain\AnSumeri.API.Domain.csproj" />
     <ProjectReference Include="..\AnSumeri.API.Infrastructure\AnSumeri.API.Infrastructure.csproj" />
+    <ProjectReference Include="..\AnSumeri.API.Infrastructure.ElasticSearch\AnSumeri.API.Infrastructure.ElasticSearch.csproj" />
   </ItemGroup>
 
 </Project>
