@@ -5,16 +5,14 @@ namespace AnSumeri.API.Infrastructure.ElasticSearch.Factories;
 
 public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<ArticleSearchDto, ArticleSearchFilter>
 {
+    #region IElasticSearchQueryFactory Implementation
+
     public QueryContainer CreateAllMatchQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
         ArticleSearchFilter filter) =>
         descriptor.Bool(b => b
             .Must(
                 // 1. Match the UserId
-                mu => mu
-                    .Match(m => m
-                        .Field(f => f.UserId)
-                        .Query(filter.UserId.ToString())
-                    ),
+                mu => CreateUserIdQuery(mu, filter),
                 // 2. Full-text search on Title and Content
                 fs => fs
                     .MultiMatch(m => m
@@ -30,36 +28,12 @@ public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<Artic
     public QueryContainer CreateSingleMatchQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
         ArticleSearchFilter filter)
     {
-        if (String.IsNullOrEmpty(filter.Title))
-        {
-            return descriptor.Bool(b => b
-                .Must(
-                    // 1. Match the UserId
-                    mu => mu
-                        .Match(m => m
-                            .Field(f => f.UserId)
-                            .Query(filter.UserId.ToString())
-                        ),
-                    // 2. Search by Content
-                    fs => fs
-                        .Match(q =>
-                            q.Field(f1 => f1.Content).Query(filter.Content))
-                )
-            );
-        }
-
         return descriptor.Bool(b => b
             .Must(
                 // 1. Match the UserId
-                mu => mu
-                    .Match(m => m
-                        .Field(f => f.UserId)
-                        .Query(filter.UserId.ToString())
-                    ),
+                mu => CreateUserIdQuery(mu, filter),
                 // 2. Search by Content
-                fs => fs
-                    .Match(q =>
-                        q.Field(f1 => f1.Content).Query(filter.Content))));
+                fs => CreateSingleMatchSubQuery(fs, filter)));
     }
 
     public QueryContainer CreateAllTrueQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
@@ -67,10 +41,7 @@ public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<Artic
         descriptor.Bool(b => b.
             Must(
                 // 1. Match the UserId
-                mu => mu
-                    .Match(m => m
-                        .Field(f => f.UserId)
-                        .Query(filter.UserId.ToString())))
+                mu => CreateUserIdQuery(mu, filter))
             .Must(
                 m => m
                     .Match(condition => condition.
@@ -86,10 +57,7 @@ public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<Artic
         descriptor.Bool(b => b
             .Must(
                 // 1. Match the UserId
-                mu => mu
-                    .Match(m => m
-                        .Field(f => f.UserId)
-                        .Query(filter.UserId.ToString())))
+                mu => CreateUserIdQuery(mu, filter))
             .Should(
                 sh => sh.Match(m => m
                     .Field(f => f.Content)
@@ -101,4 +69,27 @@ public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<Artic
                 )
             )
         );
+
+    #endregion
+
+    #region Private members
+
+    private QueryContainer CreateUserIdQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
+        ArticleSearchFilter filter) =>
+        descriptor.Match(m => m
+            .Field(f => f.UserId)
+            .Query(filter.UserId.ToString()));
+
+    private QueryContainer CreateSingleMatchSubQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
+        ArticleSearchFilter filter) =>
+        String.IsNullOrEmpty(filter.Title)
+            ? descriptor
+                .Match(q =>
+                    q.Field(f1 => f1.Content).Query(filter.Content))
+            : descriptor
+                .Match(q =>
+                    q.Field(f1 => f1.Title).Query(filter.Title));
+
+    #endregion
+
 }
