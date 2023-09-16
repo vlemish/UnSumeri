@@ -28,29 +28,6 @@ public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<Artic
     public QueryContainer CreateSingleMatchQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
         ArticleSearchFilter filter)
     {
-        // if (String.IsNullOrEmpty(filter.Title))
-        // {
-        //     return descriptor.Bool(b => b
-        //         .Must(
-        //             // 1. Match the UserId
-        //             mu => CreateUserIdQuery(mu, filter),
-        //             // 2. Search by Content
-        //             fs => fs
-        //                 .Match(q =>
-        //                     q.Field(f1 => f1.Content).Query(filter.Content))
-        //         )
-        //     );
-        // }
-        //
-        // return descriptor.Bool(b => b
-        //     .Must(
-        //         // 1. Match the UserId
-        //         mu => CreateUserIdQuery(mu, filter),
-        //         // 2. Search by Content
-        //         fs => fs
-        //             .Match(q =>
-        //                 q.Field(f1 => f1.Content).Query(filter.Content))));
-        //
         return descriptor.Bool(b => b
             .Must(
                 // 1. Match the UserId
