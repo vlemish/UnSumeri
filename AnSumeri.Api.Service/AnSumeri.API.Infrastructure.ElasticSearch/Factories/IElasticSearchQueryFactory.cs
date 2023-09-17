@@ -3,6 +3,7 @@ using Nest;
 
 namespace AnSumeri.API.Infrastructure.ElasticSearch.Factories;
 
+[Obsolete]
 public interface IElasticSearchQueryFactory<TResult, TFilter> where TResult : class
 {
     QueryContainer CreateAllMatchQuery(QueryContainerDescriptor<TResult> descriptor,

@@ -1,14 +1,16 @@
 using AnSumeri.API.Domain.Search;
+using AnSumeri.API.Domain.Search.Filters;
 using Nest;
 
 namespace AnSumeri.API.Infrastructure.ElasticSearch.Factories;
 
-public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<ArticleSearchDto, ArticleSearchFilter>
+[Obsolete]
+public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<ArticleSearchDto, ArticleAllShouldMustFilter>
 {
     #region IElasticSearchQueryFactory Implementation
 
     public QueryContainer CreateAllMatchQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
-        ArticleSearchFilter filter) =>
+        ArticleAllShouldMustFilter filter) =>
         descriptor.Bool(b => b
             .Must(
                 // 1. Match the UserId
@@ -26,18 +28,16 @@ public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<Artic
         );
 
     public QueryContainer CreateSingleMatchQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
-        ArticleSearchFilter filter)
-    {
-        return descriptor.Bool(b => b
+        ArticleAllShouldMustFilter filter) =>
+        descriptor.Bool(b => b
             .Must(
                 // 1. Match the UserId
                 mu => CreateUserIdQuery(mu, filter),
                 // 2. Search by Content
                 fs => CreateSingleMatchSubQuery(fs, filter)));
-    }
 
     public QueryContainer CreateAllTrueQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
-        ArticleSearchFilter filter) =>
+        ArticleAllShouldMustFilter filter) =>
         descriptor.Bool(b => b.
             Must(
                 // 1. Match the UserId
@@ -53,7 +53,7 @@ public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<Artic
                         .Query(filter.Title))));
 
     public QueryContainer CreateSomeTrueQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
-        ArticleSearchFilter filter) =>
+        ArticleAllShouldMustFilter filter) =>
         descriptor.Bool(b => b
             .Must(
                 // 1. Match the UserId
@@ -75,13 +75,13 @@ public class ElasticSearchArticleQueryFactory : IElasticSearchQueryFactory<Artic
     #region Private members
 
     private QueryContainer CreateUserIdQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
-        ArticleSearchFilter filter) =>
+        ArticleAllShouldMustFilter filter) =>
         descriptor.Match(m => m
             .Field(f => f.UserId)
             .Query(filter.UserId.ToString()));
 
     private QueryContainer CreateSingleMatchSubQuery(QueryContainerDescriptor<ArticleSearchDto> descriptor,
-        ArticleSearchFilter filter) =>
+        ArticleAllShouldMustFilter filter) =>
         String.IsNullOrEmpty(filter.Title)
             ? descriptor
                 .Match(q =>

@@ -1,7 +1,9 @@
 using System.Collections.Immutable;
 using AnSumeri.API.Domain.Contracts;
 using AnSumeri.API.Domain.Search;
+using AnSumeri.API.Domain.Search.Filters;
 using AnSumeri.API.Infrastructure.ElasticSearch.Constants;
+using AnSumeri.API.Infrastructure.ElasticSearch.Factories;
 using AnSumeri.API.Infrastructure.ElasticSearch.Providers;
 using Nest;
 
@@ -10,13 +12,15 @@ namespace AnSumeri.API.Infrastructure.ElasticSearch;
 public class ArticleElasticSearchRepository : IArticleSearchRepository
 {
     private readonly IElasticClient _client;
-    private readonly IQueryContainerProvider<ArticleSearchDto, ArticleSearchFilter> _queryContainerProvider;
+    private readonly IQueryContainerProvider<ArticleSearchDto, ArticleAllShouldMustFilter> _queryContainerProvider;
+    private readonly IElasticSearchQueryDirectorFactory _queryDirectorFactory;
 
     public ArticleElasticSearchRepository(IElasticClient client,
-        IQueryContainerProvider<ArticleSearchDto, ArticleSearchFilter> queryContainerProvider)
+        IQueryContainerProvider<ArticleSearchDto, ArticleAllShouldMustFilter> queryContainerProvider, IElasticSearchQueryDirectorFactory queryDirectorFactory)
     {
         _queryContainerProvider = queryContainerProvider;
         _client = client;
+        _queryDirectorFactory = queryDirectorFactory;
         DefineIndexes();
     }
 
@@ -54,19 +58,19 @@ public class ArticleElasticSearchRepository : IArticleSearchRepository
                     .Id(id)));
     }
 
-    public async Task<ArticleSearchDto> FindOne(ArticleSearchFilter filter)
+    public async Task<ArticleSearchDto> FindOne(IArticleSearchFilter filter)
     {
         var searchResponse = await _client.SearchAsync<ArticleSearchDto>(s =>
-            s.Query(q => _queryContainerProvider.Provide(q, filter))
+            s.Query(q => _queryDirectorFactory.CreateQueryDirector(filter.SearchMode, q).Direct(filter))
                 .Size(1));
 
         return searchResponse.Hits.Select(s => s.Source).FirstOrDefault();
     }
 
-    public async Task<IImmutableList<ArticleSearchDto>> Find(ArticleSearchFilter filter)
+    public async Task<IImmutableList<ArticleSearchDto>> Find(IArticleSearchFilter filter)
     {
         var searchResponse = await _client.SearchAsync<ArticleSearchDto>(s =>
-            s.Query(q => _queryContainerProvider.Provide(q, filter)));
+            s.Query(q => _queryDirectorFactory.CreateQueryDirector(filter.SearchMode, q).Direct(filter)));
         return searchResponse.Hits.Select(s => s.Source).ToImmutableList();
     }
 
