@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AnSumeri.API.Domain.Search;
+using AnSumeri.API.Domain.Search.Filters;
 
 namespace AnSumeri.API.Domain.Contracts;
 
@@ -13,7 +14,7 @@ public interface IArticleSearchRepository
 
     Task RemoveManyAsync(IEnumerable<int> identifiers);
 
-    Task<ArticleSearchDto> FindOne(ArticleSearchFilter filter);
+    Task<ArticleSearchDto> FindOne(IArticleSearchFilter filter);
 
-    Task<IImmutableList<ArticleSearchDto>> Find(ArticleSearchFilter filter);
+    Task<IImmutableList<ArticleSearchDto>> Find(IArticleSearchFilter filter);
 }
