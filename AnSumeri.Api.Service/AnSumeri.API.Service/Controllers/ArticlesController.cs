@@ -1,7 +1,9 @@
-using MediatR;
+using System.Collections.Immutable;
 using Microsoft.AspNetCore.Mvc;
-using AnSumeri.API.Application.Articles.Commands.Add;
-using AnSumeri.API.Application.OperationStatuses;
+
+using MediatR;
+
+using AnSumeri.API.Application.Articles.Queries.FindArticlesByPattern;
 using AnSumeri.API.Service.Contracts.Requests;
 
 namespace AnSumeri.API.Service.Controllers
@@ -35,7 +37,18 @@ namespace AnSumeri.API.Service.Controllers
         public async Task<IActionResult> GetArticleById([FromRoute] int id, CancellationToken cancellationToken)
         {
             GetOneArticleById query = new(id, HttpContext.GetUserId());
-            ResultDto<ArticleDto> queryResult = await this._mediator.Send(query, cancellationToken);
+            ResultDto<ArticleDto> queryResult = await _mediator.Send(query, cancellationToken);
+            return queryResult.ToHttpObjectResult();
+        }
+
+        [HttpGet("search")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ImmutableList<FindArticlesByPatternResult>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> FindArticlesByPatternAcross([FromQuery] string searchPattern,
+            CancellationToken cancellationToken)
+        {
+            FindArticlesByPattern query = new(HttpContext.GetUserId(), searchPattern);
+            ResultDto<ImmutableList<FindArticlesByPatternResult>> queryResult = await _mediator.Send(query, cancellationToken);
             return queryResult.ToHttpObjectResult();
         }
 
@@ -49,7 +62,7 @@ namespace AnSumeri.API.Service.Controllers
             CancellationToken cancellationToken)
         {
             MoveArticle request = new(id, HttpContext.GetUserId(), moveToCategoryId);
-            ResultDto commandResult = await this._mediator.Send(request, cancellationToken);
+            ResultDto commandResult = await _mediator.Send(request, cancellationToken);
             return commandResult.ToHttpObjectResult();
         }
 
@@ -64,7 +77,7 @@ namespace AnSumeri.API.Service.Controllers
         {
             AnSumeri.API.Application.Articles.Commands.Update.UpdateArticle request = new(id, HttpContext.GetUserId(),
                 updateArticleRequest.Title, updateArticleRequest.Content);
-            ResultDto commandResult = await this._mediator.Send(request, cancellationToken);
+            ResultDto commandResult = await _mediator.Send(request, cancellationToken);
             return commandResult.ToHttpObjectResult();
         }
 
@@ -76,7 +89,7 @@ namespace AnSumeri.API.Service.Controllers
         public async Task<IActionResult> DeleteArticle([FromRoute] int id, CancellationToken cancellationToken)
         {
             AnSumeri.API.Application.Articles.Commands.Delete.DeleteArticle request = new(id, HttpContext.GetUserId());
-            ResultDto<int> commandResult = await this._mediator.Send(request, cancellationToken);
+            ResultDto<int> commandResult = await _mediator.Send(request, cancellationToken);
             return commandResult.ToHttpObjectResult();
         }
     }
